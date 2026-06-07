@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="uz" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kiyim Magazini - Web Daftar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="src/styles/style.css" />
+    <link rel="icon" href="src/images/web-daftar.png" />
+  </head>
+
+  <body>
+    <div class="main-background"></div>
+    <div class="backdrop-blur">
+      <div class="max-w-6xl mx-auto px-4 py-6 md:py-10">
+        <div class="flex justify-between items-center mb-5 md:mb-8">
+          <!-- Header section -->
+          <div class="flex items-center gap-1.5 md:gap-3 animate-fade-in">
+            <img
+              class="w-14 md:w-16 rounded-md md:rounded-xl mx-auto"
+              src="src/images/web-daftar.png"
+              alt=""
+            />
+            <!-- <i class="fas fa-store text-5xl mb-4 text-blue-600"></i> -->
+            <div>
+              <h1 class="text-lg sm:text-2xl md:text-4xl font-bold text-white">Kiyim Magazini</h1>
+              <p class="text-gray-200 text-sm sm:text-base md:text-xl">Qarz Daftar Tizimi</p>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <a
+              href="src/pages/diagram.html"
+              class="submit-button px-5 py-2 rounded-full shadow font-semibold whitespace-nowrap"
+            >
+              <i class="fas fa-chart-line mr-2"></i> Diagrama
+            </a>
+          </div>
+        </div>
+
+        <!-- Stats cards -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 animate-slide-up"
+        >
+          <div
+            class="hidden md:inline bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg"
+          >
+            <div class="flex items-center">
+              <i class="fas fa-users text-3xl text-blue-500 mr-4"></i>
+              <div>
+                <h3 class="text-xl font-semibold">Jami mijozlar</h3>
+                <p id="totalCustomers" class="text-2xl font-bold text-blue-600">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-money-bill-wave text-3xl text-green-500 mr-4"
+              ></i>
+              <div>
+                <h3 class="text-xl font-semibold">Jami qarzlar</h3>
+                <p id="totalDebt" class="text-2xl font-bold text-green-600">
+                  0 so'm
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="hidden md:inline bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg"
+          >
+            <div class="flex items-center">
+              <i class="fas fa-clock text-3xl text-red-500 mr-4"></i>
+              <div>
+                <h3 class="text-xl font-semibold">Muddati o'tgan</h3>
+                <p id="overdueDebts" class="text-2xl font-bold text-red-600">
+                  0
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Yangi qarz qo'shish formasi -->
+        <div
+          class="mx-auto my-5 md:my-8 bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-2xl animate-slide-up"
+        >
+          <div class="flex justify-center md:justify-start items-center mb-2 md:mb-6 mt-0 md:mt-2">
+            <i class="fas fa-plus-circle text-2xl md:text-3xl text-blue-500 mr-1 md:mr-3"></i>
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800">
+              Yangi Qarz Qo'shish
+            </h2>
+          </div>
+          <form id="qarzForm" class="space-y-2 md:space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-6">
+              <!-- Mijoz ismi -->
+              <div class="form-group relative">
+                <input
+                  class="w-full p-2 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  type="text"
+                  id="mijozIsmi"
+                  placeholder="Mijoz ismini kiriting"
+                  required
+                />
+                <i
+                  class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                ></i>
+              </div>
+              <!-- Telefon raqami -->
+              <div class="form-group relative">
+                <input
+                  class="w-full p-2 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  type="tel"
+                  id="telefon"
+                  placeholder="Telefon raqamini kiriting"
+                  required
+                />
+                <i
+                  class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                ></i>
+              </div>
+              <!-- Mahsulot nomi -->
+              <div class="form-group relative">
+                <input
+                  class="w-full p-2 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  type="text"
+                  id="mahsulot"
+                  placeholder="Mahsulot nomini kiriting (Mahsulot 1, Mahsulot 2)"
+                  required
+                />
+                <i
+                  class="fas fa-tshirt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                ></i>
+              </div>
+              <!-- Qarz miqdori -->
+              <div class="form-group relative">
+                <input
+                  class="w-full p-2 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  type="text"
+                  id="qarzMiqdori"
+                  oninput="formatNumber(this)"
+                  required
+                  placeholder="Qarz miqdorini kiriting"
+                />
+                <i
+                  class="fas fa-money-bill-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                ></i>
+              </div>
+              <!-- Sana -->
+              <div class="form-group relative">
+                <input
+                  class="w-full p-2 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  type="date"
+                  id="sana"
+                  required
+                />
+                <i
+                  class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                ></i>
+              </div>
+              <!-- To'lash muddati -->
+              <div class="form-group relative">
+                <input
+                  class="w-full p-2 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  type="date"
+                  id="tolashMuddati"
+                  required
+                />
+                <i
+                  class="fas fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                ></i>
+              </div>
+            </div>
+            <button type="submit" class="submit-button group">
+              <span class="flex items-center justify-center">
+                <i
+                  class="fas fa-save mr-2 group-hover:translate-x-1 transition-transform"
+                ></i>
+                Qarzni saqlash
+              </span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Qarzlar ro'yxati -->
+        <div
+          class="bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-lg animate-slide-up"
+        >
+          <div
+            class="flex flex-col sm:flex-row items-center justify-between gap-0 md:gap-4 mb-4"
+          >
+            <div class="flex items-center mt-2">
+              <i class="fas fa-list text-2xl text-blue-500 mr-3"></i>
+              <h2 class="text-xl font-semibold">Qarzlar Ro'yxati</h2>
+            </div>
+            <div
+              class="flex items-center gap-1.5 md:gap-4 w-full sm:w-auto mt-2 md:mt-0 whitespace-nowrap"
+            >
+              <div class="search-box w-full sm:w-auto flex items-center">
+                <i class="fas fa-search search-icon"></i>
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="Qidiruv..."
+                  class="search-input"
+                />
+              </div>
+              <button
+                onclick="exportToExcel()"
+                class="bg-green-500 hover:bg-green-600 text-white px-9 md:px-4 py-3 md:py-2 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-file-excel mr-0 md:mr-2"></i>
+                <span class="hidden sm:inline">Excelga export</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter tugmalari -->
+          <div class="grid grid-cols-4 gap-2 mb-2 md:mb-4">
+            <button
+              onclick="filterQarzlar('all')"
+              class="filter-btn text-center active flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 hover:text-white transition-colors whitespace-nowrap"
+              data-filter="all"
+            >
+              <i class="fas fa-list"></i>
+              <span class="hidden sm:inline">Barchasi</span>
+            </button>
+            <button
+              onclick="filterQarzlar('tolangan')"
+              class="filter-btn flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-full bg-green-500 text-white hover:bg-green-600 hover:text-white transition-colors whitespace-nowrap"
+              data-filter="tolangan"
+            >
+              <i class="fas fa-check"></i>
+              <span class="hidden sm:inline">To'langan</span>
+            </button>
+            <button
+              onclick="filterQarzlar('tolanmagan')"
+              class="filter-btn flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-full bg-yellow-500 text-white hover:bg-yellow-600 hover:text-white transition-colors whitespace-nowrap"
+              data-filter="tolanmagan"
+            >
+              <i class="fas fa-clock"></i>
+              <span class="hidden sm:inline">To'lanmagan</span>
+            </button>
+            <button
+              onclick="filterQarzlar('muddatiOtgan')"
+              class="filter-btn flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 hover:text-white transition-colors whitespace-nowrap"
+              id="muddatiOtganBtn"
+              data-filter="muddatiOtgan"
+            >
+              <i class="fas fa-exclamation-circle"></i>
+              <span class="hidden sm:inline">Muddati o'tgan</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50/50">
+                <tr>
+                  <th class="table-header whitespace-nowrap">Mijoz</th>
+                  <th class="table-header whitespace-nowrap">Telefon</th>
+                  <th class="table-header whitespace-nowrap">Mahsulot</th>
+                  <th class="table-header whitespace-nowrap">Qarz miqdori</th>
+                  <th class="table-header whitespace-nowrap">
+                    <div class="date-filter-container">
+                      <span>Sana</span>
+                      <input
+                        type="date"
+                        id="sanaFilter"
+                        class="date-filter-input"
+                        onchange="filterByDate(this.value)"
+                      />
+                      <i class="fas fa-calendar-alt calendar-icon"></i>
+                    </div>
+                  </th>
+                  <th class="table-header whitespace-nowrap">
+                    To'lash muddati
+                  </th>
+                  <th class="table-header whitespace-nowrap">Amallar</th>
+                </tr>
+              </thead>
+              <tbody
+                id="qarzlarRoyxati"
+                class="bg-white/50 divide-y divide-gray-200"
+              >
+                <!-- JavaScript orqali to'ldiriladi -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="src/scripts/script.js"></script>
+  </body>
+</html>
