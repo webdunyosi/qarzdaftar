@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import * as XLSX from "xlsx";
 import toast from "react-hot-toast";
 import logo from "../assets/web-daftar.png";
@@ -55,7 +55,38 @@ async function sendTelegramFile(file, caption) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentUser, setCurrentUser] = useState(null);
+
+  // Activity logger helper
+  const addActivityLog = (text, type) => {
+    try {
+      const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
+      const newLog = {
+        id: Date.now(),
+        text,
+        time: new Date().toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" }),
+        type,
+      };
+      const updatedLogs = [...savedLogs, newLog].slice(-20);
+      localStorage.setItem("activity_logs", JSON.stringify(updatedLogs));
+      window.dispatchEvent(new Event("activity_logged"));
+    } catch (e) {
+      console.error("Log error", e);
+    }
+  };
+
+  // Handle scroll events from mobile BottomBar
+  useEffect(() => {
+    if (location.state?.scrollTo === "form") {
+      qarzFormRef.current?.scrollIntoView({ behavior: "smooth" });
+      navigate(location.pathname, { replace: true, state: {} });
+    } else if (location.state?.scrollTo === "list") {
+      const listEl = document.getElementById("qarzlar-list-container");
+      listEl?.scrollIntoView({ behavior: "smooth" });
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   // Form states
   const [mijozIsmi, setMijozIsmi] = useState("");
@@ -169,6 +200,7 @@ export default function Dashboard() {
           q.id === tahrirlanayotganId ? { ...q, ...yangiMalumot } : q
         );
         toast.success("Qarz ma'lumotlari muvaffaqiyatli yangilandi!");
+        addActivityLog(`Qarz yangilandi: ${mijozIsmi} (${parsedAmount.toLocaleString()} so'm)`, "edit");
 
         const message = `🔄 <b>Qarz yangilandi</b>\n\n👤 Mijoz: ${
           yangiMalumot.mijozIsmi
@@ -188,6 +220,7 @@ export default function Dashboard() {
         };
         updatedQarzlar = [...qarzlar, newQarz];
         toast.success("Yangi qarz muvaffaqiyatli qo'shildi!");
+        addActivityLog(`Yangi qarz qo'shildi: ${mijozIsmi} (${parsedAmount.toLocaleString()} so'm)`, "add");
 
         const message = `➕ <b>Yangi qarz qo'shildi</b>\n\n👤 Mijoz: ${
           yangiMalumot.mijozIsmi
@@ -248,6 +281,7 @@ export default function Dashboard() {
           updatedDebt.tolashMuddati
         ).toLocaleDateString()}`;
         sendTelegramMessage(message);
+        addActivityLog(`Qarz to'landi: ${q.mijozIsmi} (${q.qarzMiqdori.toLocaleString()} so'm)`, "pay");
 
         return updatedDebt;
       }
@@ -282,6 +316,7 @@ export default function Dashboard() {
         target.tolashMuddati
       ).toLocaleDateString()}`;
       sendTelegramMessage(message);
+      addActivityLog(`Qarz o'chirildi: ${target.mijozIsmi}`, "delete");
     }
 
     setQarzlar(updated);
@@ -643,7 +678,7 @@ export default function Dashboard() {
           </div>
 
           {/* Qarzlar ro'yxati */}
-          <div className="bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-lg animate-slide-up">
+          <div id="qarzlar-list-container" className="bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-lg animate-slide-up">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
               <div className="flex items-center">
                 <i className="fas fa-list text-2xl text-blue-500 mr-3"></i>

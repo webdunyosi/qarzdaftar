@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Diagram from "./pages/Diagram";
+import BottomBar from "./components/BottomBar";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <BottomBar />
       </Router>
       <Toaster position="top-center" reverseOrder={false} />
     </>
