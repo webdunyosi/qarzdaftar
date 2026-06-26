@@ -30,6 +30,21 @@ export default function Profile() {
     });
   }, [navigate]);
 
+  const clearLogs = () => {
+    localStorage.setItem("activity_logs", JSON.stringify([]));
+    setLogs([]);
+  };
+
+  const getLogIcon = (type) => {
+    switch (type) {
+      case "add": return { icon: "fa-plus-circle", bg: "bg-green-100 text-green-600" };
+      case "edit": return { icon: "fa-edit", bg: "bg-yellow-100 text-yellow-600" };
+      case "delete": return { icon: "fa-trash", bg: "bg-red-100 text-red-600" };
+      case "pay": return { icon: "fa-check-circle", bg: "bg-blue-100 text-blue-600" };
+      default: return { icon: "fa-info-circle", bg: "bg-gray-100 text-gray-600" };
+    }
+  };
+
   const handleLogout = () => {
     sessionStorage.removeItem("currentUser");
     toast.success("Tizimdan chiqildi!");
@@ -193,6 +208,52 @@ export default function Profile() {
               </div>
               <i className="fas fa-chevron-right text-gray-300 text-xs flex-shrink-0"></i>
             </div>
+          </div>
+
+          {/* Notifications Section */}
+          <div className="bg-white rounded-2xl overflow-hidden shadow-xl animate-slide-up">
+            <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <i className="fas fa-bell text-base"></i>
+                </div>
+                <div>
+                  <p className="text-gray-800 font-semibold text-sm">Bildirishnomalar</p>
+                  <p className="text-gray-400 text-xs">{logs.length} ta faoliyat</p>
+                </div>
+              </div>
+              {logs.length > 0 && (
+                <button
+                  onClick={clearLogs}
+                  className="text-xs text-red-500 font-semibold hover:text-red-600 transition"
+                >
+                  Tozalash
+                </button>
+              )}
+            </div>
+            {logs.length === 0 ? (
+              <div className="text-center py-8 px-4">
+                <i className="fas fa-bell-slash text-2xl text-gray-300 mb-2"></i>
+                <p className="text-gray-400 text-sm">Bildirishnomalar mavjud emas</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {[...logs].reverse().slice(0, 6).map((log) => {
+                  const ic = getLogIcon(log.type);
+                  return (
+                    <div key={log.id} className="flex items-center gap-3 px-4 py-3">
+                      <div className={`w-8 h-8 ${ic.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                        <i className={`fas ${ic.icon} text-xs`}></i>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-gray-700 text-sm truncate">{log.text}</p>
+                        <p className="text-gray-400 text-xs">{log.time}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Logout Button */}

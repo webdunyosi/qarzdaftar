@@ -8,7 +8,16 @@ import Diagram from "./pages/Diagram";
 import AddDebt from "./pages/AddDebt";
 import DebtsList from "./pages/DebtsList";
 import Profile from "./pages/Profile";
+import Home from "./pages/Home";
 import BottomBar from "./components/BottomBar";
+
+// Smart root: mobile → Home, desktop → Dashboard
+function RootPage() {
+  if (window.innerWidth < 768) {
+    return <Home />;
+  }
+  return <Dashboard />;
+}
 
 export default function App() {
   return (
@@ -20,7 +29,7 @@ export default function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <RootPage />
               </ProtectedRoute>
             }
           />
