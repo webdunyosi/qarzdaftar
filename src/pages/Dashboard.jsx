@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
+import toast from "react-hot-toast";
 import logo from "../assets/web-daftar.png";
 
 // Telegram configurations
@@ -136,7 +137,7 @@ export default function Dashboard() {
     e.preventDefault();
 
     if (!mijozIsmi || !telefon || !mahsulot || !qarzMiqdori || !sana || !tolashMuddati) {
-      alert("Iltimos, barcha maydonlarni to'ldiring!");
+      toast.error("Iltimos, barcha maydonlarni to'ldiring!");
       return;
     }
 
@@ -161,7 +162,7 @@ export default function Dashboard() {
         updatedQarzlar = qarzlar.map((q) =>
           q.id === tahrirlanayotganId ? { ...q, ...yangiMalumot } : q
         );
-        alert("Qarz ma'lumotlari muvaffaqiyatli yangilandi!");
+        toast.success("Qarz ma'lumotlari muvaffaqiyatli yangilandi!");
 
         const message = `🔄 <b>Qarz yangilandi</b>\n\n👤 Mijoz: ${
           yangiMalumot.mijozIsmi
@@ -180,7 +181,7 @@ export default function Dashboard() {
           ...yangiMalumot,
         };
         updatedQarzlar = [...qarzlar, newQarz];
-        alert("Yangi qarz muvaffaqiyatli qo'shildi!");
+        toast.success("Yangi qarz muvaffaqiyatli qo'shildi!");
 
         const message = `➕ <b>Yangi qarz qo'shildi</b>\n\n👤 Mijoz: ${
           yangiMalumot.mijozIsmi
@@ -199,7 +200,7 @@ export default function Dashboard() {
       resetForm();
     } catch (error) {
       console.error("Xatolik yuz berdi:", error);
-      alert("Ma'lumotlarni saqlashda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring.");
+      toast.error("Ma'lumotlarni saqlashda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring.");
     }
   };
 
@@ -341,10 +342,10 @@ export default function Dashboard() {
       XLSX.writeFile(wb, fileName);
       await sendTelegramFile(file, caption);
 
-      alert("Excel fayli yuklandi va Telegram kanalga yuborildi!");
+      toast.success("Excel fayli yuklandi va Telegram kanalga yuborildi!");
     } catch (error) {
       console.error("Excel yaratishda xatolik:", error);
-      alert("Excel faylini yaratishda xatolik yuz berdi!");
+      toast.error("Excel faylini yaratishda xatolik yuz berdi!");
     }
   };
 

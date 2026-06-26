@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import logo from "../assets/web-daftar.png";
 
 const USERS = [
@@ -56,7 +57,7 @@ export default function Login() {
 
       navigate("/");
     } else {
-      alert("Login yoki parol noto'g'ri!");
+      toast.error("Login yoki parol noto'g'ri!");
     }
   };
 
