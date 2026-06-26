@@ -75,6 +75,12 @@ export default function Dashboard() {
   const [sanaFilter, setSanaFilter] = useState("");
   const [filterType, setFilterType] = useState("all");
 
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    onConfirm: null,
+  });
+
   const dailyReportTimeoutRef = useRef(null);
   const qarzFormRef = useRef(null);
 
@@ -254,26 +260,34 @@ export default function Dashboard() {
 
   // Delete debt
   const qarzniOchirish = (id) => {
-    if (window.confirm("Bu qarzni o'chirishni xohlaysizmi?")) {
-      const target = qarzlar.find((q) => q.id === id);
-      const updated = qarzlar.filter((q) => q.id !== id);
+    setConfirmModal({
+      isOpen: true,
+      message: "Bu qarzni o'chirishni xohlaysizmi?",
+      onConfirm: () => executeDelete(id),
+    });
+  };
 
-      if (target) {
-        const message = `❌ <b>Qarz o'chirildi</b>\n\n👤 Mijoz: ${
-          target.mijozIsmi
-        }\n📱 Telefon: ${target.telefon}\n👕 Mahsulot: ${
-          target.mahsulot
-        }\n💰 Qarz miqdori: ${target.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
-          target.sana
-        ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
-          target.tolashMuddati
-        ).toLocaleDateString()}`;
-        sendTelegramMessage(message);
-      }
+  const executeDelete = (id) => {
+    const target = qarzlar.find((q) => q.id === id);
+    const updated = qarzlar.filter((q) => q.id !== id);
 
-      setQarzlar(updated);
-      localStorage.setItem("qarzlar", JSON.stringify(updated));
+    if (target) {
+      const message = `❌ <b>Qarz o'chirildi</b>\n\n👤 Mijoz: ${
+        target.mijozIsmi
+      }\n📱 Telefon: ${target.telefon}\n👕 Mahsulot: ${
+        target.mahsulot
+      }\n💰 Qarz miqdori: ${target.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
+        target.sana
+      ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
+        target.tolashMuddati
+      ).toLocaleDateString()}`;
+      sendTelegramMessage(message);
     }
+
+    setQarzlar(updated);
+    localStorage.setItem("qarzlar", JSON.stringify(updated));
+    toast.success("Qarz muvaffaqiyatli o'chirildi!");
+    setConfirmModal({ isOpen: false, message: "", onConfirm: null });
   };
 
   // Export to Excel
@@ -605,7 +619,7 @@ export default function Dashboard() {
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className={`submit-button w-full py-3 rounded-full text-white font-semibold transition ${
+                  className={`submit-button flex-1 py-3 rounded-full text-white font-semibold transition ${
                     tahrirlanayotganId ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-500 hover:bg-blue-600"
                   }`}
                 >
@@ -619,7 +633,7 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="bg-gray-400 hover:bg-gray-500 text-white font-semibold px-6 py-3 rounded-full transition"
+                    className="bg-gray-400 hover:bg-gray-500 text-white font-semibold px-8 py-3 rounded-full transition whitespace-nowrap"
                   >
                     Bekor qilish
                   </button>
@@ -862,6 +876,34 @@ export default function Dashboard() {
 
         </div>
       </div>
+
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl max-w-md w-full p-6 text-center animate-slide-up border border-indigo-100">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+              <i className="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Tasdiqlash</h3>
+            <p className="text-gray-600 mb-6">{confirmModal.message}</p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => {
+                  if (confirmModal.onConfirm) confirmModal.onConfirm();
+                }}
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-full transition shadow-md cursor-pointer"
+              >
+                Ha, o'chirish
+              </button>
+              <button
+                onClick={() => setConfirmModal({ isOpen: false, message: "", onConfirm: null })}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-6 py-2 rounded-full transition cursor-pointer"
+              >
+                Bekor qilish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
