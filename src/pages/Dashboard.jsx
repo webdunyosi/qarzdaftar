@@ -245,6 +245,10 @@ export default function Dashboard() {
 
   // Start edit mode
   const qarzniTahrirlash = (qarz) => {
+    if (window.innerWidth < 768) {
+      navigate("/add-debt", { state: { editDebt: qarz } });
+      return;
+    }
     setTahrirlanayotganId(qarz.id);
     setMijozIsmi(qarz.mijozIsmi);
     setTelefon(qarz.telefon);
@@ -539,7 +543,7 @@ export default function Dashboard() {
           {/* Yangi qarz qo'shish formasi */}
           <div
             ref={qarzFormRef}
-            className="mx-auto my-5 md:my-8 bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-2xl animate-slide-up"
+            className="hidden md:block mx-auto my-5 md:my-8 bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-2xl animate-slide-up"
           >
             <div className="flex justify-center md:justify-start items-center mb-2 md:mb-6 mt-0 md:mt-2">
               <i className="fas fa-plus-circle text-2xl md:text-3xl text-blue-500 mr-1 md:mr-3"></i>

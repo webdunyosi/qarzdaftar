@@ -87,12 +87,7 @@ export default function BottomBar() {
         }
       }
     } else if (tab === "form") {
-      if (location.pathname !== "/") {
-        navigate("/", { state: { scrollTo: "form" } });
-      } else {
-        const formEl = document.querySelector("form");
-        formEl?.scrollIntoView({ behavior: "smooth" });
-      }
+      navigate("/add-debt");
     }
   };
 
@@ -120,7 +115,7 @@ export default function BottomBar() {
       case "pay":
         return "fa-check-circle text-blue-400";
       default:
-        return "fa-info-circle text-indigo-400";
+        return "fa-info-circle text-blue-400";
     }
   };
 
@@ -146,7 +141,7 @@ export default function BottomBar() {
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-white font-bold text-lg flex items-center gap-2">
-            <i className="fas fa-bell text-indigo-400 animate-pulse"></i>
+            <i className="fas fa-bell text-blue-500 animate-pulse"></i>
             Bildirishnomalar
           </h3>
           {logs.length > 0 && (
@@ -189,13 +184,13 @@ export default function BottomBar() {
         }`}
       >
         <div className="text-center mb-6">
-          <div className="w-20 h-20 bg-indigo-500/10 border-2 border-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
-            <i className="fas fa-user-tie text-4xl text-indigo-400"></i>
+          <div className="w-20 h-20 bg-blue-500/10 border-2 border-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+            <i className="fas fa-user-tie text-4xl text-blue-500"></i>
           </div>
           <h3 className="text-white font-bold text-xl capitalize">
             {currentUser?.username || "Mehmon"}
           </h3>
-          <p className="text-xs text-indigo-400 mt-1 font-semibold uppercase tracking-wider">
+          <p className="text-xs text-blue-500 mt-1 font-semibold uppercase tracking-wider">
             {currentUser?.role === "admin" ? "Tizim Administratori" : "Operator / User"}
           </p>
         </div>
@@ -224,7 +219,7 @@ export default function BottomBar() {
         <button
           onClick={() => handleTabClick("diagram")}
           className={`flex flex-col items-center justify-center flex-1 transition ${
-            location.pathname === "/diagram" ? "text-indigo-400" : "text-zinc-400 hover:text-indigo-400"
+            location.pathname === "/diagram" ? "text-blue-500" : "text-zinc-400 hover:text-blue-500"
           }`}
         >
           <i className="fas fa-chart-line text-lg mb-0.5"></i>
@@ -234,7 +229,7 @@ export default function BottomBar() {
         {/* Tab 2: Qarzlar ro'yxati */}
         <button
           onClick={() => handleTabClick("qarzlar")}
-          className="flex flex-col items-center justify-center flex-1 text-zinc-400 hover:text-indigo-400 transition"
+          className="flex flex-col items-center justify-center flex-1 text-zinc-400 hover:text-blue-500 transition"
         >
           <i className="fas fa-list-ul text-lg mb-0.5"></i>
           <span className="text-[9px] font-semibold">Qarzlar</span>
@@ -244,7 +239,7 @@ export default function BottomBar() {
         <div className="flex-1 flex justify-center -mt-7 relative">
           <button
             onClick={() => handleTabClick("form")}
-            className="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center shadow-lg border-4 border-zinc-950 transition active:scale-95 duration-200"
+            className="w-14 h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg border-4 border-zinc-950 transition active:scale-95 duration-200"
             title="Qarz qo'shish"
           >
             <i className="fas fa-plus text-lg"></i>
@@ -258,7 +253,7 @@ export default function BottomBar() {
             setIsNotificationOpen(!isNotificationOpen);
           }}
           className={`flex flex-col items-center justify-center flex-1 transition relative ${
-            isNotificationOpen ? "text-indigo-400" : "text-zinc-400 hover:text-indigo-400"
+            isNotificationOpen ? "text-blue-500" : "text-zinc-400 hover:text-blue-500"
           }`}
         >
           <i className="fas fa-bell text-lg mb-0.5"></i>
@@ -275,7 +270,7 @@ export default function BottomBar() {
             setIsProfileOpen(!isProfileOpen);
           }}
           className={`flex flex-col items-center justify-center flex-1 transition ${
-            isProfileOpen ? "text-indigo-400" : "text-zinc-400 hover:text-indigo-400"
+            isProfileOpen ? "text-blue-500" : "text-zinc-400 hover:text-blue-500"
           }`}
         >
           <i className="fas fa-user-circle text-lg mb-0.5"></i>
