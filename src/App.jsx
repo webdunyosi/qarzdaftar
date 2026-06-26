@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Diagram from "./pages/Diagram";
 import AddDebt from "./pages/AddDebt";
+import DebtsList from "./pages/DebtsList";
 import BottomBar from "./components/BottomBar";
 
 export default function App() {
@@ -35,6 +36,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AddDebt />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/debts"
+            element={
+              <ProtectedRoute>
+                <DebtsList />
               </ProtectedRoute>
             }
           />

@@ -682,7 +682,7 @@ export default function Dashboard() {
           </div>
 
           {/* Qarzlar ro'yxati */}
-          <div id="qarzlar-list-container" className="bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-lg animate-slide-up">
+          <div id="qarzlar-list-container" className="hidden md:block bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-lg animate-slide-up">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
               <div className="flex items-center">
                 <i className="fas fa-list text-2xl text-blue-500 mr-3"></i>

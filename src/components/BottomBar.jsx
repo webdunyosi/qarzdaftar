@@ -74,18 +74,7 @@ export default function BottomBar() {
     if (tab === "diagram") {
       navigate("/diagram");
     } else if (tab === "qarzlar") {
-      if (location.pathname !== "/") {
-        navigate("/", { state: { scrollTo: "list" } });
-      } else {
-        const listEl = document.getElementById("qarzlar-list-container");
-        if (listEl) {
-          listEl.scrollIntoView({ behavior: "smooth" });
-        } else {
-          // Fallback to table element scroll
-          const tableEl = document.querySelector("table");
-          tableEl?.scrollIntoView({ behavior: "smooth" });
-        }
-      }
+      navigate("/debts");
     } else if (tab === "form") {
       navigate("/add-debt");
     }
@@ -229,7 +218,9 @@ export default function BottomBar() {
         {/* Tab 2: Qarzlar ro'yxati */}
         <button
           onClick={() => handleTabClick("qarzlar")}
-          className="flex flex-col items-center justify-center flex-1 text-zinc-400 hover:text-blue-500 transition"
+          className={`flex flex-col items-center justify-center flex-1 transition ${
+            location.pathname === "/debts" ? "text-blue-500" : "text-zinc-400 hover:text-blue-500"
+          }`}
         >
           <i className="fas fa-list-ul text-lg mb-0.5"></i>
           <span className="text-[9px] font-semibold">Qarzlar</span>
