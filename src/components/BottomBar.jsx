@@ -166,41 +166,6 @@ export default function BottomBar() {
         )}
       </div>
 
-      {/* Profile Drawer */}
-      <div
-        className={`md:hidden fixed left-0 right-0 bg-zinc-900 border-t border-zinc-800 rounded-t-3xl p-6 shadow-2xl z-40 transition-transform duration-300 ${
-          isProfileOpen ? "translate-y-0 bottom-16" : "translate-y-full bottom-0"
-        }`}
-      >
-        <div className="text-center mb-6">
-          <div className="w-20 h-20 bg-blue-500/10 border-2 border-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
-            <i className="fas fa-user-tie text-4xl text-blue-500"></i>
-          </div>
-          <h3 className="text-white font-bold text-xl capitalize">
-            {currentUser?.username || "Mehmon"}
-          </h3>
-          <p className="text-xs text-blue-500 mt-1 font-semibold uppercase tracking-wider">
-            {currentUser?.role === "admin" ? "Tizim Administratori" : "Operator / User"}
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-4 flex justify-between items-center">
-            <span className="text-sm text-zinc-400">Foydalanuvchi roli</span>
-            <span className="text-sm text-zinc-200 capitalize font-medium">
-              {currentUser?.role || "-"}
-            </span>
-          </div>
-
-          <button
-            onClick={handleLogout}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md"
-          >
-            <i className="fas fa-sign-out-alt"></i>
-            Tizimdan chiqish
-          </button>
-        </div>
-      </div>
 
       {/* Navigation Bottom Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-zinc-950/95 border-t border-zinc-800/60 backdrop-blur-lg px-2 flex justify-between items-center h-16 shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
@@ -258,10 +223,10 @@ export default function BottomBar() {
         <button
           onClick={() => {
             setIsNotificationOpen(false);
-            setIsProfileOpen(!isProfileOpen);
+            navigate("/profile");
           }}
           className={`flex flex-col items-center justify-center flex-1 transition ${
-            isProfileOpen ? "text-blue-500" : "text-zinc-400 hover:text-blue-500"
+            location.pathname === "/profile" ? "text-blue-500" : "text-zinc-400 hover:text-blue-500"
           }`}
         >
           <i className="fas fa-user-circle text-lg mb-0.5"></i>

@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Diagram from "./pages/Diagram";
 import AddDebt from "./pages/AddDebt";
 import DebtsList from "./pages/DebtsList";
+import Profile from "./pages/Profile";
 import BottomBar from "./components/BottomBar";
 
 export default function App() {
@@ -44,6 +45,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <DebtsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />
