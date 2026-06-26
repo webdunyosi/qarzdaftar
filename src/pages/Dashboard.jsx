@@ -90,23 +90,6 @@ export default function Dashboard() {
     const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
     setQarzlar(savedQarzlar);
 
-    // Restore draft form data if exists
-    const savedDraft = localStorage.getItem("formData");
-    if (savedDraft) {
-      try {
-        const draft = JSON.parse(savedDraft);
-        if (draft.mijozIsmi) setMijozIsmi(draft.mijozIsmi);
-        if (draft.telefon) setTelefon(draft.telefon);
-        if (draft.mahsulot) setMahsulot(draft.mahsulot);
-        if (draft.customProduct) setCustomProduct(draft.customProduct);
-        if (draft.qarzMiqdori) setQarzMiqdori(draft.qarzMiqdori);
-        if (draft.sana) setSana(draft.sana);
-        if (draft.tolashMuddati) setTolashMuddati(draft.tolashMuddati);
-      } catch (e) {
-        console.error("Draft error", e);
-      }
-    }
-
     // Schedule daily report
     scheduleDailyReport();
 
@@ -116,20 +99,6 @@ export default function Dashboard() {
       }
     };
   }, [navigate]);
-
-  // Save Draft Form Data automatically
-  useEffect(() => {
-    const draft = {
-      mijozIsmi,
-      telefon,
-      mahsulot,
-      customProduct,
-      qarzMiqdori,
-      sana,
-      tolashMuddati,
-    };
-    localStorage.setItem("formData", JSON.stringify(draft));
-  }, [mijozIsmi, telefon, mahsulot, customProduct, qarzMiqdori, sana, tolashMuddati]);
 
   // Format amount input as user types
   const handleAmountChange = (e) => {
@@ -160,7 +129,6 @@ export default function Dashboard() {
     setSana("");
     setTolashMuddati("");
     setTahrirlanayotganId(null);
-    localStorage.removeItem("formData");
   };
 
   // Submit / Add or Edit Debt

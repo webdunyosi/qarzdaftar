@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
-/* Input stillarini sozlash */
-input {
-  border: 1px solid #e2e8f0;
-  padding: 0.5rem;
+@layer base {
+  /* Input stillarini sozlash */
+  input {
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem;
+  }
 }
 
 /* Jadval qatorlari uchun hover effekti */
