@@ -99,7 +99,7 @@ export default function Profile() {
         <div className="px-4 pt-6 pb-2 flex items-center gap-3">
           <button
             onClick={() => navigate("/")}
-            className="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full hidden md:flex items-center justify-center transition active:scale-95 border border-slate-200"
+            className="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full md:hidden flex items-center justify-center transition active:scale-95 border border-slate-200"
           >
             <i className="fas fa-arrow-left text-sm"></i>
           </button>

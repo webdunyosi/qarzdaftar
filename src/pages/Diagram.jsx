@@ -129,7 +129,7 @@ export default function Diagram() {
     plugins: {
       legend: {
         labels: {
-          color: "#fff",
+          color: "#475569",
           font: {
             size: window.innerWidth < 640 ? 11 : 14,
             weight: "bold",
@@ -141,7 +141,7 @@ export default function Diagram() {
         align: "center",
       },
       tooltip: {
-        backgroundColor: "#18181b",
+        backgroundColor: "rgba(15, 23, 42, 0.95)",
         titleColor: "#fff",
         bodyColor: "#fff",
         borderColor: "#6366f1",
@@ -164,23 +164,23 @@ export default function Diagram() {
     scales: {
       x: {
         ticks: {
-          color: "#c7d2fe",
+          color: "#64748b",
           font: {
             size: window.innerWidth < 640 ? 10 : 13,
           },
         },
-        grid: { color: "rgba(255, 255, 255, 0.05)" },
+        grid: { color: "rgba(0, 0, 0, 0.05)" },
       },
       y: {
         beginAtZero: true,
         ticks: {
-          color: "#c7d2fe",
+          color: "#64748b",
           font: {
             size: window.innerWidth < 640 ? 10 : 13,
           },
           stepSize: 1,
         },
-        grid: { color: "rgba(255, 255, 255, 0.08)" },
+        grid: { color: "rgba(0, 0, 0, 0.05)" },
       },
     },
   };
@@ -201,7 +201,7 @@ export default function Diagram() {
           </div>
         </div>
       </div>
-      <div className="flex justify-center mt-6">
+      <div className="flex justify-center mt-6 md:hidden">
         <Link
           to="/"
           className="text-indigo-600 hover:text-indigo-700 hover:underline text-lg font-semibold flex items-center gap-2"

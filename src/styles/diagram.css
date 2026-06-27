@@ -8,27 +8,27 @@ body {
   position: relative;
 }
 .chart-container {
-  background: rgba(24, 24, 27, 0.7);
+  background: rgba(255, 255, 255, 0.85);
   border-radius: 2rem;
-  box-shadow: 0 8px 40px 0 #000a, 0 1.5px 8px 0 #6366f1cc;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
   padding: 2.5rem 2rem 2rem 2rem;
   max-width: 800px;
   margin: 4rem auto 2rem auto;
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1.5px solid rgba(99, 102, 241, 0.15);
+  border: 1.5px solid rgba(99, 102, 241, 0.1);
   position: relative;
   overflow: hidden;
 }
 .chart-title {
-  color: #fff;
+  color: #1e293b;
   font-size: 2rem;
   font-weight: 800;
   margin-bottom: 0.5rem;
   letter-spacing: 0.01em;
 }
 .chart-desc {
-  color: #c7d2fe;
+  color: #64748b;
   font-size: 1.1rem;
   margin-bottom: 2.2rem;
   font-weight: 500;
@@ -40,7 +40,7 @@ body {
   left: -60px;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, #6366f1cc 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
   z-index: 0;
   filter: blur(30px);
 }
@@ -51,7 +51,7 @@ body {
   right: -60px;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, #818cf8bb 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.08) 0%, transparent 70%);
   z-index: 0;
   filter: blur(30px);
 }
@@ -93,8 +93,9 @@ body {
     margin: 0.5rem;
     margin-top: 1.2rem;
     border-radius: 1rem;
-    box-shadow: 0 2px 8px 0 #0004, 0 1px 2px 0 #6366f1aa;
-    background: rgba(24, 24, 27, 0.85);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(99, 102, 241, 0.08);
   }
   .chart-title {
     font-size: 1.1rem;
@@ -116,7 +117,7 @@ body {
     margin-bottom: 0.5rem;
   }
   body::before {
-    opacity: 0.25;
+    opacity: 0.1;
     filter: blur(12px) brightness(0.98);
   }
 }
