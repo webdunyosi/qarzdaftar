@@ -15,7 +15,7 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
     }
     // Admin cannot access seller pages
     if (!adminOnly && user.role === "admin") {
-      return <Navigate to="/" replace />;
+      return <Navigate to="/admin" replace />;
     }
   } catch (e) {
     console.error(e);

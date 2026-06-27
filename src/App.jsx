@@ -12,22 +12,7 @@ import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
 import BottomBar from "./components/BottomBar";
 import UserLayout from "./components/UserLayout";
-
-// Smart root: admin → AdminDashboard, sellers → Home (on both desktop & mobile)
-function RootPage() {
-  const currentUserStr = sessionStorage.getItem("currentUser");
-  if (currentUserStr) {
-    try {
-      const currentUser = JSON.parse(currentUserStr);
-      if (currentUser.role === "admin") {
-        return <AdminDashboard />;
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-  return <Home />;
-}
+import AdminLayout from "./components/AdminLayout";
 
 export default function App() {
   return (
@@ -36,19 +21,30 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           
-          {/* User Routes Wrapped in Layout */}
+          {/* User (Seller) Routes Wrapped in UserLayout */}
           <Route
             element={
-              <ProtectedRoute>
+              <ProtectedRoute adminOnly={false}>
                 <UserLayout />
               </ProtectedRoute>
             }
           >
-            <Route path="/" element={<RootPage />} />
+            <Route path="/" element={<Home />} />
             <Route path="/diagram" element={<Diagram />} />
             <Route path="/add-debt" element={<AddDebt />} />
             <Route path="/debts" element={<DebtsList />} />
             <Route path="/profile" element={<Profile />} />
+          </Route>
+
+          {/* Admin Routes Wrapped in AdminLayout */}
+          <Route
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/admin" element={<AdminDashboard />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

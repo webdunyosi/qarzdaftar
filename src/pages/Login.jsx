@@ -85,7 +85,11 @@ export default function Login() {
         })
       );
 
-      navigate("/");
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } else {
       toast.error("Login yoki parol noto'g'ri!");
     }

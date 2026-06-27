@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import logo from "../assets/web-daftar.png";
-
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(null);
   
   // Lists loaded from localStorage
   const [users, setUsers] = useState([]);
   const [qarzlar, setQarzlar] = useState([]);
   const [broadcasts, setBroadcasts] = useState([]);
   
-  // Tab state: "sellers", "all_debts", "notifications", "settings"
-  const [activeTab, setActiveTab] = useState("sellers");
+  const [searchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "sellers";
   
   // New/Edit Seller Form state
   const [sellerUsername, setSellerUsername] = useState("");
@@ -42,7 +39,6 @@ export default function AdminDashboard() {
       navigate("/");
       return;
     }
-    setCurrentUser(loggedUser);
     setAdminUsername(loggedUser.username);
     
     // Load lists from localStorage
@@ -65,12 +61,6 @@ export default function AdminDashboard() {
     const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
     const globalBroadcasts = savedLogs.filter(log => log.type === "broadcast" || !log.seller);
     setBroadcasts(globalBroadcasts);
-  };
-  
-  const handleLogout = () => {
-    sessionStorage.removeItem("currentUser");
-    toast.success("Tizimdan chiqildi!");
-    navigate("/login");
   };
   
   // Add new seller
@@ -205,12 +195,13 @@ export default function AdminDashboard() {
       username: adminUsername.trim(),
       role: "admin"
     }));
-    setCurrentUser({
-      username: adminUsername.trim(),
-      role: "admin"
-    });
     setAdminPassword("");
     toast.success("Admin ma'lumotlari muvaffaqiyatli o'zgartirildi!");
+    
+    // Reload layout to reflect new username in the header immediately
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
   
   // Get stats for a specific seller
@@ -235,35 +226,7 @@ export default function AdminDashboard() {
   const totalSellersCount = users.filter(u => u.role === "seller").length;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 pb-20">
-      
-      {/* Header Panel */}
-      <div className="bg-white border-b border-blue-100 shadow-sm sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Logo" className="w-12 h-12 rounded-xl shadow-md" />
-            <div>
-              <h1 className="text-xl font-bold text-slate-800 leading-tight">Admin Boshqaruv Paneli</h1>
-              <p className="text-slate-500 text-xs font-semibold">Tizim holati va sotuvchilar nazorati</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <p className="text-slate-800 font-bold text-sm">@{currentUser?.username || "Admin"}</p>
-              <p className="text-blue-600 text-xs font-bold uppercase tracking-wider">Super Admin</p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="bg-red-50 hover:bg-red-100 text-red-600 px-3.5 py-2 rounded-xl border border-red-200/60 transition active:scale-95 cursor-pointer flex items-center gap-2 text-sm font-semibold"
-            >
-              <i className="fas fa-sign-out-alt"></i>
-              Chiqish
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="max-w-6xl mx-auto px-4 py-6">
         
         {/* Global Statistics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -305,45 +268,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Tab Navigation buttons */}
-        <div className="flex bg-blue-50/85 border border-blue-100/60 p-1.5 rounded-2xl mb-6 shadow-sm overflow-x-auto whitespace-nowrap">
-          <button
-            onClick={() => setActiveTab("sellers")}
-            className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition ${
-              activeTab === "sellers" ? "bg-blue-600 text-white shadow-md" : "text-slate-600 hover:text-blue-600"
-            }`}
-          >
-            <i className="fas fa-users"></i>
-            Sotuvchilar
-          </button>
-          <button
-            onClick={() => setActiveTab("all_debts")}
-            className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition ${
-              activeTab === "all_debts" ? "bg-blue-600 text-white shadow-md" : "text-slate-600 hover:text-blue-600"
-            }`}
-          >
-            <i className="fas fa-list-alt"></i>
-            Barcha Qarzlar
-          </button>
-          <button
-            onClick={() => setActiveTab("notifications")}
-            className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition ${
-              activeTab === "notifications" ? "bg-blue-600 text-white shadow-md" : "text-slate-600 hover:text-blue-600"
-            }`}
-          >
-            <i className="fas fa-bullhorn"></i>
-            Xabar Yuborish
-          </button>
-          <button
-            onClick={() => setActiveTab("settings")}
-            className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition ${
-              activeTab === "settings" ? "bg-blue-600 text-white shadow-md" : "text-slate-600 hover:text-blue-600"
-            }`}
-          >
-            <i className="fas fa-user-cog"></i>
-            Profil Sozlamalari
-          </button>
-        </div>
+
 
         {/* Tab Content 1: Sellers Management */}
         {activeTab === "sellers" && (
@@ -666,7 +591,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-      </div>
     </div>
   );
 }
