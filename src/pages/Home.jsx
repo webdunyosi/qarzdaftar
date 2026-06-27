@@ -74,6 +74,21 @@ export default function Home() {
       ? (n / 1000000).toFixed(1) + " mln"
       : n.toLocaleString("uz-UZ");
 
+  const getUzbekDate = () => {
+    const now = new Date();
+    const months = [
+      "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
+      "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
+    ];
+    const weekdays = [
+      "Yakshanba", "Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba"
+    ];
+    const day = now.getDate();
+    const month = months[now.getMonth()];
+    const weekday = weekdays[now.getDay()];
+    return `${day}-${month} ${weekday}`;
+  };
+
   const statusColor = (q) => {
     if (q.status === "To'langan") return "text-green-500";
     const d = new Date(q.tolashMuddati); d.setHours(0,0,0,0);
@@ -88,19 +103,8 @@ export default function Home() {
 
   return (
     <div>
-      {/* Bright vivid gradient background matching profile page */}
-      <div
-        className="fixed inset-0 z-[-2]"
-        style={{
-          background: "linear-gradient(160deg, #1e40af 0%, #2563eb 40%, #7c3aed 100%)",
-        }}
-      />
-      <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle, #a78bfa, transparent 70%)" }} />
-        <div className="absolute bottom-40 -left-16 w-48 h-48 rounded-full opacity-15"
-          style={{ background: "radial-gradient(circle, #60a5fa, transparent 70%)" }} />
-      </div>
+      {/* Solid white background */}
+      <div className="fixed inset-0 z-[-2]" style={{ backgroundColor: "#ffffff" }} />
 
       <div className="min-h-screen pb-24">
         {/* Header */}
@@ -108,18 +112,16 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <img src={logo} alt="Logo" className="w-10 h-10 rounded-xl shadow" />
             <div>
-              <p className="text-blue-200 text-xs font-semibold">{greet()},</p>
-              <h1 className="text-white font-bold text-lg leading-tight capitalize">
+              <p className="text-slate-500 text-xs font-semibold">{greet()},</p>
+              <h1 className="text-slate-800 font-bold text-lg leading-tight capitalize">
                 {currentUser?.username || "Admin"}
               </h1>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-blue-200 text-xs">
-              {new Date().toLocaleDateString("uz-UZ", { weekday: "long" })}
-            </p>
-            <p className="text-white font-semibold text-sm">
-              {new Date().toLocaleDateString("uz-UZ", { day: "2-digit", month: "long" })}
+            <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider">Bugun</p>
+            <p className="text-slate-700 font-bold text-sm whitespace-nowrap">
+              {getUzbekDate()}
             </p>
           </div>
         </div>
@@ -127,7 +129,7 @@ export default function Home() {
         <div className="px-4 space-y-4">
 
           {/* Main Summary Card */}
-          <div className="bg-white rounded-2xl p-5 shadow-xl animate-slide-up">
+          <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md animate-slide-up">
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1">Umumiy to'lanmagan</p>
             <p className="text-4xl font-black text-blue-700">{formatMoney(totalUnpaidAmount)} <span className="text-lg font-semibold text-blue-400">so'm</span></p>
             <div className="mt-3 flex gap-4">
@@ -135,12 +137,12 @@ export default function Home() {
                 <p className="text-gray-400 text-xs">Qarzlar soni</p>
                 <p className="text-gray-800 font-bold text-lg">{unpaid.length} ta</p>
               </div>
-              <div className="w-px bg-gray-100"></div>
+              <div className="w-px bg-blue-100"></div>
               <div>
                 <p className="text-gray-400 text-xs">Muddati o'tgan</p>
                 <p className="text-red-600 font-bold text-lg">{overdue.length} ta</p>
               </div>
-              <div className="w-px bg-gray-100"></div>
+              <div className="w-px bg-blue-100"></div>
               <div>
                 <p className="text-gray-400 text-xs">Bugun to'lanadi</p>
                 <p className="text-orange-600 font-bold text-lg">{todayDue.length} ta</p>
@@ -150,7 +152,7 @@ export default function Home() {
 
           {/* Stats Row: Daily & Monthly */}
           <div className="grid grid-cols-2 gap-3 animate-slide-up">
-            <div className="bg-white rounded-2xl p-4 shadow-lg">
+            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 shadow-md">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
                   <i className="fas fa-calendar-day text-orange-500 text-sm"></i>
@@ -160,7 +162,7 @@ export default function Home() {
               <p className="text-2xl font-black text-gray-800">{formatMoney(dailyTotal)}</p>
               <p className="text-gray-400 text-xs mt-0.5">so'm</p>
             </div>
-            <div className="bg-white rounded-2xl p-4 shadow-lg">
+            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 shadow-md">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                   <i className="fas fa-calendar-alt text-purple-500 text-sm"></i>
@@ -175,8 +177,8 @@ export default function Home() {
           {/* Today's Due Debts */}
           <div className="animate-slide-up">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-white font-bold text-base flex items-center gap-2">
-                <i className="fas fa-clock text-yellow-300"></i>
+              <h2 className="text-slate-800 font-bold text-base flex items-center gap-2">
+                <i className="fas fa-clock text-yellow-500"></i>
                 Bugun to'lanishi kerak
               </h2>
               <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full">
@@ -185,17 +187,17 @@ export default function Home() {
             </div>
 
             {todayDue.length === 0 ? (
-              <div className="bg-white/20 backdrop-blur-sm border border-white/25 rounded-2xl p-6 text-center">
-                <i className="fas fa-check-circle text-3xl text-green-300 mb-2"></i>
-                <p className="text-white font-semibold">Bugun to'lanishi kerak bo'lgan qarz yo'q</p>
-                <p className="text-blue-200 text-xs mt-1">Barcha qarzlar belgilangan!</p>
+              <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-6 text-center shadow-md">
+                <i className="fas fa-check-circle text-3xl text-green-500 mb-2"></i>
+                <p className="text-slate-700 font-semibold">Bugun to'lanishi kerak bo'lgan qarz yo'q</p>
+                <p className="text-slate-400 text-xs mt-1">Barcha qarzlar belgilangan!</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {todayDue.map((q) => (
                   <div
                     key={q.id}
-                    className="bg-white rounded-2xl p-4 shadow-lg flex items-center gap-3"
+                    className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 shadow-md flex items-center gap-3"
                   >
                     <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       <i className="fas fa-user text-orange-500"></i>
@@ -218,8 +220,8 @@ export default function Home() {
           {overdue.length > 0 && (
             <div className="animate-slide-up">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-white font-bold text-base flex items-center gap-2">
-                  <i className="fas fa-exclamation-triangle text-red-300"></i>
+                <h2 className="text-slate-800 font-bold text-base flex items-center gap-2">
+                  <i className="fas fa-exclamation-triangle text-red-500"></i>
                   Muddati o'tgan
                 </h2>
                 <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
@@ -234,14 +236,14 @@ export default function Home() {
                   return (
                     <div
                       key={q.id}
-                      className="bg-white rounded-2xl p-4 shadow-lg flex items-center gap-3 border-l-4 border-red-400"
+                      className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 shadow-md flex items-center gap-3 border-l-4 border-red-400"
                     >
                       <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
                         <i className="fas fa-user text-red-500"></i>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-gray-800 font-bold text-sm truncate">{q.mijozIsmi}</p>
-                        <p className="text-red-400 text-xs">{daysLate} kun kechikkan</p>
+                        <p className="text-red-500 text-xs">{daysLate} kun kechikkan</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-red-600 font-black text-sm">{Number(q.miqdor || 0).toLocaleString()}</p>
@@ -253,7 +255,7 @@ export default function Home() {
                 {overdue.length > 5 && (
                   <button
                     onClick={() => navigate("/debts")}
-                    className="w-full text-center text-blue-200 text-sm font-semibold py-2 hover:text-white transition"
+                    className="w-full text-center text-blue-600 text-sm font-semibold py-2 hover:text-blue-700 transition"
                   >
                     Yana {overdue.length - 5} ta ko'rish →
                   </button>
@@ -264,11 +266,11 @@ export default function Home() {
 
           {/* Quick Actions */}
           <div className="animate-slide-up">
-            <h2 className="text-white font-bold text-base mb-3">Tez harakatlar</h2>
+            <h2 className="text-slate-800 font-bold text-base mb-3">Tez harakatlar</h2>
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => navigate("/add-debt")}
-                className="bg-white rounded-2xl p-4 shadow-lg flex flex-col items-center gap-2 active:scale-95 transition"
+                className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 shadow-md flex flex-col items-center gap-2 active:scale-95 transition cursor-pointer"
               >
                 <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                   <i className="fas fa-plus text-blue-600"></i>
@@ -277,7 +279,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => navigate("/debts")}
-                className="bg-white rounded-2xl p-4 shadow-lg flex flex-col items-center gap-2 active:scale-95 transition"
+                className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 shadow-md flex flex-col items-center gap-2 active:scale-95 transition cursor-pointer"
               >
                 <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                   <i className="fas fa-list text-green-600"></i>
@@ -286,7 +288,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => navigate("/diagram")}
-                className="bg-white rounded-2xl p-4 shadow-lg flex flex-col items-center gap-2 active:scale-95 transition"
+                className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 shadow-md flex flex-col items-center gap-2 active:scale-95 transition cursor-pointer"
               >
                 <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
                   <i className="fas fa-chart-line text-purple-600"></i>

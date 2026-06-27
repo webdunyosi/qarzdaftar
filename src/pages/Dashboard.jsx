@@ -483,8 +483,8 @@ export default function Dashboard() {
             <div className="flex items-center gap-1.5 md:gap-3 animate-fade-in">
               <img className="w-14 md:w-16 rounded-md md:rounded-xl mx-auto" src={logo} alt="Logo" />
               <div>
-                <h1 className="text-lg sm:text-2xl md:text-4xl font-bold text-white">Kiyim Magazini</h1>
-                <p className="text-gray-200 text-sm sm:text-base md:text-xl">Qarz Daftar Tizimi</p>
+                <h1 className="text-lg sm:text-2xl md:text-4xl font-bold text-slate-800">Kiyim Magazini</h1>
+                <p className="text-slate-500 text-sm sm:text-base md:text-xl">Qarz Daftar Tizimi</p>
               </div>
             </div>
 
@@ -507,21 +507,21 @@ export default function Dashboard() {
 
           {/* Stats cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 animate-slide-up">
-            <div className="bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg">
+            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-md">
               <div className="flex items-center">
                 <i className="fas fa-users text-3xl text-blue-500 mr-4"></i>
                 <div>
-                  <h3 className="text-xl font-semibold">Jami mijozlar</h3>
+                  <h3 className="text-xl font-semibold text-slate-700">Jami mijozlar</h3>
                   <p className="text-2xl font-bold text-blue-600">{uniqueCustomersCount}</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg">
+            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-md">
               <div className="flex items-center">
                 <i className="fas fa-money-bill-wave text-3xl text-green-500 mr-4"></i>
                 <div>
-                  <h3 className="text-xl font-semibold">Jami qarzlar</h3>
+                  <h3 className="text-xl font-semibold text-slate-700">Jami qarzlar</h3>
                   <p className="text-2xl font-bold text-green-600">
                     {totalDebtAmount.toLocaleString()} so'm
                   </p>
@@ -529,11 +529,11 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg">
+            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-md">
               <div className="flex items-center">
                 <i className="fas fa-clock text-3xl text-red-500 mr-4"></i>
                 <div>
-                  <h3 className="text-xl font-semibold">Muddati o'tgan</h3>
+                  <h3 className="text-xl font-semibold text-slate-700">Muddati o'tgan</h3>
                   <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
                 </div>
               </div>
@@ -543,7 +543,7 @@ export default function Dashboard() {
           {/* Yangi qarz qo'shish formasi */}
           <div
             ref={qarzFormRef}
-            className="hidden md:block mx-auto my-5 md:my-8 bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-2xl animate-slide-up"
+            className="hidden md:block mx-auto my-5 md:my-8 bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-lg animate-slide-up"
           >
             <div className="flex justify-center md:justify-start items-center mb-2 md:mb-6 mt-0 md:mt-2">
               <i className="fas fa-plus-circle text-2xl md:text-3xl text-blue-500 mr-1 md:mr-3"></i>
@@ -682,7 +682,7 @@ export default function Dashboard() {
           </div>
 
           {/* Qarzlar ro'yxati */}
-          <div id="qarzlar-list-container" className="hidden md:block bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-lg animate-slide-up">
+          <div id="qarzlar-list-container" className="hidden md:block bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-4 md:p-6 rounded-lg shadow-lg animate-slide-up">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
               <div className="flex items-center">
                 <i className="fas fa-list text-2xl text-blue-500 mr-3"></i>
