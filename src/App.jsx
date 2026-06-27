@@ -11,8 +11,9 @@ import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
 import BottomBar from "./components/BottomBar";
+import UserLayout from "./components/UserLayout";
 
-// Smart root: admin → AdminDashboard, mobile → Home, desktop → Dashboard
+// Smart root: admin → AdminDashboard, sellers → Home (on both desktop & mobile)
 function RootPage() {
   const currentUserStr = sessionStorage.getItem("currentUser");
   if (currentUserStr) {
@@ -25,10 +26,7 @@ function RootPage() {
       console.error(e);
     }
   }
-  if (window.innerWidth < 768) {
-    return <Home />;
-  }
-  return <Dashboard />;
+  return <Home />;
 }
 
 export default function App() {
@@ -37,46 +35,22 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          
+          {/* User Routes Wrapped in Layout */}
           <Route
-            path="/"
             element={
               <ProtectedRoute>
-                <RootPage />
+                <UserLayout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/diagram"
-            element={
-              <ProtectedRoute>
-                <Diagram />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/add-debt"
-            element={
-              <ProtectedRoute>
-                <AddDebt />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/debts"
-            element={
-              <ProtectedRoute>
-                <DebtsList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="/" element={<RootPage />} />
+            <Route path="/diagram" element={<Diagram />} />
+            <Route path="/add-debt" element={<AddDebt />} />
+            <Route path="/debts" element={<DebtsList />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+          
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <BottomBar />
@@ -85,3 +59,4 @@ export default function App() {
     </>
   );
 }
+
