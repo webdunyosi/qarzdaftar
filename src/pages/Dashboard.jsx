@@ -479,7 +479,7 @@ export default function Dashboard() {
         <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
           
           {/* Header section */}
-          <div className="flex justify-between items-center mb-5 md:mb-8">
+          <div className="hidden md:flex justify-between items-center mb-5 md:mb-8">
             <div className="flex items-center gap-1.5 md:gap-3 animate-fade-in">
               <img className="w-14 md:w-16 rounded-md md:rounded-xl mx-auto" src={logo} alt="Logo" />
               <div>
@@ -507,7 +507,7 @@ export default function Dashboard() {
 
           {/* Stats cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 animate-slide-up">
-            <div className="hidden md:inline bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg">
+            <div className="bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg">
               <div className="flex items-center">
                 <i className="fas fa-users text-3xl text-blue-500 mr-4"></i>
                 <div>
@@ -529,7 +529,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="hidden md:inline bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg">
+            <div className="bg-white/80 backdrop-blur-md p-5 md:p-6 py-2 md:py-6 rounded-lg shadow-lg">
               <div className="flex items-center">
                 <i className="fas fa-clock text-3xl text-red-500 mr-4"></i>
                 <div>

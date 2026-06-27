@@ -192,7 +192,7 @@ export default function AddDebt() {
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => navigate("/")}
-              className="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition active:scale-95 cursor-pointer"
+              className="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full hidden md:flex items-center justify-center transition active:scale-95 cursor-pointer"
               title="Orqaga"
             >
               <i className="fas fa-arrow-left"></i>

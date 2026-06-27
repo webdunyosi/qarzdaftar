@@ -115,7 +115,7 @@ export default function Profile() {
         <div className="px-4 pt-6 pb-2 flex items-center gap-3">
           <button
             onClick={() => navigate("/")}
-            className="w-9 h-9 bg-white/25 hover:bg-white/35 text-white rounded-full flex items-center justify-center transition active:scale-95 backdrop-blur-sm border border-white/30"
+            className="w-9 h-9 bg-white/25 hover:bg-white/35 text-white rounded-full hidden md:flex items-center justify-center transition active:scale-95 backdrop-blur-sm border border-white/30"
           >
             <i className="fas fa-arrow-left text-sm"></i>
           </button>
