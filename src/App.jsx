@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
@@ -14,10 +14,30 @@ import BottomBar from "./components/BottomBar";
 import UserLayout from "./components/UserLayout";
 import AdminLayout from "./components/AdminLayout";
 
+// Component to scroll window to top on pathname or search params change
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTo(0, 0);
+      document.body.scrollTo(0, 0);
+    };
+
+    handleScroll();
+    const timer = setTimeout(handleScroll, 20); // backup for rendering delay
+    return () => clearTimeout(timer);
+  }, [pathname, search]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <>
       <Router>
+        <ScrollToTop />
         <Routes>
           <Route path="/login" element={<Login />} />
           

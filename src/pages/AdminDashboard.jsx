@@ -19,6 +19,12 @@ export default function AdminDashboard() {
   const [editUsername, setEditUsername] = useState("");
   const [editPassword, setEditPassword] = useState("");
   
+  // Category management and seller type state
+  const [sellerTypes, setSellerTypes] = useState([]);
+  const [sellerType, setSellerType] = useState("");
+  const [editType, setEditType] = useState("");
+  const [newTypeName, setNewTypeName] = useState("");
+  
   // Notification form state
   const [notificationText, setNotificationText] = useState("");
   const [notificationType, setNotificationType] = useState("info");
@@ -49,7 +55,7 @@ export default function AdminDashboard() {
     // Users list
     const savedUsers = JSON.parse(localStorage.getItem("users")) || [
       { username: "Admin", password: "Admin123*", role: "admin" },
-      { username: "Marjona", password: "Marjona123*", role: "seller" }
+      { username: "Marjona", password: "Marjona123*", role: "seller", type: "Kiyim-kechak" }
     ];
     setUsers(savedUsers);
     
@@ -61,6 +67,49 @@ export default function AdminDashboard() {
     const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
     const globalBroadcasts = savedLogs.filter(log => log.type === "broadcast" || !log.seller);
     setBroadcasts(globalBroadcasts);
+
+    // Load seller types (categories)
+    const savedTypes = JSON.parse(localStorage.getItem("seller_types")) || [
+      "Kiyim-kechak",
+      "Oziq-ovqat",
+      "Go'sht mahsulotlari (Tovuq)",
+      "Maishiy texnika"
+    ];
+    setSellerTypes(savedTypes);
+    if (savedTypes.length > 0 && !sellerType) {
+      setSellerType(savedTypes[0]);
+    }
+  };
+
+  const handleAddType = (e) => {
+    e.preventDefault();
+    if (!newTypeName.trim()) return;
+    if (sellerTypes.includes(newTypeName.trim())) {
+      toast.error("Bunday tur allaqachon mavjud!");
+      return;
+    }
+    const updatedTypes = [...sellerTypes, newTypeName.trim()];
+    localStorage.setItem("seller_types", JSON.stringify(updatedTypes));
+    setSellerTypes(updatedTypes);
+    setNewTypeName("");
+    toast.success("Yangi tur qo'shildi!");
+    
+    if (!sellerType) {
+      setSellerType(newTypeName.trim());
+    }
+  };
+
+  const handleDeleteType = (typeToDelete) => {
+    if (window.confirm(`"${typeToDelete}" turini o'chirib tashlamoqchimisiz?`)) {
+      const updatedTypes = sellerTypes.filter(t => t !== typeToDelete);
+      localStorage.setItem("seller_types", JSON.stringify(updatedTypes));
+      setSellerTypes(updatedTypes);
+      toast.success("Sotuvchi turi o'chirildi!");
+      
+      if (sellerType === typeToDelete) {
+        setSellerType(updatedTypes[0] || "");
+      }
+    }
   };
   
   // Add new seller
@@ -80,7 +129,8 @@ export default function AdminDashboard() {
     const newSeller = {
       username: sellerUsername.trim(),
       password: sellerPassword.trim(),
-      role: "seller"
+      role: "seller",
+      type: sellerType || (sellerTypes[0] || "Kiyim-kechak")
     };
     
     const updatedUsers = [...users, newSeller];
@@ -121,7 +171,12 @@ export default function AdminDashboard() {
           localStorage.setItem("qarzlar", JSON.stringify(updatedDebts));
           setQarzlar(updatedDebts);
         }
-        return { ...u, username: editUsername.trim(), password: editPassword.trim() };
+        return { 
+          ...u, 
+          username: editUsername.trim(), 
+          password: editPassword.trim(),
+          type: editType
+        };
       }
       return u;
     });
@@ -204,6 +259,12 @@ export default function AdminDashboard() {
     }, 500);
   };
   
+  const handleLogout = () => {
+    sessionStorage.removeItem("currentUser");
+    toast.success("Tizimdan chiqildi!");
+    navigate("/login");
+  };
+  
   // Get stats for a specific seller
   const getSellerStats = (username) => {
     const sellerDebts = qarzlar.filter(q => (q.seller || "Marjona") === username);
@@ -274,40 +335,121 @@ export default function AdminDashboard() {
         {activeTab === "sellers" && (
           <div className="space-y-6">
             
-            {/* Add Seller section */}
-            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md">
-              <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i className="fas fa-user-plus text-blue-600"></i>
-                Yangi Sotuvchi Qo'shish
-              </h2>
-              <form onSubmit={handleAddSeller} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="relative">
+            {/* Grid for Add Seller + Manage Categories */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Add Seller Section */}
+              <div className="lg:col-span-2 bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md flex flex-col justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i className="fas fa-user-plus text-blue-600"></i>
+                    Yangi Sotuvchi Qo'shish
+                  </h2>
+                  <form onSubmit={handleAddSeller} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Sotuvchi logini (ism)"
+                          value={sellerUsername}
+                          onChange={(e) => setSellerUsername(e.target.value)}
+                          className="w-full p-3 pl-10 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+                        />
+                        <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Sotuvchi paroli"
+                          value={sellerPassword}
+                          onChange={(e) => setSellerPassword(e.target.value)}
+                          className="w-full p-3 pl-10 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+                        />
+                        <i className="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4 items-end">
+                      <div className="flex-1 w-full">
+                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                          Sotuvchi turi / Do'kon sohasi
+                        </label>
+                        <select
+                          value={sellerType}
+                          onChange={(e) => setSellerType(e.target.value)}
+                          className="w-full p-3 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold appearance-none cursor-pointer"
+                        >
+                          {sellerTypes.map((type) => (
+                            <option key={type} value={type}>
+                              {type}
+                            </option>
+                          ))}
+                          {sellerTypes.length === 0 && (
+                            <option value="">Turlar mavjud emas</option>
+                          )}
+                        </select>
+                      </div>
+                      <button
+                        type="submit"
+                        className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-blue-500/10 h-[48px] sm:w-auto w-full"
+                      >
+                        Sotuvchini qo'shish
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              {/* Manage Types / Categories Section */}
+              <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md flex flex-col justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i className="fas fa-tags text-blue-600"></i>
+                    Sotuvchi Turlari
+                  </h2>
+                  
+                  {/* Category badges list */}
+                  <div className="flex flex-wrap gap-2 mb-4 max-h-[120px] overflow-y-auto p-1 bg-white/40 rounded-xl border border-slate-100">
+                    {sellerTypes.length === 0 ? (
+                      <p className="text-slate-400 text-xs p-2">Turlar yaratilmagan</p>
+                    ) : (
+                      sellerTypes.map((type) => (
+                        <span
+                          key={type}
+                          className="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm"
+                        >
+                          {type}
+                          <button
+                            onClick={() => handleDeleteType(type)}
+                            className="text-blue-500 hover:text-red-600 font-bold ml-0.5 cursor-pointer text-[10px]"
+                            title="O'chirish"
+                          >
+                            <i className="fas fa-times"></i>
+                          </button>
+                        </span>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <form onSubmit={handleAddType} className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Sotuvchi logini (ism)"
-                    value={sellerUsername}
-                    onChange={(e) => setSellerUsername(e.target.value)}
-                    className="w-full p-3 pl-10 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+                    placeholder="Yangi tur nomi..."
+                    value={newTypeName}
+                    onChange={(e) => setNewTypeName(e.target.value)}
+                    className="flex-1 p-2.5 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-xs"
                   />
-                  <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Sotuvchi paroli"
-                    value={sellerPassword}
-                    onChange={(e) => setSellerPassword(e.target.value)}
-                    className="w-full p-3 pl-10 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
-                  />
-                  <i className="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                </div>
-                <button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-blue-500/10"
-                >
-                  Sotuvchini qo'shish
-                </button>
-              </form>
+                  <button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-md text-xs flex items-center justify-center min-w-[40px]"
+                    title="Qo'shish"
+                  >
+                    <i className="fas fa-plus"></i>
+                  </button>
+                </form>
+              </div>
+
             </div>
 
             {/* Editing seller modal overlay */}
@@ -333,6 +475,20 @@ export default function AdminDashboard() {
                         onChange={(e) => setEditPassword(e.target.value)}
                         className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
                       />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Sotuvchi turi</label>
+                      <select
+                        value={editType}
+                        onChange={(e) => setEditType(e.target.value)}
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer"
+                      >
+                        {sellerTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="flex gap-2 pt-2">
                       <button
@@ -373,7 +529,14 @@ export default function AdminDashboard() {
                             {u.username[0]}
                           </div>
                           <div>
-                            <p className="font-bold text-slate-800 text-base">{u.username}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-slate-800 text-base">{u.username}</p>
+                              {u.type && (
+                                <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border border-blue-100">
+                                  {u.type}
+                                </span>
+                              )}
+                            </div>
                             <p className="text-slate-400 text-xs font-semibold">Parol: {u.password}</p>
                           </div>
                         </div>
@@ -401,6 +564,7 @@ export default function AdminDashboard() {
                               setEditingUserId(u.username);
                               setEditUsername(u.username);
                               setEditPassword(u.password);
+                              setEditType(u.type || (sellerTypes[0] || "Kiyim-kechak"));
                             }}
                             className="bg-blue-50 hover:bg-blue-100 text-blue-600 p-2.5 rounded-xl border border-blue-100/60 transition active:scale-95 cursor-pointer text-xs font-bold"
                             title="Tahrirlash"
@@ -588,6 +752,17 @@ export default function AdminDashboard() {
                 O'zgarishlarni saqlash
               </button>
             </form>
+            
+            {/* Tizimdan chiqish tugmasi */}
+            <div className="pt-4 border-t border-slate-200/60">
+              <button
+                onClick={handleLogout}
+                className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-sm border border-red-100/50 shadow-sm"
+              >
+                <i className="fas fa-sign-out-alt"></i>
+                Tizimdan chiqish (Log Out)
+              </button>
+            </div>
           </div>
         )}
 

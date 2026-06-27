@@ -120,23 +120,7 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* 2. Mobile Top Header */}
-      <div className="md:hidden sticky top-0 z-30 bg-white border-b border-blue-100 shadow-sm flex items-center justify-between p-4 w-full">
-        <div className="flex items-center gap-3">
-          <img src={logo} alt="Logo" className="w-9 h-9 rounded-lg shadow-md" />
-          <div>
-            <h1 className="text-sm font-bold text-slate-800 leading-tight">Admin Paneli</h1>
-            <p className="text-slate-400 text-[10px] font-semibold">Super Admin</p>
-          </div>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="bg-red-50 hover:bg-red-100 text-red-600 px-3.5 py-1.5 rounded-lg border border-red-200/60 transition active:scale-95 cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
-        >
-          <i className="fas fa-sign-out-alt text-xs"></i>
-          Chiqish
-        </button>
-      </div>
+
 
       {/* 3. Main Content Container */}
       <div className="flex-1 md:pl-64 min-h-screen w-full flex flex-col pb-20 md:pb-0">

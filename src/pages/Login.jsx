@@ -27,7 +27,7 @@ const initializeUsers = () => {
     updated.push({ username: "Admin", password: "Admin123*", role: "admin" });
   }
   if (!hasMarjona) {
-    updated.push({ username: "Marjona", password: "Marjona123*", role: "seller" });
+    updated.push({ username: "Marjona", password: "Marjona123*", role: "seller", type: "Kiyim-kechak" });
   }
 
   // Filter out invalid/corrupt user objects
