@@ -8,8 +8,8 @@ export default function AdminLayout() {
   const [currentUser, setCurrentUser] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Get active tab from URL params, default is "sellers"
-  const activeTab = searchParams.get("tab") || "sellers";
+  // Get active tab from URL params, default is "dashboard"
+  const activeTab = searchParams.get("tab") || "dashboard";
 
   useEffect(() => {
     const userStr = sessionStorage.getItem("currentUser");
@@ -41,6 +41,7 @@ export default function AdminLayout() {
   };
 
   const menuItems = [
+    { id: "dashboard", label: "Bosh sahifa", icon: "fa-chart-pie" },
     { id: "sellers", label: "Sotuvchilar", icon: "fa-users" },
     { id: "all_debts", label: "Barcha Qarzlar", icon: "fa-list-alt" },
     { id: "notifications", label: "Xabar Yuborish", icon: "fa-bullhorn" },
