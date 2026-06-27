@@ -68,6 +68,8 @@ export default function DebtsList() {
     onConfirm: null,
   });
 
+  const [expandedGroups, setExpandedGroups] = useState({});
+
   // Activity logger helper
   const addActivityLog = (text, type) => {
     try {
@@ -279,6 +281,45 @@ export default function DebtsList() {
     })
     .reverse();
 
+  const toggleGroup = (key) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const yangiQarzQoshishMijoz = (mijozIsmi, telefon) => {
+    navigate("/add-debt", { state: { prefill: { mijozIsmi, telefon } } });
+  };
+
+  const getAvatarGradient = (name) => {
+    const char = name.trim().charAt(0).toUpperCase();
+    const index = char.charCodeAt(0) % 5;
+    const gradients = [
+      "from-indigo-500 to-purple-600",
+      "from-emerald-400 to-teal-600",
+      "from-blue-500 to-indigo-600",
+      "from-rose-400 to-red-600",
+      "from-amber-400 to-orange-600",
+    ];
+    return gradients[index];
+  };
+
+  // Group debts by customer for mobile view
+  const groupedDebts = filteredQarzlar.reduce((acc, q) => {
+    const key = `${q.mijozIsmi.trim().toLowerCase()}_${q.telefon.trim()}`;
+    if (!acc[key]) {
+      acc[key] = {
+        mijozIsmi: q.mijozIsmi,
+        telefon: q.telefon,
+        items: [],
+      };
+    }
+    acc[key].items.push(q);
+    return acc;
+  }, {});
+  const groupedDebtsList = Object.values(groupedDebts);
+
   return (
     <div>
       <div className="main-background"></div>
@@ -387,7 +428,8 @@ export default function DebtsList() {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto rounded-xl border border-gray-200">
+          {/* Table (Desktop View) */}
+          <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50/75">
                 <tr>
@@ -472,6 +514,15 @@ export default function DebtsList() {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => yangiQarzQoshishMijoz(q.mijozIsmi, q.telefon)}
+                            className="text-white bg-indigo-500 hover:bg-indigo-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
+                            title="Yangi qarz qo'shish"
+                          >
+                            <i className="fas fa-plus mr-1"></i>
+                            Qarz+
+                          </button>
+
                           {q.status !== "To'langan" && (
                             <button
                               onClick={() => qarzniTolash(q.id)}
@@ -516,6 +567,186 @@ export default function DebtsList() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Accordion List (Mobile View) */}
+          <div className="block md:hidden space-y-3">
+            {groupedDebtsList.map((group) => {
+              const key = `${group.mijozIsmi.trim().toLowerCase()}_${group.telefon.trim()}`;
+              const isExpanded = expandedGroups[key];
+              
+              // Calculate group status indicator dot
+              const hasOverdue = group.items.some((item) => {
+                const tolashDate = new Date(item.tolashMuddati);
+                return today > tolashDate && item.status === "To'lanmagan";
+              });
+              const hasUnpaid = group.items.some((item) => item.status === "To'lanmagan");
+              
+              let dotColor = "bg-green-500";
+              if (hasOverdue) {
+                dotColor = "bg-red-500 animate-pulse";
+              } else if (hasUnpaid) {
+                dotColor = "bg-yellow-500 animate-pulse";
+              }
+
+              return (
+                <div key={key} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  {/* Customer Header */}
+                  <div
+                    onClick={() => toggleGroup(key)}
+                    className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition active:bg-gray-100"
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Avatar */}
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-gradient-to-tr ${getAvatarGradient(group.mijozIsmi)} shadow-sm`}>
+                        {group.mijozIsmi.trim().charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-bold text-gray-800 capitalize">
+                            {group.mijozIsmi}
+                          </span>
+                          <span className={`w-2 h-2 rounded-full ${dotColor}`} />
+                        </div>
+                        <span className="text-xs text-gray-500 font-medium">
+                          {group.telefon}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          yangiQarzQoshishMijoz(group.mijozIsmi, group.telefon);
+                        }}
+                        className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-100 transition active:scale-90"
+                        title="Yangi qarz qo'shish"
+                      >
+                        <i className="fas fa-plus text-xs"></i>
+                      </button>
+                      <a
+                        href={`tel:${group.telefon}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition active:scale-90"
+                      >
+                        <i className="fas fa-phone text-xs"></i>
+                      </a>
+                      <a
+                        href={`https://t.me/${group.telefon.replace(/[^0-9]/g, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-100 transition active:scale-90"
+                      >
+                        <i className="fab fa-telegram-plane text-xs"></i>
+                      </a>
+                      <div className="w-8 h-8 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center">
+                        <i className={`fas ${isExpanded ? "fa-chevron-up" : "fa-chevron-down"} text-xs transition-transform duration-200`}></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Customer Debts List */}
+                  {isExpanded && (
+                    <div className="px-4 pb-4 pt-1 border-t border-gray-50 bg-gray-50/30 space-y-3">
+                      {group.items.map((item) => {
+                        const tolashDate = new Date(item.tolashMuddati);
+                        const overdue = today > tolashDate && item.status === "To'lanmagan";
+                        const remainingDays = Math.ceil((tolashDate - today) / (1000 * 60 * 60 * 24));
+
+                        let remainingText = "";
+                        let borderClass = "border-l-yellow-500 bg-yellow-50/15";
+                        let statusColor = "text-yellow-600 bg-yellow-50";
+                        
+                        if (item.status === "To'langan") {
+                          remainingText = <span className="text-green-600 font-medium">To'langan</span>;
+                          borderClass = "border-l-green-500 bg-green-50/15";
+                          statusColor = "text-green-600 bg-green-50";
+                        } else if (overdue) {
+                          remainingText = <span className="text-red-600 font-bold">{Math.abs(remainingDays)} kun o'tgan</span>;
+                          borderClass = "border-l-red-500 bg-red-50/15";
+                          statusColor = "text-red-600 bg-red-50";
+                        } else if (remainingDays === 0) {
+                          remainingText = <span className="text-yellow-600 font-bold">Bugun</span>;
+                        } else {
+                          remainingText = <span className="text-blue-600 font-medium">{remainingDays} kun qoldi</span>;
+                        }
+
+                        return (
+                          <div key={item.id} className={`p-3 rounded-xl border-l-4 ${borderClass} shadow-sm space-y-2 animate-fade-in`}>
+                            {/* Sub-card header */}
+                            <div className="flex justify-between items-center text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
+                              <span>📅 {new Date(item.sana).toLocaleDateString("uz-UZ")}</span>
+                              <span>⏰ {new Date(item.tolashMuddati).toLocaleDateString("uz-UZ")}</span>
+                            </div>
+
+                            {/* Sub-card info */}
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="text-sm font-bold text-gray-800 flex items-center gap-1.5">
+                                  <i className="fas fa-tshirt text-gray-400 text-xs"></i>
+                                  {item.mahsulot}
+                                </h4>
+                                <div className="text-xs text-gray-500 mt-0.5">
+                                  Muddat: {remainingText}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-sm font-extrabold text-gray-900 block">
+                                  {item.qarzMiqdori.toLocaleString()} so'm
+                                </span>
+                                <span className={`inline-block px-2 py-0.5 text-[9px] font-bold rounded-full mt-1 ${statusColor}`}>
+                                  {item.status}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Sub-card actions */}
+                            <div className="flex justify-end gap-1.5 pt-2 border-t border-gray-100">
+                              {item.status !== "To'langan" && (
+                                <button
+                                  onClick={() => qarzniTolash(item.id)}
+                                  className="text-white bg-green-500 hover:bg-green-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                >
+                                  <i className="fas fa-check mr-1"></i>
+                                  To'landi
+                                </button>
+                              )}
+                              {currentUser?.role === "admin" && (
+                                <>
+                                  <button
+                                    onClick={() => qarzniTahrirlash(item)}
+                                    className="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                  >
+                                    <i className="fas fa-edit mr-1"></i>
+                                    Tahrirlash
+                                  </button>
+                                  <button
+                                    onClick={() => qarzniOchirish(item.id)}
+                                    className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                  >
+                                    <i className="fas fa-trash mr-1"></i>
+                                    O'chirish
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {groupedDebtsList.length === 0 && (
+              <div className="p-8 text-center text-gray-500 bg-white rounded-2xl border border-gray-100">
+                <i className="fas fa-search text-3xl mb-2 text-gray-300"></i>
+                <p className="text-sm">Hech qanday qarz topilmadi</p>
+              </div>
+            )}
           </div>
 
         </div>

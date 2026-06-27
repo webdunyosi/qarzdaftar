@@ -83,6 +83,10 @@ export default function AddDebt() {
       setQarzMiqdori(qarz.qarzMiqdori.toLocaleString());
       setSana(qarz.sana);
       setTolashMuddati(qarz.tolashMuddati);
+    } else if (location.state?.prefill) {
+      const { mijozIsmi, telefon } = location.state.prefill;
+      setMijozIsmi(mijozIsmi);
+      setTelefon(telefon);
     }
   }, [location]);
 
