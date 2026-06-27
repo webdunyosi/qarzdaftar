@@ -71,7 +71,7 @@ export default function DebtsList() {
   const [expandedGroups, setExpandedGroups] = useState({});
 
   // Activity logger helper
-  const addActivityLog = (text, type) => {
+  const addLog = (text, type) => {
     try {
       const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
       const newLog = {
@@ -79,6 +79,7 @@ export default function DebtsList() {
         text,
         time: new Date().toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" }),
         type,
+        seller: currentUser?.username,
       };
       const updatedLogs = [...savedLogs, newLog].slice(-20);
       localStorage.setItem("activity_logs", JSON.stringify(updatedLogs));
@@ -95,22 +96,27 @@ export default function DebtsList() {
       navigate("/login");
       return;
     }
-    setCurrentUser(JSON.parse(userStr));
+    const loggedUser = JSON.parse(userStr);
+    setCurrentUser(loggedUser);
 
     // Load debts
-    const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
-    setQarzlar(savedQarzlar);
+    const loadFilteredDebts = () => {
+      const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
+      const filtered = savedQarzlar.filter(q => (q.seller || "Marjona") === loggedUser.username);
+      setQarzlar(filtered);
+    };
+
+    loadFilteredDebts();
 
     // Listen for storage updates (e.g. if updated from another tab or page)
     const handleStorageChange = () => {
-      const updated = JSON.parse(localStorage.getItem("qarzlar")) || [];
-      setQarzlar(updated);
+      loadFilteredDebts();
     };
     window.addEventListener("storage", handleStorageChange);
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, [navigate]);
+  }, [navigate, currentUser?.username]);
 
   // Mark as paid
   const qarzniTolash = (id) => {

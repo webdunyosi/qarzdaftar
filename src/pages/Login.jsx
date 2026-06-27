@@ -3,10 +3,39 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import logo from "../assets/web-daftar.png";
 
-const USERS = [
-  { username: "admin", password: "Admin123!", role: "admin" },
-  { username: "user", password: "user123", role: "user" },
-];
+const initializeUsers = () => {
+  let existing = [];
+  try {
+    const raw = localStorage.getItem("users");
+    if (raw) {
+      existing = JSON.parse(raw);
+    }
+  } catch (e) {
+    console.error("Failed to parse users:", e);
+  }
+
+  if (!Array.isArray(existing)) {
+    existing = [];
+  }
+
+  // Ensure Admin and Marjona are always present
+  const hasAdmin = existing.some(u => u && u.username && u.username.toLowerCase() === "admin");
+  const hasMarjona = existing.some(u => u && u.username && u.username.toLowerCase() === "marjona");
+
+  let updated = [...existing];
+  if (!hasAdmin) {
+    updated.push({ username: "Admin", password: "Admin123*", role: "admin" });
+  }
+  if (!hasMarjona) {
+    updated.push({ username: "Marjona", password: "Marjona123*", role: "seller" });
+  }
+
+  // Filter out invalid/corrupt user objects
+  updated = updated.filter(u => u && typeof u === "object" && u.username && u.password);
+
+  localStorage.setItem("users", JSON.stringify(updated));
+  return updated;
+};
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -33,15 +62,16 @@ export default function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const user = USERS.find(
-      (u) => u.username === username && u.password === password
+    const users = initializeUsers();
+    const user = users.find(
+      (u) => u && u.username && u.username.toLowerCase() === username.toLowerCase() && u.password === password
     );
 
     if (user) {
       if (remember) {
         localStorage.setItem(
           "rememberedUser",
-          JSON.stringify({ username, password })
+          JSON.stringify({ username: user.username, password })
         );
       } else {
         localStorage.removeItem("rememberedUser");

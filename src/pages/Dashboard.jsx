@@ -67,6 +67,7 @@ export default function Dashboard() {
         text,
         time: new Date().toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" }),
         type,
+        seller: currentUser?.username,
       };
       const updatedLogs = [...savedLogs, newLog].slice(-20);
       localStorage.setItem("activity_logs", JSON.stringify(updatedLogs));
@@ -115,6 +116,12 @@ export default function Dashboard() {
   const dailyReportTimeoutRef = useRef(null);
   const qarzFormRef = useRef(null);
 
+  const saveAndRefresh = (updatedCompleteList, currentUsername = currentUser?.username) => {
+    localStorage.setItem("qarzlar", JSON.stringify(updatedCompleteList));
+    const username = currentUsername || "Marjona";
+    setQarzlar(updatedCompleteList.filter(q => (q.seller || "Marjona") === username));
+  };
+
   // Authenticate & Load Initial Data
   useEffect(() => {
     const userStr = sessionStorage.getItem("currentUser");
@@ -122,11 +129,13 @@ export default function Dashboard() {
       navigate("/login");
       return;
     }
-    setCurrentUser(JSON.parse(userStr));
+    const loggedUser = JSON.parse(userStr);
+    setCurrentUser(loggedUser);
 
     // Load debts
     const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
-    setQarzlar(savedQarzlar);
+    const filtered = savedQarzlar.filter(q => (q.seller || "Marjona") === loggedUser.username);
+    setQarzlar(filtered);
 
     // Schedule daily report
     scheduleDailyReport();
@@ -192,11 +201,16 @@ export default function Dashboard() {
         status: "To'lanmagan",
       };
 
-      let updatedQarzlar;
+      const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
+      let updatedComplete;
 
       if (tahrirlanayotganId) {
         // Edit existing
-        updatedQarzlar = qarzlar.map((q) =>
+        const oldDebt = savedQarzlar.find((q) => q.id === tahrirlanayotganId);
+        yangiMalumot.status = oldDebt ? oldDebt.status : "To'lanmagan"; // Preserve status
+        yangiMalumot.seller = oldDebt ? (oldDebt.seller || "Marjona") : (currentUser?.username || "Marjona");
+
+        updatedComplete = savedQarzlar.map((q) =>
           q.id === tahrirlanayotganId ? { ...q, ...yangiMalumot } : q
         );
         toast.success("Qarz ma'lumotlari muvaffaqiyatli yangilandi!");
@@ -217,8 +231,9 @@ export default function Dashboard() {
         const newQarz = {
           id: Date.now(),
           ...yangiMalumot,
+          seller: currentUser?.username || "Marjona",
         };
-        updatedQarzlar = [...qarzlar, newQarz];
+        updatedComplete = [...savedQarzlar, newQarz];
         toast.success("Yangi qarz muvaffaqiyatli qo'shildi!");
         addActivityLog(`Yangi qarz qo'shildi: ${mijozIsmi} (${parsedAmount.toLocaleString()} so'm)`, "add");
 
@@ -234,8 +249,7 @@ export default function Dashboard() {
         sendTelegramMessage(message);
       }
 
-      setQarzlar(updatedQarzlar);
-      localStorage.setItem("qarzlar", JSON.stringify(updatedQarzlar));
+      saveAndRefresh(updatedComplete);
       resetForm();
     } catch (error) {
       console.error("Xatolik yuz berdi:", error);
@@ -271,7 +285,8 @@ export default function Dashboard() {
 
   // Mark as paid
   const qarzniTolash = (id) => {
-    const updated = qarzlar.map((q) => {
+    const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
+    const updated = savedQarzlar.map((q) => {
       if (q.id === id) {
         const updatedDebt = { ...q, status: "To'langan" };
         
@@ -292,8 +307,7 @@ export default function Dashboard() {
       return q;
     });
 
-    setQarzlar(updated);
-    localStorage.setItem("qarzlar", JSON.stringify(updated));
+    saveAndRefresh(updated);
   };
 
   // Delete debt
@@ -306,8 +320,9 @@ export default function Dashboard() {
   };
 
   const executeDelete = (id) => {
-    const target = qarzlar.find((q) => q.id === id);
-    const updated = qarzlar.filter((q) => q.id !== id);
+    const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
+    const target = savedQarzlar.find((q) => q.id === id);
+    const updated = savedQarzlar.filter((q) => q.id !== id);
 
     if (target) {
       const message = `❌ <b>Qarz o'chirildi</b>\n\n👤 Mijoz: ${
@@ -323,8 +338,7 @@ export default function Dashboard() {
       addActivityLog(`Qarz o'chirildi: ${target.mijozIsmi}`, "delete");
     }
 
-    setQarzlar(updated);
-    localStorage.setItem("qarzlar", JSON.stringify(updated));
+    saveAndRefresh(updated);
     toast.success("Qarz muvaffaqiyatli o'chirildi!");
     setConfirmModal({ isOpen: false, message: "", onConfirm: null });
   };

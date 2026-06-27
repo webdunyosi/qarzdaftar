@@ -5,9 +5,16 @@ export default function BottomBar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If user is not logged in, do not show Bottom Bar
+  // If user is not logged in or is admin, do not show Bottom Bar
   const userStr = sessionStorage.getItem("currentUser");
   if (!userStr) return null;
+
+  try {
+    const currentUser = JSON.parse(userStr);
+    if (currentUser.role === "admin") return null;
+  } catch (e) {
+    console.error(e);
+  }
 
   const tabs = [
     {

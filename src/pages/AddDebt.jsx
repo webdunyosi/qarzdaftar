@@ -33,6 +33,16 @@ async function sendTelegramMessage(message) {
 export default function AddDebt() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const userStr = sessionStorage.getItem("currentUser");
+    if (!userStr) {
+      navigate("/login");
+      return;
+    }
+    setCurrentUser(JSON.parse(userStr));
+  }, [navigate]);
 
   // Activity logger helper
   const addActivityLog = (text, type) => {
@@ -43,6 +53,7 @@ export default function AddDebt() {
         text,
         time: new Date().toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" }),
         type,
+        seller: currentUser?.username,
       };
       const updatedLogs = [...savedLogs, newLog].slice(-20);
       localStorage.setItem("activity_logs", JSON.stringify(updatedLogs));
@@ -139,6 +150,7 @@ export default function AddDebt() {
         // Edit existing
         const oldDebt = savedQarzlar.find((q) => q.id === tahrirlanayotganId);
         yangiMalumot.status = oldDebt ? oldDebt.status : "To'lanmagan"; // Preserve status
+        yangiMalumot.seller = oldDebt ? (oldDebt.seller || "Marjona") : (currentUser?.username || "Marjona");
 
         updatedQarzlar = savedQarzlar.map((q) =>
           q.id === tahrirlanayotganId ? { ...q, ...yangiMalumot } : q
@@ -161,6 +173,7 @@ export default function AddDebt() {
         const newQarz = {
           id: Date.now(),
           ...yangiMalumot,
+          seller: currentUser?.username || "Marjona",
         };
         updatedQarzlar = [...savedQarzlar, newQarz];
         toast.success("Yangi qarz muvaffaqiyatli qo'shildi!");

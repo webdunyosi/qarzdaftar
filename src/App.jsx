@@ -9,10 +9,22 @@ import AddDebt from "./pages/AddDebt";
 import DebtsList from "./pages/DebtsList";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
+import AdminDashboard from "./pages/AdminDashboard";
 import BottomBar from "./components/BottomBar";
 
-// Smart root: mobile → Home, desktop → Dashboard
+// Smart root: admin → AdminDashboard, mobile → Home, desktop → Dashboard
 function RootPage() {
+  const currentUserStr = sessionStorage.getItem("currentUser");
+  if (currentUserStr) {
+    try {
+      const currentUser = JSON.parse(currentUserStr);
+      if (currentUser.role === "admin") {
+        return <AdminDashboard />;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
   if (window.innerWidth < 768) {
     return <Home />;
   }

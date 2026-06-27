@@ -10,12 +10,18 @@ export default function Home() {
   useEffect(() => {
     const userStr = sessionStorage.getItem("currentUser");
     if (!userStr) { navigate("/login"); return; }
-    setCurrentUser(JSON.parse(userStr));
+    const loggedUser = JSON.parse(userStr);
+    setCurrentUser(loggedUser);
 
-    const saved = JSON.parse(localStorage.getItem("qarzlar")) || [];
-    setQarzlar(saved);
+    const loadFilteredDebts = () => {
+      const saved = JSON.parse(localStorage.getItem("qarzlar")) || [];
+      const filtered = saved.filter(q => (q.seller || "Marjona") === loggedUser.username);
+      setQarzlar(filtered);
+    };
 
-    const onStorage = () => setQarzlar(JSON.parse(localStorage.getItem("qarzlar")) || []);
+    loadFilteredDebts();
+
+    const onStorage = () => loadFilteredDebts();
     window.addEventListener("storage", onStorage);
     window.addEventListener("qarzlar_updated", onStorage);
     return () => {

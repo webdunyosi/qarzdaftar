@@ -15,23 +15,29 @@ export default function Profile() {
       navigate("/login");
       return;
     }
-    setCurrentUser(JSON.parse(userStr));
+    const loggedUser = JSON.parse(userStr);
+    setCurrentUser(loggedUser);
 
     const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
-    setLogs(savedLogs);
+    const myLogs = savedLogs.filter(log => !log.seller || log.seller === loggedUser.username);
+    setLogs(myLogs);
 
     const qarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
+    const myQarzlar = qarzlar.filter(q => (q.seller || "Marjona") === loggedUser.username);
+    
     setQarzStats({
-      total: qarzlar.length,
-      paid: qarzlar.filter((q) => q.status === "To'langan").length,
-      overdue: qarzlar.filter(
+      total: myQarzlar.length,
+      paid: myQarzlar.filter((q) => q.status === "To'langan").length,
+      overdue: myQarzlar.filter(
         (q) => new Date(q.tolashMuddati) < new Date() && q.status !== "To'langan"
       ).length,
     });
   }, [navigate]);
 
   const clearLogs = () => {
-    localStorage.setItem("activity_logs", JSON.stringify([]));
+    const allLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
+    const remaining = allLogs.filter(log => log.seller && log.seller !== currentUser?.username);
+    localStorage.setItem("activity_logs", JSON.stringify(remaining));
     setLogs([]);
   };
 
