@@ -330,7 +330,7 @@ export default function DebtsList() {
     <div>
       <div className="main-background"></div>
       <div className="backdrop-blur flex items-start justify-center p-4 min-h-screen pb-20">
-        <div className="w-full max-w-4xl bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-lg animate-slide-up">
+        <div className="w-full max-w-4xl glass-card-premium hover-shadow-blue p-5 sm:p-7 rounded-3xl animate-slide-up">
           
           {/* Header & Back Button */}
           <div className="flex items-center justify-between mb-5">

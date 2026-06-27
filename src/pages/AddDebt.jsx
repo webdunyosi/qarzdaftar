@@ -203,7 +203,7 @@ export default function AddDebt() {
     <div>
       <div className="main-background"></div>
       <div className="backdrop-blur flex items-center justify-center p-4 min-h-screen pb-20">
-        <div className="w-full max-w-lg bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-5 sm:p-6 rounded-2xl shadow-lg animate-slide-up">
+        <div className="w-full max-w-lg glass-card-premium hover-shadow-blue p-6 sm:p-8 rounded-3xl animate-slide-up">
           
           {/* Header & Back Button */}
           <div className="flex items-center gap-3 mb-6">

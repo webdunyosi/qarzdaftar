@@ -90,8 +90,7 @@ export default function Profile() {
 
   return (
     <div>
-      {/* Solid white background */}
-      <div className="fixed inset-0 z-[-2]" style={{ backgroundColor: "#ffffff" }} />
+      <div className="main-background" />
 
       <div className="min-h-screen pb-24">
 
@@ -109,84 +108,84 @@ export default function Profile() {
         <div className="px-4 pt-2 space-y-4">
 
           {/* User Card */}
-          <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 flex items-center gap-4 shadow-md animate-slide-up">
+          <div className="glass-card-premium hover-shadow-blue rounded-3xl p-6 flex items-center gap-4 animate-slide-up">
             <div className="relative flex-shrink-0">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_8px_20px_rgba(37,99,235,0.25)] border-2 border-white">
                 <i className="fas fa-user-tie text-3xl text-white"></i>
               </div>
               <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-400 border-2 border-white rounded-full shadow"></span>
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-gray-900 font-bold text-xl capitalize truncate">
+              <h2 className="text-slate-800 font-extrabold text-xl capitalize truncate">
                 {currentUser?.username || "Mehmon"}
               </h2>
-              <p className="text-blue-600 text-xs font-semibold uppercase tracking-wider mt-0.5">
+              <p className="text-blue-600 text-xs font-bold uppercase tracking-wider mt-0.5">
                 {currentUser?.role === "admin" ? "Tizim Administratori" : "Operator / Foydalanuvchi"}
               </p>
-              <div className="mt-2 inline-flex items-center gap-1.5 bg-blue-600 rounded-full px-3 py-1">
-                <i className="fas fa-shield-alt text-[9px] text-white"></i>
-                <span className="text-[10px] text-white font-bold uppercase tracking-wider">
+              <div className="mt-2 inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded-full px-3 py-1 text-blue-600">
+                <i className="fas fa-shield-alt text-[9px]"></i>
+                <span className="text-[10px] font-bold uppercase tracking-wider">
                   {currentUser?.role || "user"}
                 </span>
               </div>
             </div>
-            <img src={logo} alt="Logo" className="w-12 h-12 rounded-xl flex-shrink-0 shadow-md" />
+            <img src={logo} alt="Logo" className="w-12 h-12 rounded-xl flex-shrink-0 shadow border border-slate-100 bg-white" />
           </div>
 
           {/* Stats Row */}
           <div className="grid grid-cols-3 gap-3 animate-slide-up">
-            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 text-center shadow-md">
+            <div className="glass-card-premium card-gradient-blue hover-shadow-blue rounded-2xl p-4 text-center cursor-pointer">
               <p className="text-3xl font-black text-blue-600">{qarzStats.total}</p>
-              <p className="text-xs text-gray-500 font-semibold mt-1">Jami</p>
+              <p className="text-xs text-slate-500 font-bold mt-1">Jami</p>
             </div>
-            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 text-center shadow-md">
-              <p className="text-3xl font-black text-green-500">{qarzStats.paid}</p>
-              <p className="text-xs text-gray-500 font-semibold mt-1">To'langan</p>
+            <div className="glass-card-premium card-gradient-green hover-shadow-green rounded-2xl p-4 text-center cursor-pointer">
+              <p className="text-3xl font-black text-emerald-600">{qarzStats.paid}</p>
+              <p className="text-xs text-slate-500 font-bold mt-1">To'langan</p>
             </div>
-            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-4 text-center shadow-md">
-              <p className="text-3xl font-black text-red-500">{qarzStats.overdue}</p>
-              <p className="text-xs text-gray-500 font-semibold mt-1">Muddati o'tgan</p>
+            <div className="glass-card-premium card-gradient-red hover-shadow-red rounded-2xl p-4 text-center cursor-pointer">
+              <p className="text-3xl font-black text-rose-600">{qarzStats.overdue}</p>
+              <p className="text-xs text-slate-500 font-bold mt-1">Muddati o'tgan</p>
             </div>
           </div>
 
           {/* Menu Items */}
-          <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl overflow-hidden shadow-md animate-slide-up">
+          <div className="glass-card-premium hover-shadow-blue rounded-3xl p-2 animate-slide-up">
             {menuItems.map((item, index) => (
               <button
                 key={index}
                 onClick={item.action}
-                className="w-full flex items-center justify-between px-4 py-4 hover:bg-blue-100/40 active:bg-blue-100/60 transition cursor-pointer text-left border-b border-blue-100/40 last:border-b-0"
+                className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl hover:bg-slate-50/80 hover:pl-6 active:bg-blue-50 transition-all duration-300 cursor-pointer text-left border-b border-slate-100/60 last:border-b-0 group"
               >
                 <div className="flex items-center gap-4">
-                  <div className={`w-11 h-11 ${item.iconBg} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                  <div className={`w-11 h-11 ${item.iconBg} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-110`}>
                     <i className={`fas ${item.icon} text-base`}></i>
                   </div>
                   <div>
-                    <p className="text-gray-800 font-semibold text-sm">{item.label}</p>
-                    {item.desc && <p className="text-gray-400 text-xs mt-0.5">{item.desc}</p>}
+                    <p className="text-slate-700 font-semibold text-sm transition-colors duration-200 group-hover:text-blue-600">{item.label}</p>
+                    {item.desc && <p className="text-slate-400 text-xs mt-0.5">{item.desc}</p>}
                   </div>
                 </div>
-                <i className="fas fa-chevron-right text-gray-300 text-xs flex-shrink-0"></i>
+                <i className="fas fa-chevron-right text-slate-300 text-xs flex-shrink-0 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-blue-500"></i>
               </button>
             ))}
           </div>
 
           {/* Notifications Section */}
-          <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl overflow-hidden shadow-md animate-slide-up">
-            <div className="flex items-center justify-between px-4 py-4 border-b border-blue-100/40">
+          <div className="glass-card-premium hover-shadow-blue rounded-3xl p-4 animate-slide-up">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-11 h-11 bg-amber-50 border border-amber-100 text-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
                   <i className="fas fa-bell text-base"></i>
                 </div>
                 <div>
-                  <p className="text-gray-800 font-semibold text-sm">Bildirishnomalar</p>
-                  <p className="text-gray-400 text-xs">{logs.length} ta faoliyat</p>
+                  <p className="text-slate-800 font-bold text-sm">Bildirishnomalar</p>
+                  <p className="text-slate-400 text-xs">{logs.length} ta faoliyat</p>
                 </div>
               </div>
               {logs.length > 0 && (
                 <button
                   onClick={clearLogs}
-                  className="text-xs text-red-500 font-semibold hover:text-red-600 transition"
+                  className="text-xs text-rose-500 font-bold hover:text-rose-600 transition"
                 >
                   Tozalash
                 </button>
@@ -194,21 +193,21 @@ export default function Profile() {
             </div>
             {logs.length === 0 ? (
               <div className="text-center py-8 px-4">
-                <i className="fas fa-bell-slash text-2xl text-gray-300 mb-2"></i>
-                <p className="text-gray-400 text-sm">Bildirishnomalar mavjud emas</p>
+                <i className="fas fa-bell-slash text-2xl text-slate-300 mb-2"></i>
+                <p className="text-slate-400 text-sm">Bildirishnomalar mavjud emas</p>
               </div>
             ) : (
-              <div className="divide-y divide-blue-100/40">
+              <div className="divide-y divide-slate-100 mt-2">
                 {[...logs].reverse().slice(0, 6).map((log) => {
                   const ic = getLogIcon(log.type);
                   return (
-                    <div key={log.id} className="flex items-center gap-3 px-4 py-3">
+                    <div key={log.id} className="flex items-center gap-3 py-3 border-b last:border-b-0 border-slate-100/60 hover:bg-slate-50/40 px-2 rounded-xl transition duration-150">
                       <div className={`w-8 h-8 ${ic.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
                         <i className={`fas ${ic.icon} text-xs`}></i>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-gray-700 text-sm truncate">{log.text}</p>
-                        <p className="text-gray-400 text-xs">{log.time}</p>
+                        <p className="text-slate-700 text-sm truncate font-medium">{log.text}</p>
+                        <p className="text-slate-400 text-xs mt-0.5">{log.time}</p>
                       </div>
                     </div>
                   );
@@ -220,7 +219,7 @@ export default function Profile() {
           {/* Logout Button */}
           <button
             onClick={handleLogout}
-            className="w-full bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-4 rounded-2xl transition flex items-center justify-center gap-3 shadow-lg cursor-pointer animate-slide-up"
+            className="w-full bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 hover:shadow-red-500/25 text-white font-extrabold py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(239,68,68,0.25)] hover:shadow-lg active:scale-95 cursor-pointer animate-slide-up"
           >
             <i className="fas fa-sign-out-alt text-lg"></i>
             Tizimdan chiqish
