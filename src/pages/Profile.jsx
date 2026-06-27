@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import logo from "../assets/web-daftar.png";
+import api from "../utils/api";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -18,27 +19,35 @@ export default function Profile() {
     const loggedUser = JSON.parse(userStr);
     setCurrentUser(loggedUser);
 
-    const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
-    const myLogs = savedLogs.filter(log => !log.seller || log.seller === loggedUser.username);
-    setLogs(myLogs);
+    const loadProfileData = async () => {
+      const logsRes = await api.get("/logs");
+      if (!logsRes.error) {
+        setLogs(logsRes);
+      }
 
-    const qarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
-    const myQarzlar = qarzlar.filter(q => (q.seller || "Marjona") === loggedUser.username);
-    
-    setQarzStats({
-      total: myQarzlar.length,
-      paid: myQarzlar.filter((q) => q.status === "To'langan").length,
-      overdue: myQarzlar.filter(
-        (q) => new Date(q.tolashMuddati) < new Date() && q.status !== "To'langan"
-      ).length,
-    });
+      const debtsRes = await api.get("/debts");
+      if (!debtsRes.error) {
+        setQarzStats({
+          total: debtsRes.length,
+          paid: debtsRes.filter((q) => q.status === "To'langan").length,
+          overdue: debtsRes.filter(
+            (q) => new Date(q.tolashMuddati) < new Date() && q.status !== "To'langan"
+          ).length,
+        });
+      }
+    };
+
+    loadProfileData();
   }, [navigate]);
 
-  const clearLogs = () => {
-    const allLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
-    const remaining = allLogs.filter(log => log.seller && log.seller !== currentUser?.username);
-    localStorage.setItem("activity_logs", JSON.stringify(remaining));
-    setLogs([]);
+  const clearLogs = async () => {
+    const res = await api.delete("/logs");
+    if (!res.error) {
+      toast.success("Jurnal muvaffaqiyatli tozalandi!");
+      setLogs([]);
+    } else {
+      toast.error(res.error);
+    }
   };
 
   const getLogIcon = (type) => {
@@ -53,6 +62,7 @@ export default function Profile() {
 
   const handleLogout = () => {
     sessionStorage.removeItem("currentUser");
+    localStorage.removeItem("token");
     toast.success("Tizimdan chiqildi!");
     navigate("/login");
   };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import api from "../utils/api";
 export default function AdminDashboard() {
   const navigate = useNavigate();
   
@@ -52,176 +53,153 @@ export default function AdminDashboard() {
     loadAllData();
   }, [navigate]);
   
-  const loadAllData = () => {
+  const loadAllData = async () => {
     // Users list
-    const savedUsers = JSON.parse(localStorage.getItem("users")) || [
-      { username: "Admin", password: "Admin123*", role: "admin" },
-      { username: "Marjona", password: "Marjona123*", role: "seller", type: "Kiyim-kechak" }
-    ];
-    setUsers(savedUsers);
+    const usersRes = await api.get("/users");
+    if (!usersRes.error) {
+      setUsers(usersRes);
+    }
     
     // Debts list
-    const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
-    setQarzlar(savedQarzlar);
+    const debtsRes = await api.get("/debts");
+    if (!debtsRes.error) {
+      setQarzlar(debtsRes);
+    }
     
     // Broadcast notifications (from activity_logs where seller is null/global)
-    const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
-    const globalBroadcasts = savedLogs.filter(log => log.type === "broadcast" || !log.seller);
-    setBroadcasts(globalBroadcasts);
+    const logsRes = await api.get("/logs");
+    if (!logsRes.error) {
+      const globalBroadcasts = logsRes.filter(log => log.type === "broadcast" || !log.seller);
+      setBroadcasts(globalBroadcasts);
+    }
 
     // Load seller types (categories)
-    const savedTypes = JSON.parse(localStorage.getItem("seller_types")) || [
-      "Kiyim-kechak",
-      "Oziq-ovqat",
-      "Go'sht mahsulotlari (Tovuq)",
-      "Maishiy texnika"
-    ];
-    setSellerTypes(savedTypes);
-    if (savedTypes.length > 0 && !sellerType) {
-      setSellerType(savedTypes[0]);
+    const typesRes = await api.get("/seller-types");
+    if (!typesRes.error) {
+      setSellerTypes(typesRes);
+      if (typesRes.length > 0 && !sellerType) {
+        setSellerType(typesRes[0]);
+      }
     }
   };
 
-  const handleAddType = (e) => {
+  const handleAddType = async (e) => {
     e.preventDefault();
     if (!newTypeName.trim()) return;
     if (sellerTypes.includes(newTypeName.trim())) {
       toast.error("Bunday tur allaqachon mavjud!");
       return;
     }
-    const updatedTypes = [...sellerTypes, newTypeName.trim()];
-    localStorage.setItem("seller_types", JSON.stringify(updatedTypes));
-    setSellerTypes(updatedTypes);
-    setNewTypeName("");
-    toast.success("Yangi tur qo'shildi!");
     
-    if (!sellerType) {
-      setSellerType(newTypeName.trim());
+    const res = await api.post("/seller-types", { name: newTypeName.trim() });
+    if (res.error) {
+      toast.error(res.error);
+      return;
     }
+    
+    toast.success("Yangi tur qo'shildi!");
+    setNewTypeName("");
+    loadAllData();
   };
 
-  const handleDeleteType = (typeToDelete) => {
+  const handleDeleteType = async (typeToDelete) => {
     if (window.confirm(`"${typeToDelete}" turini o'chirib tashlamoqchimisiz?`)) {
-      const updatedTypes = sellerTypes.filter(t => t !== typeToDelete);
-      localStorage.setItem("seller_types", JSON.stringify(updatedTypes));
-      setSellerTypes(updatedTypes);
-      toast.success("Sotuvchi turi o'chirildi!");
-      
-      if (sellerType === typeToDelete) {
-        setSellerType(updatedTypes[0] || "");
+      const res = await api.delete(`/seller-types/${typeToDelete}`);
+      if (res.error) {
+        toast.error(res.error);
+        return;
       }
+      toast.success("Sotuvchi turi o'chirildi!");
+      loadAllData();
     }
   };
   
   // Add new seller
-  const handleAddSeller = (e) => {
+  const handleAddSeller = async (e) => {
     e.preventDefault();
     if (!sellerUsername.trim() || !sellerPassword.trim()) {
       toast.error("Iltimos, barcha maydonlarni to'ldiring!");
       return;
     }
     
-    const existing = users.find(u => u.username.toLowerCase() === sellerUsername.trim().toLowerCase());
-    if (existing) {
-      toast.error("Bunday nomli sotuvchi allaqachon mavjud!");
+    const targetType = sellerType || (sellerTypes[0] || "Kiyim-kechak");
+    const res = await api.post("/users", {
+      username: sellerUsername.trim(),
+      password: sellerPassword.trim(),
+      type: targetType,
+    });
+
+    if (res.error) {
+      toast.error(res.error);
       return;
     }
     
-    const newSeller = {
-      username: sellerUsername.trim(),
-      password: sellerPassword.trim(),
-      role: "seller",
-      type: sellerType || (sellerTypes[0] || "Kiyim-kechak")
-    };
-    
-    const updatedUsers = [...users, newSeller];
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    setUsers(updatedUsers);
     setSellerUsername("");
     setSellerPassword("");
     toast.success("Yangi sotuvchi muvaffaqiyatli qo'shildi!");
+    loadAllData();
   };
   
   // Save edited seller username/password
-  const handleSaveSellerEdit = (e) => {
+  const handleSaveSellerEdit = async (e) => {
     e.preventDefault();
     if (!editUsername.trim() || !editPassword.trim()) {
       toast.error("Iltimos, barcha maydonlarni to'ldiring!");
       return;
     }
     
-    // Check duplication (excluding currently editing one)
-    const otherUser = users.find(u => 
-      u.username.toLowerCase() === editUsername.trim().toLowerCase() && 
-      u.username !== users.find(x => x.username === editingUserId)?.username
-    );
-    
-    if (otherUser) {
-      toast.error("Ushbu login band!");
+    const res = await api.put(`/users/${editingUserId}`, {
+      username: editUsername.trim(),
+      password: editPassword.trim(),
+      type: editType,
+    });
+
+    if (res.error) {
+      toast.error(res.error);
       return;
     }
     
-    const updatedUsers = users.map(u => {
-      if (u.username === editingUserId) {
-        // Update associated debts with the new username
-        if (u.username !== editUsername.trim()) {
-          const allDebts = JSON.parse(localStorage.getItem("qarzlar")) || [];
-          const updatedDebts = allDebts.map(q => 
-            (q.seller || "Marjona") === u.username ? { ...q, seller: editUsername.trim() } : q
-          );
-          localStorage.setItem("qarzlar", JSON.stringify(updatedDebts));
-          setQarzlar(updatedDebts);
-        }
-        return { 
-          ...u, 
-          username: editUsername.trim(), 
-          password: editPassword.trim(),
-          type: editType
-        };
-      }
-      return u;
-    });
-    
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    setUsers(updatedUsers);
     setEditingUserId(null);
     toast.success("Sotuvchi ma'lumotlari muvaffaqiyatli tahrirlandi!");
+    loadAllData();
   };
   
   // Delete seller
-  const handleDeleteSeller = (username) => {
+  const handleDeleteSeller = async (username) => {
     if (username.toLowerCase() === "admin") {
       toast.error("Admin hisobini o'chirib bo'lmaydi!");
       return;
     }
     
     if (window.confirm(`${username} sotuvchini tizimdan butunlay o'chirib tashlamoqchimisiz?`)) {
-      const updatedUsers = users.filter(u => u.username !== username);
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
-      setUsers(updatedUsers);
+      const res = await api.delete(`/users/${username}`);
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
       toast.success("Sotuvchi muvaffaqiyatli o'chirildi!");
+      loadAllData();
     }
   };
   
   // Send Broadcast notification
-  const handleSendNotification = (e) => {
+  const handleSendNotification = async (e) => {
     e.preventDefault();
     if (!notificationText.trim()) {
       toast.error("Iltimos, bildirishnoma matnini kiriting!");
       return;
     }
     
-    const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
-    const newLog = {
-      id: Date.now(),
+    const res = await api.post("/logs", {
       text: `📢 ${notificationText.trim()}`,
-      time: new Date().toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" }),
       type: notificationType,
       seller: null // global/broadcasted to all
-    };
-    
-    const updatedLogs = [...savedLogs, newLog].slice(-50);
-    localStorage.setItem("activity_logs", JSON.stringify(updatedLogs));
+    });
+
+    if (res.error) {
+      toast.error(res.error);
+      return;
+    }
     
     setNotificationText("");
     toast.success("Bildirishnoma barcha sotuvchilarga yuborildi!");
@@ -229,26 +207,26 @@ export default function AdminDashboard() {
   };
   
   // Change Admin Profile
-  const handleUpdateAdminProfile = (e) => {
+  const handleUpdateAdminProfile = async (e) => {
     e.preventDefault();
     if (!adminUsername.trim() || !adminPassword.trim()) {
       toast.error("Iltimos, login va parolni kiriting!");
       return;
     }
     
-    const updatedUsers = users.map(u => {
-      if (u.role === "admin") {
-        return { ...u, username: adminUsername.trim(), password: adminPassword.trim() };
-      }
-      return u;
+    const res = await api.put("/users/profile", {
+      username: adminUsername.trim(),
+      password: adminPassword.trim(),
     });
-    
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    setUsers(updatedUsers);
+
+    if (res.error) {
+      toast.error(res.error);
+      return;
+    }
     
     // Update currentUser in session
     sessionStorage.setItem("currentUser", JSON.stringify({
-      username: adminUsername.trim(),
+      username: res.username,
       role: "admin"
     }));
     setAdminPassword("");
@@ -262,6 +240,7 @@ export default function AdminDashboard() {
   
   const handleLogout = () => {
     sessionStorage.removeItem("currentUser");
+    localStorage.removeItem("token");
     toast.success("Tizimdan chiqildi!");
     navigate("/login");
   };

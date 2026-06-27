@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import toast from "react-hot-toast";
+import api from "../utils/api";
 
 // Telegram configurations
 const TELEGRAM_BOT_TOKEN = "7972518235:AAEIhLp-LVENoe5DCweerO8l-9oK5KFZyRw";
@@ -71,25 +72,22 @@ export default function DebtsList() {
   const [expandedGroups, setExpandedGroups] = useState({});
 
   // Activity logger helper
-  const addLog = (text, type) => {
+  const addActivityLog = async (text, type) => {
     try {
-      const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
-      const newLog = {
-        id: Date.now(),
-        text,
-        time: new Date().toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" }),
-        type,
-        seller: currentUser?.username,
-      };
-      const updatedLogs = [...savedLogs, newLog].slice(-20);
-      localStorage.setItem("activity_logs", JSON.stringify(updatedLogs));
-      window.dispatchEvent(new Event("activity_logged"));
+      await api.post("/logs", { text, type });
     } catch (e) {
       console.error("Log error", e);
     }
   };
 
   // Load Initial Data
+  const loadFilteredDebts = async () => {
+    const res = await api.get("/debts");
+    if (!res.error) {
+      setQarzlar(res);
+    }
+  };
+
   useEffect(() => {
     const userStr = sessionStorage.getItem("currentUser");
     if (!userStr) {
@@ -99,51 +97,35 @@ export default function DebtsList() {
     const loggedUser = JSON.parse(userStr);
     setCurrentUser(loggedUser);
 
-    // Load debts
-    const loadFilteredDebts = () => {
-      const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
-      const filtered = savedQarzlar.filter(q => (q.seller || "Marjona") === loggedUser.username);
-      setQarzlar(filtered);
-    };
-
     loadFilteredDebts();
-
-    // Listen for storage updates (e.g. if updated from another tab or page)
-    const handleStorageChange = () => {
-      loadFilteredDebts();
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [navigate, currentUser?.username]);
+  }, [navigate]);
 
   // Mark as paid
-  const qarzniTolash = (id) => {
-    const updated = qarzlar.map((q) => {
-      if (q.id === id) {
-        const updatedDebt = { ...q, status: "To'langan" };
-        
-        const message = `✅ <b>Qarz to'landi (Mobil)</b>\n\n👤 Mijoz: ${
-          updatedDebt.mijozIsmi
-        }\n📱 Telefon: ${updatedDebt.telefon}\n👕 Mahsulot: ${
-          updatedDebt.mahsulot
-        }\n💰 Qarz miqdori: ${updatedDebt.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
-          updatedDebt.sana
-        ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
-          updatedDebt.tolashMuddati
-        ).toLocaleDateString()}`;
-        sendTelegramMessage(message);
-        addActivityLog(`Qarz to'landi: ${q.mijozIsmi} (${q.qarzMiqdori.toLocaleString()} so'm)`, "pay");
+  const qarzniTolash = async (id) => {
+    const target = qarzlar.find((q) => (q.id || q._id) === id);
+    if (!target) return;
 
-        return updatedDebt;
-      }
-      return q;
-    });
+    const res = await api.put(`/debts/${id}`, { status: "To'langan" });
+    if (res.error) {
+      toast.error(res.error);
+      return;
+    }
 
-    setQarzlar(updated);
-    localStorage.setItem("qarzlar", JSON.stringify(updated));
+    const message = `✅ <b>Qarz to'landi (Mobil)</b>\n\n👤 Mijoz: ${
+      res.mijozIsmi
+    }\n📱 Telefon: ${res.telefon}\n👕 Mahsulot: ${
+      res.mahsulot
+    }\n💰 Qarz miqdori: ${res.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
+      res.sana
+    ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
+      res.tolashMuddati
+    ).toLocaleDateString()}`;
+    
+    sendTelegramMessage(message);
+    await addActivityLog(`Qarz to'landi: ${res.mijozIsmi} (${res.qarzMiqdori.toLocaleString()} so'm)`, "pay");
+
     toast.success("Qarz to'langan deb belgilandi!");
+    loadFilteredDebts();
   };
 
   // Delete debt
@@ -155,28 +137,32 @@ export default function DebtsList() {
     });
   };
 
-  const executeDelete = (id) => {
-    const target = qarzlar.find((q) => q.id === id);
-    const updated = qarzlar.filter((q) => q.id !== id);
+  const executeDelete = async (id) => {
+    const target = qarzlar.find((q) => (q.id || q._id) === id);
+    if (!target) return;
 
-    if (target) {
-      const message = `❌ <b>Qarz o'chirildi (Mobil)</b>\n\n👤 Mijoz: ${
-        target.mijozIsmi
-      }\n📱 Telefon: ${target.telefon}\n👕 Mahsulot: ${
-        target.mahsulot
-      }\n💰 Qarz miqdori: ${target.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
-        target.sana
-      ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
-        target.tolashMuddati
-      ).toLocaleDateString()}`;
-      sendTelegramMessage(message);
-      addActivityLog(`Qarz o'chirildi: ${target.mijozIsmi}`, "delete");
+    const res = await api.delete(`/debts/${id}`);
+    if (res.error) {
+      toast.error(res.error);
+      return;
     }
 
-    setQarzlar(updated);
-    localStorage.setItem("qarzlar", JSON.stringify(updated));
+    const message = `❌ <b>Qarz o'chirildi (Mobil)</b>\n\n👤 Mijoz: ${
+      target.mijozIsmi
+    }\n📱 Telefon: ${target.telefon}\n👕 Mahsulot: ${
+      target.mahsulot
+    }\n💰 Qarz miqdori: ${target.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
+      target.sana
+    ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
+      target.tolashMuddati
+    ).toLocaleDateString()}`;
+    
+    sendTelegramMessage(message);
+    await addActivityLog(`Qarz o'chirildi: ${target.mijozIsmi}`, "delete");
+
     toast.success("Qarz muvaffaqiyatli o'chirildi!");
     setConfirmModal({ isOpen: false, message: "", onConfirm: null });
+    loadFilteredDebts();
   };
 
   // Redirect to edit page

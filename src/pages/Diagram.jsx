@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Line } from "react-chartjs-2";
+import api from "../utils/api";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -48,79 +49,82 @@ export default function Diagram() {
       return;
     }
 
-    // Load debt data
-    let qarzlar = [];
-    try {
-      qarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
-    } catch (e) {
-      console.error("Failed to parse qarzlar", e);
-    }
-
-    // Process stats
-    const weekStats = {};
-    qarzlar.forEach((q) => {
-      if (!q.sana) return;
-      const sana = new Date(q.sana);
-      const dayIdx = sana.getDay(); // 0 is Sunday, 1 is Monday ...
-      const weekDay = dayIdx === 0 ? 6 : dayIdx - 1; // Map Sunday to index 6
-      const mahsulot = q.mahsulot || "Noma'lum";
-
-      if (!weekStats[mahsulot]) {
-        weekStats[mahsulot] = [0, 0, 0, 0, 0, 0, 0];
+    const loadData = async () => {
+      // Load debt data from API
+      const qarzlar = await api.get("/debts");
+      if (qarzlar.error) {
+        console.error("Failed to fetch qarzlar:", qarzlar.error);
+        return;
       }
-      weekStats[mahsulot][weekDay]++;
-    });
 
-    const colors = [
-      ["#6366f1", "#818cf8"],
-      ["#f472b6", "#f9a8d4"],
-      ["#34d399", "#6ee7b7"],
-      ["#fbbf24", "#fde68a"],
-      ["#60a5fa", "#a5b4fc"],
-      ["#f87171", "#fca5a5"],
-      ["#a78bfa", "#c4b5fd"],
-    ];
+      // Process stats
+      const weekStats = {};
+      qarzlar.forEach((q) => {
+        if (!q.sana) return;
+        const sana = new Date(q.sana);
+        const dayIdx = sana.getDay(); // 0 is Sunday, 1 is Monday ...
+        const weekDay = dayIdx === 0 ? 6 : dayIdx - 1; // Map Sunday to index 6
+        const mahsulot = q.mahsulot || "Noma'lum";
 
-    let colorIdx = 0;
-    const datasets = Object.entries(weekStats).map(([mahsulot, data]) => {
-      const [c1, c2] = colors[colorIdx % colors.length];
-      colorIdx++;
-      return {
-        label: mahsulot,
-        data,
-        borderColor: c1,
-        backgroundColor: "rgba(99, 102, 241, 0.05)",
-        borderWidth: 3,
-        tension: 0.4,
-        pointRadius: 5,
-        pointBackgroundColor: c1,
-        pointBorderColor: "#fff",
-        pointHoverRadius: 8,
-        fill: false,
-      };
-    });
-
-    // Fallback demo dataset if no data exists
-    if (datasets.length === 0) {
-      datasets.push({
-        label: "Demo Mahsulot",
-        data: [1, 2, 1, 3, 2, 0, 1],
-        borderColor: "#6366f1",
-        backgroundColor: "rgba(99, 102, 241, 0.05)",
-        borderWidth: 3,
-        tension: 0.4,
-        pointRadius: 5,
-        pointBackgroundColor: "#6366f1",
-        pointBorderColor: "#fff",
-        pointHoverRadius: 8,
-        fill: false,
+        if (!weekStats[mahsulot]) {
+          weekStats[mahsulot] = [0, 0, 0, 0, 0, 0, 0];
+        }
+        weekStats[mahsulot][weekDay]++;
       });
-    }
 
-    setChartData({
-      labels: LABELS,
-      datasets,
-    });
+      const colors = [
+        ["#6366f1", "#818cf8"],
+        ["#f472b6", "#f9a8d4"],
+        ["#34d399", "#6ee7b7"],
+        ["#fbbf24", "#fde68a"],
+        ["#60a5fa", "#a5b4fc"],
+        ["#f87171", "#fca5a5"],
+        ["#a78bfa", "#c4b5fd"],
+      ];
+
+      let colorIdx = 0;
+      const datasets = Object.entries(weekStats).map(([mahsulot, data]) => {
+        const [c1, c2] = colors[colorIdx % colors.length];
+        colorIdx++;
+        return {
+          label: mahsulot,
+          data,
+          borderColor: c1,
+          backgroundColor: "rgba(99, 102, 241, 0.05)",
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 5,
+          pointBackgroundColor: c1,
+          pointBorderColor: "#fff",
+          pointHoverRadius: 8,
+          fill: false,
+        };
+      });
+
+      // Fallback demo dataset if no data exists
+      if (datasets.length === 0) {
+        datasets.push({
+          label: "Demo Mahsulot",
+          data: [1, 2, 1, 3, 2, 0, 1],
+          borderColor: "#6366f1",
+          backgroundColor: "rgba(99, 102, 241, 0.05)",
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 5,
+          pointBackgroundColor: "#6366f1",
+          pointBorderColor: "#fff",
+          pointHoverRadius: 8,
+          fill: false,
+        });
+      }
+
+      setChartData({
+        labels: LABELS,
+        datasets,
+      });
+    };
+
+    loadData();
   }, [navigate]);
 
   const options = {

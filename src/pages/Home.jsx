@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/web-daftar.png";
+import api from "../utils/api";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -13,21 +14,14 @@ export default function Home() {
     const loggedUser = JSON.parse(userStr);
     setCurrentUser(loggedUser);
 
-    const loadFilteredDebts = () => {
-      const saved = JSON.parse(localStorage.getItem("qarzlar")) || [];
-      const filtered = saved.filter(q => (q.seller || "Marjona") === loggedUser.username);
-      setQarzlar(filtered);
+    const loadFilteredDebts = async () => {
+      const res = await api.get("/debts");
+      if (!res.error) {
+        setQarzlar(res);
+      }
     };
 
     loadFilteredDebts();
-
-    const onStorage = () => loadFilteredDebts();
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("qarzlar_updated", onStorage);
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener("qarzlar_updated", onStorage);
-    };
   }, [navigate]);
 
   const today = new Date();

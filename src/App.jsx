@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
 import Diagram from "./pages/Diagram";
 import AddDebt from "./pages/AddDebt";
 import DebtsList from "./pages/DebtsList";

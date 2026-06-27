@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
+import api from "../utils/api";
 
 // Telegram configurations
 const TELEGRAM_BOT_TOKEN = "7972518235:AAEIhLp-LVENoe5DCweerO8l-9oK5KFZyRw";
@@ -45,19 +46,9 @@ export default function AddDebt() {
   }, [navigate]);
 
   // Activity logger helper
-  const addActivityLog = (text, type) => {
+  const addActivityLog = async (text, type) => {
     try {
-      const savedLogs = JSON.parse(localStorage.getItem("activity_logs")) || [];
-      const newLog = {
-        id: Date.now(),
-        text,
-        time: new Date().toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" }),
-        type,
-        seller: currentUser?.username,
-      };
-      const updatedLogs = [...savedLogs, newLog].slice(-20);
-      localStorage.setItem("activity_logs", JSON.stringify(updatedLogs));
-      window.dispatchEvent(new Event("activity_logged"));
+      await api.post("/logs", { text, type });
     } catch (e) {
       console.error("Log error", e);
     }
@@ -121,7 +112,7 @@ export default function AddDebt() {
   };
 
   // Submit / Add or Edit Debt
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!mijozIsmi || !telefon || !mahsulot || !qarzMiqdori || !sana || !tolashMuddati) {
@@ -132,7 +123,6 @@ export default function AddDebt() {
     try {
       const finalProduct = mahsulot === "Boshqa" ? customProduct || "Boshqa" : mahsulot;
       const parsedAmount = parseFloat(qarzMiqdori.replace(/,/g, ""));
-      const savedQarzlar = JSON.parse(localStorage.getItem("qarzlar")) || [];
 
       const yangiMalumot = {
         mijozIsmi,
@@ -141,57 +131,52 @@ export default function AddDebt() {
         qarzMiqdori: parsedAmount,
         sana,
         tolashMuddati,
-        status: "To'lanmagan",
       };
-
-      let updatedQarzlar;
 
       if (tahrirlanayotganId) {
         // Edit existing
-        const oldDebt = savedQarzlar.find((q) => q.id === tahrirlanayotganId);
-        yangiMalumot.status = oldDebt ? oldDebt.status : "To'lanmagan"; // Preserve status
-        yangiMalumot.seller = oldDebt ? (oldDebt.seller || "Marjona") : (currentUser?.username || "Marjona");
+        const res = await api.put(`/debts/${tahrirlanayotganId}`, yangiMalumot);
+        if (res.error) {
+          toast.error(res.error);
+          return;
+        }
 
-        updatedQarzlar = savedQarzlar.map((q) =>
-          q.id === tahrirlanayotganId ? { ...q, ...yangiMalumot } : q
-        );
         toast.success("Qarz ma'lumotlari muvaffaqiyatli yangilandi!");
-        addActivityLog(`Qarz yangilandi: ${mijozIsmi} (${parsedAmount.toLocaleString()} so'm)`, "edit");
+        await addActivityLog(`Qarz yangilandi: ${mijozIsmi} (${parsedAmount.toLocaleString()} so'm)`, "edit");
 
         const message = `🔄 <b>Qarz yangilandi (Mobil)</b>\n\n👤 Mijoz: ${
-          yangiMalumot.mijozIsmi
-        }\n📱 Telefon: ${yangiMalumot.telefon}\n👕 Mahsulot: ${
-          yangiMalumot.mahsulot
-        }\n💰 Qarz miqdori: ${yangiMalumot.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
-          yangiMalumot.sana
+          res.mijozIsmi
+        }\n📱 Telefon: ${res.telefon}\n👕 Mahsulot: ${
+          res.mahsulot
+        }\n💰 Qarz miqdori: ${res.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
+          res.sana
         ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
-          yangiMalumot.tolashMuddati
+          res.tolashMuddati
         ).toLocaleDateString()}`;
         sendTelegramMessage(message);
       } else {
         // Create new
-        const newQarz = {
-          id: Date.now(),
-          ...yangiMalumot,
-          seller: currentUser?.username || "Marjona",
-        };
-        updatedQarzlar = [...savedQarzlar, newQarz];
+        const res = await api.post("/debts", yangiMalumot);
+        if (res.error) {
+          toast.error(res.error);
+          return;
+        }
+
         toast.success("Yangi qarz muvaffaqiyatli qo'shildi!");
-        addActivityLog(`Yangi qarz qo'shildi: ${mijozIsmi} (${parsedAmount.toLocaleString()} so'm)`, "add");
+        await addActivityLog(`Yangi qarz qo'shildi: ${mijozIsmi} (${parsedAmount.toLocaleString()} so'm)`, "add");
 
         const message = `➕ <b>Yangi qarz qo'shildi (Mobil)</b>\n\n👤 Mijoz: ${
-          yangiMalumot.mijozIsmi
-        }\n📱 Telefon: ${yangiMalumot.telefon}\n👕 Mahsulot: ${
-          yangiMalumot.mahsulot
-        }\n💰 Qarz miqdori: ${yangiMalumot.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
-          yangiMalumot.sana
+          res.mijozIsmi
+        }\n📱 Telefon: ${res.telefon}\n👕 Mahsulot: ${
+          res.mahsulot
+        }\n💰 Qarz miqdori: ${res.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
+          res.sana
         ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
-          yangiMalumot.tolashMuddati
+          res.tolashMuddati
         ).toLocaleDateString()}`;
         sendTelegramMessage(message);
       }
 
-      localStorage.setItem("qarzlar", JSON.stringify(updatedQarzlar));
       navigate("/");
     } catch (error) {
       console.error("Xatolik yuz berdi:", error);

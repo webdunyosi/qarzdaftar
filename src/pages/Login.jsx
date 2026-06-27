@@ -2,40 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import logo from "../assets/web-daftar.png";
-
-const initializeUsers = () => {
-  let existing = [];
-  try {
-    const raw = localStorage.getItem("users");
-    if (raw) {
-      existing = JSON.parse(raw);
-    }
-  } catch (e) {
-    console.error("Failed to parse users:", e);
-  }
-
-  if (!Array.isArray(existing)) {
-    existing = [];
-  }
-
-  // Ensure Admin and Marjona are always present
-  const hasAdmin = existing.some(u => u && u.username && u.username.toLowerCase() === "admin");
-  const hasMarjona = existing.some(u => u && u.username && u.username.toLowerCase() === "marjona");
-
-  let updated = [...existing];
-  if (!hasAdmin) {
-    updated.push({ username: "Admin", password: "Admin123*", role: "admin" });
-  }
-  if (!hasMarjona) {
-    updated.push({ username: "Marjona", password: "Marjona123*", role: "seller", type: "Kiyim-kechak" });
-  }
-
-  // Filter out invalid/corrupt user objects
-  updated = updated.filter(u => u && typeof u === "object" && u.username && u.password);
-
-  localStorage.setItem("users", JSON.stringify(updated));
-  return updated;
-};
+import api from "../utils/api";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -59,39 +26,38 @@ export default function Login() {
     }
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const users = initializeUsers();
-    const user = users.find(
-      (u) => u && u.username && u.username.toLowerCase() === username.toLowerCase() && u.password === password
-    );
+    if (!username || !password) {
+      toast.error("Login va parolni kiriting!");
+      return;
+    }
 
-    if (user) {
+    const res = await api.post("/auth/login", { username, password });
+
+    if (res.success && res.token && res.user) {
       if (remember) {
         localStorage.setItem(
           "rememberedUser",
-          JSON.stringify({ username: user.username, password })
+          JSON.stringify({ username: res.user.username, password })
         );
       } else {
         localStorage.removeItem("rememberedUser");
       }
 
-      sessionStorage.setItem(
-        "currentUser",
-        JSON.stringify({
-          username: user.username,
-          role: user.role,
-        })
-      );
+      localStorage.setItem("token", res.token);
+      sessionStorage.setItem("currentUser", JSON.stringify(res.user));
 
-      if (user.role === "admin") {
+      toast.success("Tizimga muvaffaqiyatli kirildi!");
+
+      if (res.user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/");
       }
     } else {
-      toast.error("Login yoki parol noto'g'ri!");
+      toast.error(res.error || "Login yoki parol noto'g'ri!");
     }
   };
 
