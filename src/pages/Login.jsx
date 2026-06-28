@@ -9,6 +9,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Load remembered user
@@ -34,30 +35,38 @@ export default function Login() {
       return;
     }
 
-    const res = await api.post("/auth/login", { username, password });
+    setLoading(true);
+    try {
+      const res = await api.post("/auth/login", { username, password });
 
-    if (res.success && res.token && res.user) {
-      if (remember) {
-        localStorage.setItem(
-          "rememberedUser",
-          JSON.stringify({ username: res.user.username, password })
-        );
+      if (res.success && res.token && res.user) {
+        if (remember) {
+          localStorage.setItem(
+            "rememberedUser",
+            JSON.stringify({ username: res.user.username, password })
+          );
+        } else {
+          localStorage.removeItem("rememberedUser");
+        }
+
+        localStorage.setItem("token", res.token);
+        sessionStorage.setItem("currentUser", JSON.stringify(res.user));
+
+        toast.success("Tizimga muvaffaqiyatli kirildi!");
+
+        if (res.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
-        localStorage.removeItem("rememberedUser");
+        toast.error(res.error || "Login yoki parol noto'g'ri!");
       }
-
-      localStorage.setItem("token", res.token);
-      sessionStorage.setItem("currentUser", JSON.stringify(res.user));
-
-      toast.success("Tizimga muvaffaqiyatli kirildi!");
-
-      if (res.user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
-    } else {
-      toast.error(res.error || "Login yoki parol noto'g'ri!");
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Tizimga kirishda xatolik yuz berdi!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,9 +98,10 @@ export default function Login() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  disabled={loading}
                   required
                   placeholder="Loginingizni kiriting"
-                  className="pl-10 py-2 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="pl-10 py-2 w-full rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none disabled:opacity-50 disabled:bg-gray-50"
                 />
               </div>
             </div>
@@ -108,14 +118,16 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
                   required
                   placeholder="Parolingizni kiriting"
-                  className="pl-10 pr-10 py-2 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="pl-10 pr-10 py-2 w-full rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none disabled:opacity-50 disabled:bg-gray-50"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-500 transition-colors"
+                  disabled={loading}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-500 transition-colors disabled:opacity-50"
                 >
                   <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
                 </button>
@@ -129,7 +141,8 @@ export default function Login() {
                   id="remember"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
-                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  disabled={loading}
+                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50"
                 />
                 <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">
                   Meni eslab qol
@@ -137,10 +150,23 @@ export default function Login() {
               </div>
             </div>
 
-            <button type="submit" className="submit-button group w-full py-2.5 rounded-lg text-white font-semibold transition-all">
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="submit-button group w-full py-2.5 rounded-lg text-white font-semibold transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+            >
               <span className="flex items-center justify-center">
-                Kirish
-                <i className="fas fa-sign-in-alt ml-2 group-hover:translate-x-1 transition-transform"></i>
+                {loading ? (
+                  <>
+                    Kirilmoqda...
+                    <i className="fas fa-spinner fa-spin ml-2"></i>
+                  </>
+                ) : (
+                  <>
+                    Kirish
+                    <i className="fas fa-sign-in-alt ml-2 group-hover:translate-x-1 transition-transform"></i>
+                  </>
+                )}
               </span>
             </button>
           </form>
