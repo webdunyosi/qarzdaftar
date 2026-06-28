@@ -57,6 +57,7 @@ export default function DebtsList() {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [qarzlar, setQarzlar] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Search & Filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,10 +83,12 @@ export default function DebtsList() {
 
   // Load Initial Data
   const loadFilteredDebts = async () => {
+    setLoading(true);
     const res = await api.get("/debts");
     if (!res.error) {
       setQarzlar(res);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -429,288 +432,146 @@ export default function DebtsList() {
                 </tr>
               </thead>
               <tbody className="bg-white/95 divide-y divide-gray-200">
-                {filteredQarzlar.map((q) => {
-                  const tolashDate = new Date(q.tolashMuddati);
-                  const overdue = today > tolashDate && q.status === "To'lanmagan";
-                  const remainingDays = Math.ceil((tolashDate - today) / (1000 * 60 * 60 * 24));
-
-                  let remainingText = "";
-                  if (q.status === "To'langan") {
-                    remainingText = <span className="text-green-600 font-medium">To'langan</span>;
-                  } else if (overdue) {
-                    remainingText = <span className="text-red-600 font-bold">{Math.abs(remainingDays)} kun o'tgan</span>;
-                  } else if (remainingDays === 0) {
-                    remainingText = <span className="text-yellow-600 font-bold">Bugun</span>;
-                  } else {
-                    remainingText = <span className="text-blue-600 font-medium">{remainingDays} kun qoldi</span>;
-                  }
-
-                  const statusBadge =
-                    q.status === "To'langan" ? (
-                      <span className="px-2 py-0.5 text-[10px] font-semibold text-green-600 bg-green-100 rounded-full">
-                        To'langan
-                      </span>
-                    ) : overdue ? (
-                      <span className="px-2 py-0.5 text-[10px] font-semibold text-red-600 bg-red-100 rounded-full">
-                        Muddati o'tgan
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 text-[10px] font-semibold text-yellow-600 bg-yellow-100 rounded-full">
-                        To'lanmagan
-                      </span>
-                    );
-
-                  return (
-                    <tr key={q.id} className="hover:bg-gray-50/50 transition">
-                      <td className="px-4 py-3 whitespace-nowrap">
+                {loading ? (
+                  [1, 2, 3, 4, 5].map((i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td className="px-4 py-3">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center">
-                            <i className="fas fa-user text-gray-500 text-sm"></i>
-                          </div>
-                          <div className="ml-2.5">
-                            <div className="text-sm font-medium text-gray-900">{q.mijozIsmi}</div>
-                            {statusBadge}
+                          <div className="w-8 h-8 bg-slate-200/50 rounded-full skeleton-dark-premium flex-shrink-0" />
+                          <div className="ml-2.5 space-y-1">
+                            <div className="h-3.5 w-24 bg-slate-200/70 rounded skeleton-dark-premium" />
+                            <div className="h-3 w-16 bg-slate-200/50 rounded skeleton-dark-premium" />
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <a href={`tel:${q.telefon}`} className="text-sm text-blue-700 font-medium hover:underline flex items-center gap-1">
-                          <i className="fas fa-phone text-blue-500 text-xs"></i>
-                          {q.telefon}
-                        </a>
+                      <td className="px-4 py-3">
+                        <div className="h-3.5 w-20 bg-slate-200/50 rounded skeleton-dark-premium" />
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900 flex items-center gap-1">
-                          <i className="fas fa-tshirt text-gray-400 text-xs"></i>
-                          {q.mahsulot}
-                        </span>
+                      <td className="px-4 py-3">
+                        <div className="h-3.5 w-16 bg-slate-200/50 rounded skeleton-dark-premium" />
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900 font-semibold flex items-center gap-1">
-                          <i className="fas fa-money-bill-alt text-gray-400 text-xs"></i>
-                          {q.qarzMiqdori.toLocaleString()} so'm
-                        </span>
+                      <td className="px-4 py-3">
+                        <div className="h-3.5 w-24 bg-slate-200/70 rounded skeleton-dark-premium" />
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(q.sana).toLocaleDateString()}
+                      <td className="px-4 py-3">
+                        <div className="h-3.5 w-20 bg-slate-200/50 rounded skeleton-dark-premium" />
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-950">
-                        <div>{new Date(q.tolashMuddati).toLocaleDateString()}</div>
-                        <div className="text-[10px] mt-0.5">{remainingText}</div>
+                      <td className="px-4 py-3">
+                        <div className="h-3.5 w-20 bg-slate-200/50 rounded skeleton-dark-premium mb-1" />
+                        <div className="h-3 w-16 bg-slate-200/50 rounded skeleton-dark-premium" />
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => yangiQarzQoshishMijoz(q.mijozIsmi, q.telefon)}
-                            className="text-white bg-indigo-500 hover:bg-indigo-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
-                            title="Yangi qarz qo'shish"
-                          >
-                            <i className="fas fa-plus mr-1"></i>
-                            Qarz+
-                          </button>
-
-                          {q.status !== "To'langan" && (
-                            <button
-                              onClick={() => qarzniTolash(q.id)}
-                              className="text-white bg-green-500 hover:bg-green-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
-                            >
-                              <i className="fas fa-check mr-1"></i>
-                              To'landi
-                            </button>
-                          )}
-                          
-                          {currentUser?.role === "admin" && (
-                            <>
-                              <button
-                                onClick={() => qarzniTahrirlash(q)}
-                                className="text-white bg-yellow-500 hover:bg-yellow-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
-                              >
-                                <i className="fas fa-edit mr-1"></i>
-                                Tahrirlash
-                              </button>
-                              <button
-                                onClick={() => qarzniOchirish(q.id)}
-                                className="text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
-                              >
-                                <i className="fas fa-trash mr-1"></i>
-                                O'chirish
-                              </button>
-                            </>
-                          )}
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <div className="h-6 w-16 bg-slate-200/50 rounded skeleton-dark-premium" />
+                          <div className="h-6 w-16 bg-slate-200/50 rounded skeleton-dark-premium" />
                         </div>
                       </td>
                     </tr>
-                  );
-                })}
+                  ))
+                ) : (
+                  <>
+                    {filteredQarzlar.map((q) => {
+                      const tolashDate = new Date(q.tolashMuddati);
+                      const overdue = today > tolashDate && q.status === "To'lanmagan";
+                      const remainingDays = Math.ceil((tolashDate - today) / (1000 * 60 * 60 * 24));
 
-                {filteredQarzlar.length === 0 && (
-                  <tr>
-                    <td colSpan="7" className="px-6 py-10 text-center text-gray-500">
-                      <i className="fas fa-search text-3xl mb-2 text-gray-300"></i>
-                      <p className="text-sm">Hech qanday qarz topilmadi</p>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                      let remainingText = "";
+                      if (q.status === "To'langan") {
+                        remainingText = <span className="text-green-600 font-medium">To'langan</span>;
+                      } else if (overdue) {
+                        remainingText = <span className="text-red-600 font-bold">{Math.abs(remainingDays)} kun o'tgan</span>;
+                      } else if (remainingDays === 0) {
+                        remainingText = <span className="text-yellow-600 font-bold">Bugun</span>;
+                      } else {
+                        remainingText = <span className="text-blue-600 font-medium">{remainingDays} kun qoldi</span>;
+                      }
 
-          {/* Accordion List (Mobile View) */}
-          <div className="block md:hidden space-y-3 flex-1">
-            {groupedDebtsList.map((group) => {
-              const key = `${group.mijozIsmi.trim().toLowerCase()}_${group.telefon.trim()}`;
-              const isExpanded = expandedGroups[key];
-              
-              // Calculate group status indicator dot
-              const hasOverdue = group.items.some((item) => {
-                const tolashDate = new Date(item.tolashMuddati);
-                return today > tolashDate && item.status === "To'lanmagan";
-              });
-              const hasUnpaid = group.items.some((item) => item.status === "To'lanmagan");
-              
-              let dotColor = "bg-green-500";
-              if (hasOverdue) {
-                dotColor = "bg-red-500 animate-pulse";
-              } else if (hasUnpaid) {
-                dotColor = "bg-yellow-500 animate-pulse";
-              }
-
-              return (
-                <div key={key} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                  {/* Customer Header */}
-                  <div
-                    onClick={() => toggleGroup(key)}
-                    className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition active:bg-gray-100"
-                  >
-                    <div className="flex items-center gap-3">
-                      {/* Avatar */}
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-gradient-to-tr ${getAvatarGradient(group.mijozIsmi)} shadow-sm`}>
-                        {group.mijozIsmi.trim().charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-bold text-gray-800 capitalize">
-                            {group.mijozIsmi}
+                      const statusBadge =
+                        q.status === "To'langan" ? (
+                          <span className="px-2 py-0.5 text-[10px] font-semibold text-green-600 bg-green-100 rounded-full">
+                            To'langan
                           </span>
-                          <span className={`w-2 h-2 rounded-full ${dotColor}`} />
-                        </div>
-                        <span className="text-xs text-gray-500 font-medium">
-                          {group.telefon}
-                        </span>
-                      </div>
-                    </div>
+                        ) : overdue ? (
+                          <span className="px-2 py-0.5 text-[10px] font-semibold text-red-600 bg-red-100 rounded-full">
+                            Muddati o'tgan
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 text-[10px] font-semibold text-yellow-600 bg-yellow-100 rounded-full">
+                            To'lanmagan
+                          </span>
+                        );
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          yangiQarzQoshishMijoz(group.mijozIsmi, group.telefon);
-                        }}
-                        className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-100 transition active:scale-90"
-                        title="Yangi qarz qo'shish"
-                      >
-                        <i className="fas fa-plus text-xs"></i>
-                      </button>
-                      <a
-                        href={`tel:${group.telefon}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition active:scale-90"
-                      >
-                        <i className="fas fa-phone text-xs"></i>
-                      </a>
-                      <a
-                        href={`https://t.me/${group.telefon.replace(/[^0-9]/g, "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-100 transition active:scale-90"
-                      >
-                        <i className="fab fa-telegram-plane text-xs"></i>
-                      </a>
-                      <div className="w-8 h-8 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center">
-                        <i className={`fas ${isExpanded ? "fa-chevron-up" : "fa-chevron-down"} text-xs transition-transform duration-200`}></i>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Customer Debts List */}
-                  {isExpanded && (
-                    <div className="px-4 pb-4 pt-1 border-t border-gray-50 bg-gray-50/30 space-y-3">
-                      {group.items.map((item) => {
-                        const tolashDate = new Date(item.tolashMuddati);
-                        const overdue = today > tolashDate && item.status === "To'lanmagan";
-                        const remainingDays = Math.ceil((tolashDate - today) / (1000 * 60 * 60 * 24));
-
-                        let remainingText = "";
-                        let borderClass = "border-l-yellow-500 bg-yellow-50/15";
-                        let statusColor = "text-yellow-600 bg-yellow-50";
-                        
-                        if (item.status === "To'langan") {
-                          remainingText = <span className="text-green-600 font-medium">To'langan</span>;
-                          borderClass = "border-l-green-500 bg-green-50/15";
-                          statusColor = "text-green-600 bg-green-50";
-                        } else if (overdue) {
-                          remainingText = <span className="text-red-600 font-bold">{Math.abs(remainingDays)} kun o'tgan</span>;
-                          borderClass = "border-l-red-500 bg-red-50/15";
-                          statusColor = "text-red-600 bg-red-50";
-                        } else if (remainingDays === 0) {
-                          remainingText = <span className="text-yellow-600 font-bold">Bugun</span>;
-                        } else {
-                          remainingText = <span className="text-blue-600 font-medium">{remainingDays} kun qoldi</span>;
-                        }
-
-                        return (
-                          <div key={item.id} className={`p-3 rounded-xl border-l-4 ${borderClass} shadow-sm space-y-2 animate-fade-in`}>
-                            {/* Sub-card header */}
-                            <div className="flex justify-between items-center text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
-                              <span>📅 {new Date(item.sana).toLocaleDateString("uz-UZ")}</span>
-                              <span>⏰ {new Date(item.tolashMuddati).toLocaleDateString("uz-UZ")}</span>
-                            </div>
-
-                            {/* Sub-card info */}
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h4 className="text-sm font-bold text-gray-800 flex items-center gap-1.5">
-                                  <i className="fas fa-tshirt text-gray-400 text-xs"></i>
-                                  {item.mahsulot}
-                                </h4>
-                                <div className="text-xs text-gray-500 mt-0.5">
-                                  Muddat: {remainingText}
-                                </div>
+                      return (
+                        <tr key={q.id} className="hover:bg-gray-50/50 transition">
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center">
+                                <i className="fas fa-user text-gray-500 text-sm"></i>
                               </div>
-                              <div className="text-right">
-                                <span className="text-sm font-extrabold text-gray-900 block">
-                                  {item.qarzMiqdori.toLocaleString()} so'm
-                                </span>
-                                <span className={`inline-block px-2 py-0.5 text-[9px] font-bold rounded-full mt-1 ${statusColor}`}>
-                                  {item.status}
-                                </span>
+                              <div className="ml-2.5">
+                                <div className="text-sm font-medium text-gray-900">{q.mijozIsmi}</div>
+                                {statusBadge}
                               </div>
                             </div>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <a href={`tel:${q.telefon}`} className="text-sm text-blue-700 font-medium hover:underline flex items-center gap-1">
+                              <i className="fas fa-phone text-blue-500 text-xs"></i>
+                              {q.telefon}
+                            </a>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <span className="text-sm text-gray-900 flex items-center gap-1">
+                              <i className="fas fa-tshirt text-gray-400 text-xs"></i>
+                              {q.mahsulot}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <span className="text-sm text-gray-900 font-semibold flex items-center gap-1">
+                              <i className="fas fa-money-bill-alt text-gray-400 text-xs"></i>
+                              {q.qarzMiqdori.toLocaleString()} so'm
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                            {new Date(q.sana).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-950">
+                            <div>{new Date(q.tolashMuddati).toLocaleDateString()}</div>
+                            <div className="text-[10px] mt-0.5">{remainingText}</div>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => yangiQarzQoshishMijoz(q.mijozIsmi, q.telefon)}
+                                className="text-white bg-indigo-500 hover:bg-indigo-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
+                                title="Yangi qarz qo'shish"
+                              >
+                                <i className="fas fa-plus mr-1"></i>
+                                Qarz+
+                              </button>
 
-                            {/* Sub-card actions */}
-                            <div className="flex justify-end gap-1.5 pt-2 border-t border-gray-100">
-                              {item.status !== "To'langan" && (
+                              {q.status !== "To'langan" && (
                                 <button
-                                  onClick={() => qarzniTolash(item.id)}
-                                  className="text-white bg-green-500 hover:bg-green-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                  onClick={() => qarzniTolash(q.id)}
+                                  className="text-white bg-green-500 hover:bg-green-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
                                 >
                                   <i className="fas fa-check mr-1"></i>
                                   To'landi
                                 </button>
                               )}
+                              
                               {currentUser?.role === "admin" && (
                                 <>
                                   <button
-                                    onClick={() => qarzniTahrirlash(item)}
-                                    className="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                    onClick={() => qarzniTahrirlash(q)}
+                                    className="text-white bg-yellow-500 hover:bg-yellow-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
                                   >
                                     <i className="fas fa-edit mr-1"></i>
                                     Tahrirlash
                                   </button>
                                   <button
-                                    onClick={() => qarzniOchirish(item.id)}
-                                    className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                    onClick={() => qarzniOchirish(q.id)}
+                                    className="text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
                                   >
                                     <i className="fas fa-trash mr-1"></i>
                                     O'chirish
@@ -718,20 +579,223 @@ export default function DebtsList() {
                                 </>
                               )}
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                          </td>
+                        </tr>
+                      );
+                    })}
 
-            {groupedDebtsList.length === 0 && (
-              <div className="p-8 text-center text-gray-500 bg-white rounded-2xl border border-gray-100">
-                <i className="fas fa-search text-3xl mb-2 text-gray-300"></i>
-                <p className="text-sm">Hech qanday qarz topilmadi</p>
-              </div>
+                    {filteredQarzlar.length === 0 && (
+                      <tr>
+                        <td colSpan="7" className="px-6 py-10 text-center text-gray-500">
+                          <i className="fas fa-search text-3xl mb-2 text-gray-300"></i>
+                          <p className="text-sm">Hech qanday qarz topilmadi</p>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Accordion List (Mobile View) */}
+          <div className="block md:hidden space-y-3 flex-1">
+            {loading ? (
+              [1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-4 flex items-center justify-between animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-slate-200/50 skeleton-dark-premium" />
+                    <div>
+                      <div className="h-3.5 w-24 bg-slate-200/70 rounded skeleton-dark-premium mb-2" />
+                      <div className="h-3 w-20 bg-slate-200/50 rounded skeleton-dark-premium" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-slate-200/50 skeleton-dark-premium" />
+                    <div className="w-8 h-8 rounded-full bg-slate-200/50 skeleton-dark-premium" />
+                    <div className="w-8 h-8 rounded-full bg-slate-200/50 skeleton-dark-premium" />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <>
+                {groupedDebtsList.map((group) => {
+                  const key = `${group.mijozIsmi.trim().toLowerCase()}_${group.telefon.trim()}`;
+                  const isExpanded = expandedGroups[key];
+                  
+                  // Calculate group status indicator dot
+                  const hasOverdue = group.items.some((item) => {
+                    const tolashDate = new Date(item.tolashMuddati);
+                    return today > tolashDate && item.status === "To'lanmagan";
+                  });
+                  const hasUnpaid = group.items.some((item) => item.status === "To'lanmagan");
+                  
+                  let dotColor = "bg-green-500";
+                  if (hasOverdue) {
+                    dotColor = "bg-red-500 animate-pulse";
+                  } else if (hasUnpaid) {
+                    dotColor = "bg-yellow-500 animate-pulse";
+                  }
+
+                  return (
+                    <div key={key} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                      {/* Customer Header */}
+                      <div
+                        onClick={() => toggleGroup(key)}
+                        className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition active:bg-gray-100"
+                      >
+                        <div className="flex items-center gap-3">
+                          {/* Avatar */}
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-gradient-to-tr ${getAvatarGradient(group.mijozIsmi)} shadow-sm`}>
+                            {group.mijozIsmi.trim().charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-bold text-gray-800 capitalize">
+                                {group.mijozIsmi}
+                              </span>
+                              <span className={`w-2 h-2 rounded-full ${dotColor}`} />
+                            </div>
+                            <span className="text-xs text-gray-500 font-medium">
+                              {group.telefon}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              yangiQarzQoshishMijoz(group.mijozIsmi, group.telefon);
+                            }}
+                            className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-100 transition active:scale-90"
+                            title="Yangi qarz qo'shish"
+                          >
+                            <i className="fas fa-plus text-xs"></i>
+                          </button>
+                          <a
+                            href={`tel:${group.telefon}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition active:scale-90"
+                          >
+                            <i className="fas fa-phone text-xs"></i>
+                          </a>
+                          <a
+                            href={`https://t.me/${group.telefon.replace(/[^0-9]/g, "")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-100 transition active:scale-90"
+                          >
+                            <i className="fab fa-telegram-plane text-xs"></i>
+                          </a>
+                          <div className="w-8 h-8 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center">
+                            <i className={`fas ${isExpanded ? "fa-chevron-up" : "fa-chevron-down"} text-xs transition-transform duration-200`}></i>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Customer Debts List */}
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-1 border-t border-gray-50 bg-gray-50/30 space-y-3">
+                          {group.items.map((item) => {
+                            const tolashDate = new Date(item.tolashMuddati);
+                            const overdue = today > tolashDate && item.status === "To'lanmagan";
+                            const remainingDays = Math.ceil((tolashDate - today) / (1000 * 60 * 60 * 24));
+
+                            let remainingText = "";
+                            let borderClass = "border-l-yellow-500 bg-yellow-50/15";
+                            let statusColor = "text-yellow-600 bg-yellow-50";
+                            
+                            if (item.status === "To'langan") {
+                              remainingText = <span className="text-green-600 font-medium">To'langan</span>;
+                              borderClass = "border-l-green-500 bg-green-50/15";
+                              statusColor = "text-green-600 bg-green-50";
+                            } else if (overdue) {
+                              remainingText = <span className="text-red-600 font-bold">{Math.abs(remainingDays)} kun o'tgan</span>;
+                              borderClass = "border-l-red-500 bg-red-50/15";
+                              statusColor = "text-red-600 bg-red-50";
+                            } else if (remainingDays === 0) {
+                              remainingText = <span className="text-yellow-600 font-bold">Bugun</span>;
+                            } else {
+                              remainingText = <span className="text-blue-600 font-medium">{remainingDays} kun qoldi</span>;
+                            }
+
+                            return (
+                              <div key={item.id} className={`p-3 rounded-xl border-l-4 ${borderClass} shadow-sm space-y-2 animate-fade-in`}>
+                                {/* Sub-card header */}
+                                <div className="flex justify-between items-center text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
+                                  <span>📅 {new Date(item.sana).toLocaleDateString("uz-UZ")}</span>
+                                  <span>⏰ {new Date(item.tolashMuddati).toLocaleDateString("uz-UZ")}</span>
+                                </div>
+
+                                {/* Sub-card info */}
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <h4 className="text-sm font-bold text-gray-800 flex items-center gap-1.5">
+                                      <i className="fas fa-tshirt text-gray-400 text-xs"></i>
+                                      {item.mahsulot}
+                                    </h4>
+                                    <div className="text-xs text-gray-500 mt-0.5">
+                                      Muddat: {remainingText}
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className="text-sm font-extrabold text-gray-950 block">
+                                      {item.qarzMiqdori.toLocaleString()} so'm
+                                    </span>
+                                    <span className={`inline-block px-2 py-0.5 text-[9px] font-bold rounded-full mt-1 ${statusColor}`}>
+                                      {item.status}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Sub-card actions */}
+                                <div className="flex justify-end gap-1.5 pt-2 border-t border-gray-100">
+                                  {item.status !== "To'langan" && (
+                                    <button
+                                      onClick={() => qarzniTolash(item.id)}
+                                      className="text-white bg-green-500 hover:bg-green-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                    >
+                                      <i className="fas fa-check mr-1"></i>
+                                      To'landi
+                                    </button>
+                                  )}
+                                  {currentUser?.role === "admin" && (
+                                    <>
+                                      <button
+                                        onClick={() => qarzniTahrirlash(item)}
+                                        className="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                      >
+                                        <i className="fas fa-edit mr-1"></i>
+                                        Tahrirlash
+                                      </button>
+                                      <button
+                                        onClick={() => qarzniOchirish(item.id)}
+                                        className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                      >
+                                        <i className="fas fa-trash mr-1"></i>
+                                        O'chirish
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {groupedDebtsList.length === 0 && (
+                  <div className="p-8 text-center text-gray-500 bg-white rounded-2xl border border-gray-100">
+                    <i className="fas fa-search text-3xl mb-2 text-gray-300"></i>
+                    <p className="text-sm">Hech qanday qarz topilmadi</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

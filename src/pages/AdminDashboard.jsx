@@ -9,6 +9,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [qarzlar, setQarzlar] = useState([]);
   const [broadcasts, setBroadcasts] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";
@@ -58,6 +59,7 @@ export default function AdminDashboard() {
   }, [navigate]);
   
   const loadAllData = async () => {
+    setLoading(true);
     // Users list
     const usersRes = await api.get("/users");
     if (!usersRes.error) {
@@ -85,6 +87,7 @@ export default function AdminDashboard() {
         setSellerType(typesRes[0]);
       }
     }
+    setLoading(false);
   };
 
   const handleAddType = async (e) => {
@@ -279,51 +282,70 @@ export default function AdminDashboard() {
             
             {/* Global Statistics Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-5 rounded-3xl shadow-md">
-                <div className="flex items-center gap-3 mb-2.5">
-                  <div className="w-9 h-9 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center shadow-sm">
-                    <i className="fas fa-store text-base"></i>
+              {loading ? (
+                [
+                  { bg: "bg-blue-50/85 border border-blue-100/70" },
+                  { bg: "bg-green-50/85 border border-green-100/70" },
+                  { bg: "bg-yellow-50/85 border border-yellow-100/70" },
+                  { bg: "bg-indigo-50/85 border border-indigo-100/70" }
+                ].map((item, i) => (
+                  <div key={i} className={`${item.bg} backdrop-blur-md p-5 rounded-3xl shadow-md animate-pulse`}>
+                    <div className="flex items-center gap-3 mb-2.5">
+                      <div className="w-9 h-9 bg-slate-200/50 rounded-xl skeleton-dark-premium" />
+                      <div className="h-3 w-16 bg-slate-200/50 rounded skeleton-dark-premium" />
+                    </div>
+                    <div className="h-8 w-28 bg-slate-200/70 rounded skeleton-dark-premium" />
                   </div>
-                  <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Sotuvchilar</p>
-                </div>
-                <p className="text-3xl font-black text-slate-800">{totalSellersCount} ta</p>
-              </div>
-              
-              <div className="bg-green-50/85 border border-green-100/70 backdrop-blur-md p-5 rounded-3xl shadow-md">
-                <div className="flex items-center gap-3 mb-2.5">
-                  <div className="w-9 h-9 bg-green-100 text-green-600 rounded-xl flex items-center justify-center shadow-sm">
-                    <i className="fas fa-hand-holding-usd text-base"></i>
+                ))
+              ) : (
+                <>
+                  <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-5 rounded-3xl shadow-md">
+                    <div className="flex items-center gap-3 mb-2.5">
+                      <div className="w-9 h-9 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+                        <i className="fas fa-store text-base"></i>
+                      </div>
+                      <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Sotuvchilar</p>
+                    </div>
+                    <p className="text-3xl font-black text-slate-800">{totalSellersCount} ta</p>
                   </div>
-                  <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Jami Daromad</p>
-                </div>
-                <p className="text-2xl sm:text-3xl font-black text-green-600">
-                  {totalSystemRevenue.toLocaleString()} <span className="text-sm font-semibold">so'm</span>
-                </p>
-              </div>
-              
-              <div className="bg-yellow-50/85 border border-yellow-100/70 backdrop-blur-md p-5 rounded-3xl shadow-md">
-                <div className="flex items-center gap-3 mb-2.5">
-                  <div className="w-9 h-9 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center shadow-sm">
-                    <i className="fas fa-file-invoice-dollar text-base"></i>
+                  
+                  <div className="bg-green-50/85 border border-green-100/70 backdrop-blur-md p-5 rounded-3xl shadow-md">
+                    <div className="flex items-center gap-3 mb-2.5">
+                      <div className="w-9 h-9 bg-green-100 text-green-600 rounded-xl flex items-center justify-center shadow-sm">
+                        <i className="fas fa-hand-holding-usd text-base"></i>
+                      </div>
+                      <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Jami Daromad</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-green-600">
+                      {totalSystemRevenue.toLocaleString()} <span className="text-sm font-semibold">so'm</span>
+                    </p>
                   </div>
-                  <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Faol Qarzlar</p>
-                </div>
-                <p className="text-2xl sm:text-3xl font-black text-yellow-600">
-                  {totalActiveDebts.toLocaleString()} <span className="text-sm font-semibold">so'm</span>
-                </p>
-              </div>
-              
-              <div className="bg-indigo-50/85 border border-indigo-100/70 backdrop-blur-md p-5 rounded-3xl shadow-md">
-                <div className="flex items-center gap-3 mb-2.5">
-                  <div className="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
-                    <i className="fas fa-coins text-base"></i>
+                  
+                  <div className="bg-yellow-50/85 border border-yellow-100/70 backdrop-blur-md p-5 rounded-3xl shadow-md">
+                    <div className="flex items-center gap-3 mb-2.5">
+                      <div className="w-9 h-9 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center shadow-sm">
+                        <i className="fas fa-file-invoice-dollar text-base"></i>
+                      </div>
+                      <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Faol Qarzlar</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-yellow-600">
+                      {totalActiveDebts.toLocaleString()} <span className="text-sm font-semibold">so'm</span>
+                    </p>
                   </div>
-                  <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Jami Ayblov</p>
-                </div>
-                <p className="text-2xl sm:text-3xl font-black text-indigo-600">
-                  {totalSystemDebts.toLocaleString()} <span className="text-sm font-semibold">so'm</span>
-                </p>
-              </div>
+                  
+                  <div className="bg-indigo-50/85 border border-indigo-100/70 backdrop-blur-md p-5 rounded-3xl shadow-md">
+                    <div className="flex items-center gap-3 mb-2.5">
+                      <div className="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+                        <i className="fas fa-coins text-base"></i>
+                      </div>
+                      <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Jami Ayblov</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-indigo-600">
+                      {totalSystemDebts.toLocaleString()} <span className="text-sm font-semibold">so'm</span>
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Quick overview of latest activity logs / broadcasts */}

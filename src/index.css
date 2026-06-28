@@ -756,3 +756,24 @@ tbody tr:hover {
 .animate-border-glow {
   animation: borderGlow 3s infinite ease-in-out;
 }
+
+/* Shimmer / Skeleton Loader animation */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-dark-premium {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.4) 25%,
+    rgba(203, 213, 225, 0.7) 37%,
+    rgba(226, 232, 240, 0.4) 63%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s infinite ease-in-out;
+}

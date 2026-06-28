@@ -7,6 +7,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [qarzlar, setQarzlar] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const userStr = sessionStorage.getItem("currentUser");
@@ -15,10 +16,12 @@ export default function Home() {
     setCurrentUser(loggedUser);
 
     const loadFilteredDebts = async () => {
+      setLoading(true);
       const res = await api.get("/debts");
       if (!res.error) {
         setQarzlar(res);
       }
+      setLoading(false);
     };
 
     loadFilteredDebts();
@@ -128,58 +131,102 @@ export default function Home() {
         <div className="px-4 space-y-4">
 
           {/* Main Summary Card */}
-          <div className="glass-card-premium card-gradient-blue hover-shadow-blue rounded-3xl p-6 animate-slide-up">
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Umumiy to'lanmagan</p>
-            <p className="text-4xl font-black text-blue-700">
-              {formatMoney(unpaid.reduce((s, q) => s + Number(q.qarzMiqdori || q.miqdor || 0), 0))} <span className="text-lg font-semibold text-blue-400">so'm</span>
-            </p>
-            <div className="mt-4 pt-4 border-t border-blue-100/50 flex gap-4">
-              <div>
-                <p className="text-slate-400 text-xs font-medium">Qarzlar soni</p>
-                <p className="text-slate-800 font-extrabold text-lg">{unpaid.length} ta</p>
-              </div>
-              <div className="w-px bg-blue-100/60"></div>
-              <div>
-                <p className="text-slate-400 text-xs font-medium">Muddati o'tgan</p>
-                <p className="text-rose-600 font-extrabold text-lg">{overdue.length} ta</p>
-              </div>
-              <div className="w-px bg-blue-100/60"></div>
-              <div>
-                <p className="text-slate-400 text-xs font-medium">Bugun to'lanadi</p>
-                <p className="text-amber-600 font-extrabold text-lg">{todayDue.length} ta</p>
+          {loading ? (
+            <div className="glass-card-premium card-gradient-blue rounded-3xl p-6 animate-pulse">
+              <div className="h-4 w-36 bg-slate-200/50 rounded-md skeleton-dark-premium mb-3" />
+              <div className="h-10 w-52 bg-slate-200/70 rounded-md skeleton-dark-premium mb-5" />
+              <div className="mt-4 pt-4 border-t border-blue-100/50 flex gap-4">
+                <div className="flex-1">
+                  <div className="h-3 w-16 bg-slate-200/50 rounded skeleton-dark-premium mb-2" />
+                  <div className="h-6 w-10 bg-slate-200/70 rounded skeleton-dark-premium" />
+                </div>
+                <div className="w-px bg-blue-100/60"></div>
+                <div className="flex-1">
+                  <div className="h-3 w-20 bg-slate-200/50 rounded skeleton-dark-premium mb-2" />
+                  <div className="h-6 w-10 bg-slate-200/70 rounded skeleton-dark-premium" />
+                </div>
+                <div className="w-px bg-blue-100/60"></div>
+                <div className="flex-1">
+                  <div className="h-3 w-20 bg-slate-200/50 rounded skeleton-dark-premium mb-2" />
+                  <div className="h-6 w-10 bg-slate-200/70 rounded skeleton-dark-premium" />
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="glass-card-premium card-gradient-blue hover-shadow-blue rounded-3xl p-6 animate-slide-up">
+              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Umumiy to'lanmagan</p>
+              <p className="text-4xl font-black text-blue-700">
+                {formatMoney(unpaid.reduce((s, q) => s + Number(q.qarzMiqdori || q.miqdor || 0), 0))} <span className="text-lg font-semibold text-blue-400">so'm</span>
+              </p>
+              <div className="mt-4 pt-4 border-t border-blue-100/50 flex gap-4">
+                <div>
+                  <p className="text-slate-400 text-xs font-medium">Qarzlar soni</p>
+                  <p className="text-slate-800 font-extrabold text-lg">{unpaid.length} ta</p>
+                </div>
+                <div className="w-px bg-blue-100/60"></div>
+                <div>
+                  <p className="text-slate-400 text-xs font-medium">Muddati o'tgan</p>
+                  <p className="text-rose-600 font-extrabold text-lg">{overdue.length} ta</p>
+                </div>
+                <div className="w-px bg-blue-100/60"></div>
+                <div>
+                  <p className="text-slate-400 text-xs font-medium">Bugun to'lanadi</p>
+                  <p className="text-amber-600 font-extrabold text-lg">{todayDue.length} ta</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Stats Row: Daily & Monthly */}
-          <div className="grid grid-cols-2 gap-3 animate-slide-up">
-            <div className="glass-card-premium card-gradient-red hover-shadow-red rounded-2xl p-4 cursor-pointer">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-gradient-to-tr from-amber-400/20 to-orange-500/20 border border-orange-100 rounded-lg flex items-center justify-center">
-                  <i className="fas fa-calendar-day text-orange-500 text-sm"></i>
+          {loading ? (
+            <div className="grid grid-cols-2 gap-3 animate-pulse">
+              <div className="glass-card-premium card-gradient-red rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 bg-slate-200/50 rounded-lg skeleton-dark-premium" />
+                  <div className="h-3.5 w-12 bg-slate-200/50 rounded skeleton-dark-premium" />
                 </div>
-                <p className="text-slate-500 text-xs font-bold">Bugungi</p>
+                <div className="h-8 w-24 bg-slate-200/70 rounded skeleton-dark-premium mt-2" />
+                <div className="h-3 w-10 bg-slate-200/50 rounded skeleton-dark-premium mt-1.5" />
               </div>
-              <p className="text-2xl font-black text-slate-800">
-                {formatMoney(qarzlar
-                  .filter((q) => q.tolashMuddati?.startsWith(todayStr))
-                  .reduce((s, q) => s + Number(q.qarzMiqdori || q.miqdor || 0), 0))}
-              </p>
-              <p className="text-slate-400 text-xs mt-0.5">so'm</p>
-            </div>
-            <div className="glass-card-premium card-gradient-blue hover-shadow-blue rounded-2xl p-4 cursor-pointer">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-gradient-to-tr from-indigo-400/20 to-purple-500/20 border border-purple-100 rounded-lg flex items-center justify-center">
-                  <i className="fas fa-calendar-alt text-purple-500 text-sm"></i>
+              <div className="glass-card-premium card-gradient-blue rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 bg-slate-200/50 rounded-lg skeleton-dark-premium" />
+                  <div className="h-3.5 w-12 bg-slate-200/50 rounded skeleton-dark-premium" />
                 </div>
-                <p className="text-slate-500 text-xs font-bold">Oylik</p>
+                <div className="h-8 w-24 bg-slate-200/70 rounded skeleton-dark-premium mt-2" />
+                <div className="h-3 w-10 bg-slate-200/50 rounded skeleton-dark-premium mt-1.5" />
               </div>
-              <p className="text-2xl font-black text-slate-800">
-                {formatMoney(monthlyAdded.reduce((s, q) => s + Number(q.qarzMiqdori || q.miqdor || 0), 0))}
-              </p>
-              <p className="text-slate-400 text-xs mt-0.5">so'm</p>
             </div>
-          </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 animate-slide-up">
+              <div className="glass-card-premium card-gradient-red hover-shadow-red rounded-2xl p-4 cursor-pointer">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 bg-gradient-to-tr from-amber-400/20 to-orange-500/20 border border-orange-100 rounded-lg flex items-center justify-center">
+                    <i className="fas fa-calendar-day text-orange-500 text-sm"></i>
+                  </div>
+                  <p className="text-slate-500 text-xs font-bold">Bugungi</p>
+                </div>
+                <p className="text-2xl font-black text-slate-800">
+                  {formatMoney(qarzlar
+                    .filter((q) => q.tolashMuddati?.startsWith(todayStr))
+                    .reduce((s, q) => s + Number(q.qarzMiqdori || q.miqdor || 0), 0))}
+                </p>
+                <p className="text-slate-400 text-xs mt-0.5">so'm</p>
+              </div>
+              <div className="glass-card-premium card-gradient-blue hover-shadow-blue rounded-2xl p-4 cursor-pointer">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 bg-gradient-to-tr from-indigo-400/20 to-purple-500/20 border border-purple-100 rounded-lg flex items-center justify-center">
+                    <i className="fas fa-calendar-alt text-purple-500 text-sm"></i>
+                  </div>
+                  <p className="text-slate-500 text-xs font-bold">Oylik</p>
+                </div>
+                <p className="text-2xl font-black text-slate-800">
+                  {formatMoney(monthlyAdded.reduce((s, q) => s + Number(q.qarzMiqdori || q.miqdor || 0), 0))}
+                </p>
+                <p className="text-slate-400 text-xs mt-0.5">so'm</p>
+              </div>
+            </div>
+          )}
 
           {/* Today's Due Debts */}
           <div className="animate-slide-up">
@@ -188,12 +235,32 @@ export default function Home() {
                 <i className="fas fa-clock text-amber-500"></i>
                 Bugun to'lanishi kerak
               </h2>
-              <span className="bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold px-2 py-0.5 rounded-full">
-                {todayDue.length} ta
-              </span>
+              {loading ? (
+                <div className="w-10 h-5 bg-slate-200/50 rounded-full skeleton-dark-premium" />
+              ) : (
+                <span className="bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold px-2 py-0.5 rounded-full">
+                  {todayDue.length} ta
+                </span>
+              )}
             </div>
 
-            {todayDue.length === 0 ? (
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2].map((i) => (
+                  <div key={i} className="glass-card-premium rounded-2xl p-4 flex items-center gap-3 border-l-4 border-l-amber-400">
+                    <div className="w-10 h-10 bg-slate-200/50 rounded-xl skeleton-dark-premium flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="h-4 w-28 bg-slate-200/70 rounded skeleton-dark-premium mb-1.5" />
+                      <div className="h-3 w-20 bg-slate-200/50 rounded skeleton-dark-premium" />
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="h-4 w-16 bg-slate-200/70 rounded skeleton-dark-premium mb-1" />
+                      <div className="h-3 w-8 bg-slate-200/50 rounded skeleton-dark-premium ml-auto" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : todayDue.length === 0 ? (
               <div className="glass-card-premium rounded-3xl p-6 text-center">
                 <i className="fas fa-check-circle text-3xl text-emerald-500 mb-2"></i>
                 <p className="text-slate-700 font-semibold">Bugun to'lanishi kerak bo'lgan qarz yo'q</p>
@@ -226,52 +293,74 @@ export default function Home() {
           </div>
 
           {/* Overdue Debts */}
-          {overdue.length > 0 && (
+          {(loading || overdue.length > 0) && (
             <div className="animate-slide-up">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-slate-800 font-extrabold text-base flex items-center gap-2">
                   <i className="fas fa-exclamation-triangle text-rose-500"></i>
                   Muddati o'tgan
                 </h2>
-                <span className="bg-rose-100 text-rose-800 border border-rose-200 text-xs font-bold px-2 py-0.5 rounded-full">
-                  {overdue.length} ta
-                </span>
-              </div>
-              <div className="space-y-3">
-                {overdue.slice(0, 5).map((q) => {
-                  const daysLate = Math.floor(
-                    (today - new Date(q.tolashMuddati)) / 86400000
-                  );
-                  return (
-                    <div
-                      key={q.id}
-                      className="glass-card-premium hover-shadow-red rounded-2xl p-4 flex items-center gap-3 border-l-4 border-l-rose-500"
-                    >
-                      <div className="w-10 h-10 bg-rose-50 border border-rose-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i className="fas fa-user text-rose-500"></i>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-slate-800 font-bold text-sm truncate">{q.mijozIsmi}</p>
-                        <p className="text-rose-500 text-xs font-semibold">{daysLate} kun kechikkan</p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-rose-600 font-black text-sm">
-                          {Number(q.qarzMiqdori || q.miqdor || 0).toLocaleString()}
-                        </p>
-                        <p className="text-slate-400 text-xs">so'm</p>
-                      </div>
-                    </div>
-                  );
-                })}
-                {overdue.length > 5 && (
-                  <button
-                    onClick={() => navigate("/debts")}
-                    className="w-full text-center text-blue-600 text-sm font-semibold py-2 hover:text-blue-700 transition"
-                  >
-                    Yana {overdue.length - 5} ta ko'rish →
-                  </button>
+                {loading ? (
+                  <div className="w-10 h-5 bg-slate-200/50 rounded-full skeleton-dark-premium" />
+                ) : (
+                  <span className="bg-rose-100 text-rose-800 border border-rose-200 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {overdue.length} ta
+                  </span>
                 )}
               </div>
+              {loading ? (
+                <div className="space-y-3">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="glass-card-premium rounded-2xl p-4 flex items-center gap-3 border-l-4 border-l-rose-400">
+                      <div className="w-10 h-10 bg-slate-200/50 rounded-xl skeleton-dark-premium flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="h-4 w-28 bg-slate-200/70 rounded skeleton-dark-premium mb-1.5" />
+                        <div className="h-3 w-20 bg-slate-200/50 rounded skeleton-dark-premium" />
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <div className="h-4 w-16 bg-slate-200/70 rounded skeleton-dark-premium mb-1" />
+                        <div className="h-3 w-8 bg-slate-200/50 rounded skeleton-dark-premium ml-auto" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {overdue.slice(0, 5).map((q) => {
+                    const daysLate = Math.floor(
+                      (today - new Date(q.tolashMuddati)) / 86400000
+                    );
+                    return (
+                      <div
+                        key={q.id}
+                        className="glass-card-premium hover-shadow-red rounded-2xl p-4 flex items-center gap-3 border-l-4 border-l-rose-500"
+                      >
+                        <div className="w-10 h-10 bg-rose-50 border border-rose-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <i className="fas fa-user text-rose-500"></i>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-slate-800 font-bold text-sm truncate">{q.mijozIsmi}</p>
+                          <p className="text-rose-500 text-xs font-semibold">{daysLate} kun kechikkan</p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-rose-600 font-black text-sm">
+                            {Number(q.qarzMiqdori || q.miqdor || 0).toLocaleString()}
+                          </p>
+                          <p className="text-slate-400 text-xs">so'm</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {overdue.length > 5 && (
+                    <button
+                      onClick={() => navigate("/debts")}
+                      className="w-full text-center text-blue-600 text-sm font-semibold py-2 hover:text-blue-700 transition"
+                    >
+                      Yana {overdue.length - 5} ta ko'rish →
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
