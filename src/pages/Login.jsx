@@ -85,7 +85,7 @@ export default function Login() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-2">
             <div className="form-group">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <i className="fas fa-user mr-2"></i>Login

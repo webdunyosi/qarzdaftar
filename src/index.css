@@ -148,7 +148,7 @@ tbody tr:hover {
 /* Form styles */
 .form-group {
   position: relative;
-  margin-bottom: 0rem;
+  margin-bottom: 0.75rem;
 }
 
 .form-group label {
@@ -447,7 +447,7 @@ tbody tr:hover {
   }
 
   .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
 
   input,
@@ -464,7 +464,7 @@ tbody tr:hover {
   }
 
   .form-group {
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.75rem;
   }
 }
 
