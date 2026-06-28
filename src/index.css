@@ -473,7 +473,7 @@ tbody tr:hover {
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  border: 2px solid;
+  border: 1.5px solid transparent;
   cursor: pointer;
   padding: 0.6rem 1.5rem;
   border-radius: 9999px;

@@ -319,7 +319,7 @@ export default function DebtsList() {
         <div className="w-full max-w-4xl glass-card-premium hover-shadow-blue p-5 sm:p-7 rounded-3xl animate-slide-up">
           
           {/* Header & Back Button */}
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
               <h2 className="text-xl font-bold text-gray-800">
                 Qarzlar Ro'yxati ({filteredQarzlar.length})
@@ -336,41 +336,41 @@ export default function DebtsList() {
           </div>
 
           {/* Search box & Date filter */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-            <div className="search-box flex items-center bg-white border border-gray-300 rounded-full px-4 py-2">
-              <i className="fas fa-search text-gray-400 mr-2"></i>
+          <div className="flex items-center gap-2 mb-2 w-full">
+            <div className="search-box flex items-center bg-white border border-gray-300 rounded-full px-3 py-1.5 w-1/2">
+              <i className="fas fa-search text-gray-400 mr-1.5 text-xs"></i>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Mijoz, telefon yoki mahsulot bo'yicha qidiruv..."
-                className="outline-none text-sm w-full bg-transparent border-none p-0 focus:ring-0 focus:outline-none"
+                placeholder="Mijoz, telefon..."
+                className="outline-none text-xs w-full bg-transparent border-none !p-0 !pl-1 focus:ring-0 focus:outline-none"
               />
               {searchTerm && (
                 <button onClick={() => setSearchTerm("")} className="text-gray-400 hover:text-gray-600">
-                  <i className="fas fa-times-circle"></i>
+                  <i className="fas fa-times-circle text-xs"></i>
                 </button>
               )}
             </div>
 
-            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-full px-4 py-2">
+            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-full px-3 py-1.5 w-1/2">
               <i className="fas fa-calendar text-gray-400"></i>
               <input
                 type="date"
                 value={sanaFilter}
                 onChange={(e) => setSanaFilter(e.target.value)}
-                className="outline-none text-sm w-full bg-transparent border-none p-0 focus:ring-0 cursor-pointer"
+                className="outline-none text-xs w-full bg-transparent border-none !p-0 !pl-1 focus:ring-0 cursor-pointer"
               />
               {sanaFilter && (
                 <button onClick={() => setSanaFilter("")} className="text-red-500 hover:text-red-700">
-                  <i className="fas fa-times-circle"></i>
+                  <i className="fas fa-times-circle text-xs"></i>
                 </button>
               )}
             </div>
           </div>
 
           {/* Filter buttons */}
-          <div className="grid grid-cols-4 gap-1.5 mb-4">
+          <div className="grid grid-cols-4 gap-1.5 mb-2">
             <button
               onClick={() => setFilterType("all")}
               className={`filter-btn flex items-center justify-center gap-1.5 py-2.5 rounded-full text-xs font-bold transition-colors cursor-pointer ${

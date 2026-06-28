@@ -61,9 +61,20 @@ export default function Diagram() {
       const weekStats = {};
       qarzlar.forEach((q) => {
         if (!q.sana) return;
-        const sana = new Date(q.sana);
-        const dayIdx = sana.getDay(); // 0 is Sunday, 1 is Monday ...
-        const weekDay = dayIdx === 0 ? 6 : dayIdx - 1; // Map Sunday to index 6
+        const parts = q.sana.split("-");
+        let weekDay;
+        if (parts.length === 3) {
+          const year = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const day = parseInt(parts[2], 10);
+          const sana = new Date(year, month, day);
+          const dayIdx = sana.getDay();
+          weekDay = dayIdx === 0 ? 6 : dayIdx - 1;
+        } else {
+          const sana = new Date(q.sana);
+          const dayIdx = sana.getDay();
+          weekDay = dayIdx === 0 ? 6 : dayIdx - 1;
+        }
         const mahsulot = q.mahsulot || "Noma'lum";
 
         if (!weekStats[mahsulot]) {
@@ -101,11 +112,11 @@ export default function Diagram() {
         };
       });
 
-      // Fallback demo dataset if no data exists
+      // Fallback dataset reflecting empty database state
       if (datasets.length === 0) {
         datasets.push({
-          label: "Demo Mahsulot",
-          data: [1, 2, 1, 3, 2, 0, 1],
+          label: "Qarzlar",
+          data: [0, 0, 0, 0, 0, 0, 0],
           borderColor: "#6366f1",
           backgroundColor: "rgba(99, 102, 241, 0.05)",
           borderWidth: 3,
@@ -114,7 +125,7 @@ export default function Diagram() {
           pointBackgroundColor: "#6366f1",
           pointBorderColor: "#fff",
           pointHoverRadius: 8,
-          fill: false,
+          fill: true,
         });
       }
 
