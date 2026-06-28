@@ -105,13 +105,7 @@ export default function Profile() {
       <div className="min-h-screen pb-24">
 
         {/* Header */}
-        <div className="px-4 pt-6 pb-2 flex items-center gap-3">
-          <button
-            onClick={() => navigate("/")}
-            className="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full md:hidden flex items-center justify-center transition active:scale-95 border border-slate-200"
-          >
-            <i className="fas fa-arrow-left text-sm"></i>
-          </button>
+        <div className="px-4 pt-6 pb-2">
           <h1 className="text-slate-800 font-bold text-xl">Shaxsiy Kabinet</h1>
         </div>
 
@@ -142,21 +136,7 @@ export default function Profile() {
             <img src={logo} alt="Logo" className="w-12 h-12 rounded-xl flex-shrink-0 shadow border border-slate-100 bg-white" />
           </div>
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-3 animate-slide-up">
-            <div className="glass-card-premium card-gradient-blue hover-shadow-blue rounded-2xl p-4 text-center cursor-pointer">
-              <p className="text-3xl font-black text-blue-600">{qarzStats.total}</p>
-              <p className="text-xs text-slate-500 font-bold mt-1">Jami</p>
-            </div>
-            <div className="glass-card-premium card-gradient-green hover-shadow-green rounded-2xl p-4 text-center cursor-pointer">
-              <p className="text-3xl font-black text-emerald-600">{qarzStats.paid}</p>
-              <p className="text-xs text-slate-500 font-bold mt-1">To'langan</p>
-            </div>
-            <div className="glass-card-premium card-gradient-red hover-shadow-red rounded-2xl p-4 text-center cursor-pointer">
-              <p className="text-3xl font-black text-rose-600">{qarzStats.overdue}</p>
-              <p className="text-xs text-slate-500 font-bold mt-1">Muddati o'tgan</p>
-            </div>
-          </div>
+
 
           {/* Menu Items */}
           <div className="glass-card-premium hover-shadow-blue rounded-3xl p-2 animate-slide-up">
