@@ -275,39 +275,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* Quick Actions */}
-          <div className="animate-slide-up">
-            <h2 className="text-slate-800 font-extrabold text-base mb-3">Tez harakatlar</h2>
-            <div className="grid grid-cols-3 gap-3">
-              <button
-                onClick={() => navigate("/add-debt")}
-                className="glass-card-premium hover-shadow-blue rounded-2xl p-4 flex flex-col items-center gap-2.5 active:scale-95 transition-all duration-300 cursor-pointer border border-slate-100"
-              >
-                <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                  <i className="fas fa-plus text-blue-600"></i>
-                </div>
-                <span className="text-slate-700 text-xs font-bold text-center">Qarz qo'shish</span>
-              </button>
-              <button
-                onClick={() => navigate("/debts")}
-                className="glass-card-premium hover-shadow-green rounded-2xl p-4 flex flex-col items-center gap-2.5 active:scale-95 transition-all duration-300 cursor-pointer border border-slate-100"
-              >
-                <div className="w-10 h-10 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                  <i className="fas fa-list text-emerald-600"></i>
-                </div>
-                <span className="text-slate-700 text-xs font-bold text-center">Ro'yxat</span>
-              </button>
-              <button
-                onClick={() => navigate("/diagram")}
-                className="glass-card-premium hover-shadow-blue rounded-2xl p-4 flex flex-col items-center gap-2.5 active:scale-95 transition-all duration-300 cursor-pointer border border-slate-100"
-              >
-                <div className="w-10 h-10 bg-purple-50 border border-purple-100 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                  <i className="fas fa-chart-line text-purple-600"></i>
-                </div>
-                <span className="text-slate-700 text-xs font-bold text-center">Diagrama</span>
-              </button>
-            </div>
-          </div>
+
 
         </div>
       </div>
