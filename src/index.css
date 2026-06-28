@@ -3,6 +3,13 @@
 html,
 body {
   background-color: #ffffff !important;
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 @layer base {

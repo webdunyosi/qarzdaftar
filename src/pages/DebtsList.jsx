@@ -315,8 +315,9 @@ export default function DebtsList() {
   return (
     <div>
       <div className="main-background"></div>
-      <div className="backdrop-blur flex items-start justify-center p-4 min-h-screen pb-20">
-        <div className="w-full max-w-4xl glass-card-premium hover-shadow-blue p-5 sm:p-7 rounded-3xl animate-slide-up">
+      {/* Fixed wrapper from top to just above bottom nav */}
+      <div style={{position: 'fixed', inset: 0, bottom: '4rem', overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', zIndex: 10, background: 'transparent'}}>
+        <div className="w-full glass-card-premium p-4 sm:p-6 rounded-3xl animate-slide-up" style={{flex: 1, display: 'flex', flexDirection: 'column', background: 'white', transform: 'none'}}>
           
           {/* Header & Back Button */}
           <div className="flex items-center justify-between mb-2">
@@ -555,7 +556,7 @@ export default function DebtsList() {
           </div>
 
           {/* Accordion List (Mobile View) */}
-          <div className="block md:hidden space-y-3">
+          <div className="block md:hidden space-y-3 flex-1">
             {groupedDebtsList.map((group) => {
               const key = `${group.mijozIsmi.trim().toLowerCase()}_${group.telefon.trim()}`;
               const isExpanded = expandedGroups[key];
