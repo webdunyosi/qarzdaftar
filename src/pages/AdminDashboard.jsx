@@ -277,34 +277,6 @@ export default function AdminDashboard() {
         {activeTab === "dashboard" && (
           <div className="space-y-6 animate-slide-up">
             
-            {/* Welcome Hero Card */}
-            <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-black text-slate-800 tracking-tight">
-                  Tizimga xush kelibsiz! 👋
-                </h2>
-                <p className="text-slate-500 text-sm max-w-lg leading-relaxed">
-                  Qarz Daftar boshqaruv panelida siz sotuvchilar ro'yxatini, jami tizimdagi qarzlar va ayblovlarni boshqarishingiz hamda sotuvchilarga bildirishnomalar yuborishingiz mumkin.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2.5">
-                <button
-                  onClick={() => setSearchParams({ tab: "sellers" })}
-                  className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-5 rounded-2xl font-bold transition active:scale-95 cursor-pointer shadow-md shadow-blue-500/10 text-xs flex items-center gap-2"
-                >
-                  <i className="fas fa-user-plus"></i>
-                  Sotuvchi qo'shish
-                </button>
-                <button
-                  onClick={() => setSearchParams({ tab: "notifications" })}
-                  className="bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/50 py-3 px-5 rounded-2xl font-bold transition active:scale-95 cursor-pointer text-xs flex items-center gap-2"
-                >
-                  <i className="fas fa-bullhorn"></i>
-                  Xabar yuborish
-                </button>
-              </div>
-            </div>
-
             {/* Global Statistics Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md p-5 rounded-3xl shadow-md">
@@ -389,32 +361,32 @@ export default function AdminDashboard() {
           <div className="space-y-6">
             
             {/* Search and filter row styled like Image 1 */}
-            <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center gap-4">
-              <div className="relative flex-1 w-full">
+            <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex items-center gap-2 w-full">
+              <div className="relative flex-1">
                 <input
                   type="text"
                   placeholder="Qidirish..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                  className="w-full p-2.5 pl-9 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-xs"
                 />
-                <i className="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <i className="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
               </div>
 
-              <div className="relative w-full md:w-56">
+              <div className="relative w-28 sm:w-40 flex-shrink-0">
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="w-full p-3 pr-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm appearance-none cursor-pointer"
+                  className="w-full p-2.5 pr-8 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-xs appearance-none cursor-pointer"
                 >
-                  <option value="Barchasi">Barchasi (Sohalar)</option>
+                  <option value="Barchasi">Barchasi</option>
                   {sellerTypes.map((type) => (
                     <option key={type} value={type}>
                       {type}
                     </option>
                   ))}
                 </select>
-                <i className="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                <i className="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none"></i>
               </div>
 
               <button
@@ -422,9 +394,9 @@ export default function AdminDashboard() {
                   setModalTab("add_seller");
                   setShowAddModal(true);
                 }}
-                className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 shadow-md shadow-blue-500/10"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-3 sm:px-4 rounded-xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/10 text-xs shrink-0"
               >
-                <i className="fas fa-user-plus"></i> Qo'shish
+                <i className="fas fa-user-plus text-xs"></i> <span>Qo'shish</span>
               </button>
             </div>
 
@@ -486,10 +458,10 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* Add Seller / Categories tabbed Modal */}
+            {/* Add Seller / Categories tabless Modal */}
             {showAddModal && (
               <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
-                <div className="bg-white border border-blue-100 w-full max-w-lg rounded-2xl p-6 shadow-2xl animate-scale-up relative">
+                <div className="bg-white border border-blue-100 w-full max-w-md rounded-2xl p-6 shadow-2xl animate-scale-up relative">
                   
                   {/* Close button */}
                   <button
@@ -499,102 +471,97 @@ export default function AdminDashboard() {
                     <i className="fas fa-times"></i>
                   </button>
 
-                  {/* Tabs */}
-                  <div className="flex border-b border-slate-100 mb-6">
-                    <button
-                      onClick={() => setModalTab("add_seller")}
-                      className={`pb-3 px-4 font-bold text-sm transition border-b-2 ${
-                        modalTab === "add_seller"
-                          ? "border-blue-600 text-blue-600"
-                          : "border-transparent text-slate-500 hover:text-slate-700"
-                      }`}
-                    >
-                      <i className="fas fa-user-plus mr-2"></i> Yangi Sotuvchi
-                    </button>
-                    <button
-                      onClick={() => setModalTab("manage_types")}
-                      className={`pb-3 px-4 font-bold text-sm transition border-b-2 ${
-                        modalTab === "manage_types"
-                          ? "border-blue-600 text-blue-600"
-                          : "border-transparent text-slate-500 hover:text-slate-700"
-                      }`}
-                    >
-                      <i className="fas fa-tags mr-2"></i> Do'kon Sohalari
-                    </button>
-                  </div>
-
-                  {/* Tab 1: Add Seller */}
+                  {/* Add Seller form directly (Image 2 style) */}
                   {modalTab === "add_seller" && (
-                    <form onSubmit={(e) => {
-                      handleAddSeller(e);
-                      setShowAddModal(false);
-                    }} className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
-                          Sotuvchi logini (ism)
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            placeholder="Sotuvchi logini (ism)..."
-                            value={sellerUsername}
-                            onChange={(e) => setSellerUsername(e.target.value)}
-                            className="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
-                            required
-                          />
-                          <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-2">
+                        <i className="fas fa-user-plus text-blue-600"></i>
+                        Yangi Sotuvchi Qo'shish
+                      </h3>
+                      <form onSubmit={(e) => {
+                        handleAddSeller(e);
+                        setShowAddModal(false);
+                      }} className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                            Sotuvchi logini (ism)
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              placeholder="Sotuvchi logini (ism)..."
+                              value={sellerUsername}
+                              onChange={(e) => setSellerUsername(e.target.value)}
+                              className="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                              required
+                            />
+                            <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
-                          Sotuvchi paroli
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            placeholder="Sotuvchi paroli..."
-                            value={sellerPassword}
-                            onChange={(e) => setSellerPassword(e.target.value)}
-                            className="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
-                            required
-                          />
-                          <i className="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                            Sotuvchi paroli
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              placeholder="Sotuvchi paroli..."
+                              value={sellerPassword}
+                              onChange={(e) => setSellerPassword(e.target.value)}
+                              className="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                              required
+                            />
+                            <i className="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
-                          Sotuvchi turi / Do'kon sohasi
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={sellerType}
-                            onChange={(e) => setSellerType(e.target.value)}
-                            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm cursor-pointer appearance-none"
-                          >
-                            {sellerTypes.map((type) => (
-                              <option key={type} value={type}>
-                                {type}
-                              </option>
-                            ))}
-                            {sellerTypes.length === 0 && (
-                              <option value="">Turlar mavjud emas</option>
-                            )}
-                          </select>
-                          <i className="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                            Sotuvchi turi / Do'kon sohasi
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={sellerType}
+                              onChange={(e) => setSellerType(e.target.value)}
+                              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm cursor-pointer appearance-none"
+                            >
+                              {sellerTypes.map((type) => (
+                                <option key={type} value={type}>
+                                  {type}
+                                </option>
+                              ))}
+                              {sellerTypes.length === 0 && (
+                                <option value="">Turlar mavjud emas</option>
+                              )}
+                            </select>
+                            <i className="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                          </div>
                         </div>
+                        <button
+                          type="submit"
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition shadow-md shadow-blue-500/10 cursor-pointer mt-4"
+                        >
+                          Sotuvchini qo'shish
+                        </button>
+                      </form>
+                      <div className="text-center pt-3 border-t border-slate-100 mt-4">
+                        <button
+                          type="button"
+                          onClick={() => setModalTab("manage_types")}
+                          className="text-xs text-blue-600 hover:text-blue-700 font-bold underline cursor-pointer"
+                        >
+                          Do'kon sohalarini boshqarish
+                        </button>
                       </div>
-                      <button
-                        type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition shadow-md shadow-blue-500/10 cursor-pointer mt-4"
-                      >
-                        Sotuvchini qo'shish
-                      </button>
-                    </form>
+                    </div>
                   )}
 
-                  {/* Tab 2: Manage Types */}
+                  {/* Manage Types list directly */}
                   {modalTab === "manage_types" && (
                     <div className="space-y-4">
+                      <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-2">
+                        <i className="fas fa-tags text-blue-600"></i>
+                        Do'kon Sohalari
+                      </h3>
                       <div>
                         <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
                           Mavjud do'kon sohalari
@@ -641,6 +608,15 @@ export default function AdminDashboard() {
                           </button>
                         </div>
                       </form>
+                      <div className="text-center pt-3 border-t border-slate-100 mt-4">
+                        <button
+                          type="button"
+                          onClick={() => setModalTab("add_seller")}
+                          className="text-xs text-blue-600 hover:text-blue-700 font-bold cursor-pointer"
+                        >
+                          <i className="fas fa-arrow-left mr-1"></i> Sotuvchi qo'shish oynasiga qaytish
+                        </button>
+                      </div>
                     </div>
                   )}
 
