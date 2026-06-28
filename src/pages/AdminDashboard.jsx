@@ -26,6 +26,10 @@ export default function AdminDashboard() {
   const [editType, setEditType] = useState("");
   const [newTypeName, setNewTypeName] = useState("");
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [modalTab, setModalTab] = useState("add_seller");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("Barchasi");
   
   // Notification form state
   const [notificationText, setNotificationText] = useState("");
@@ -384,121 +388,44 @@ export default function AdminDashboard() {
         {activeTab === "sellers" && (
           <div className="space-y-6">
             
-            {/* Grid for Add Seller + Manage Categories */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* Add Seller Section */}
-              <div className="lg:col-span-2 bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md flex flex-col justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i className="fas fa-user-plus text-blue-600"></i>
-                    Yangi Sotuvchi Qo'shish
-                  </h2>
-                  <form onSubmit={handleAddSeller} className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="relative">
-                        <input
-                          type="text"
-                          placeholder="Sotuvchi logini (ism)"
-                          value={sellerUsername}
-                          onChange={(e) => setSellerUsername(e.target.value)}
-                          className="w-full p-3 pl-10 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
-                        />
-                        <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          placeholder="Sotuvchi paroli"
-                          value={sellerPassword}
-                          onChange={(e) => setSellerPassword(e.target.value)}
-                          className="w-full p-3 pl-10 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
-                        />
-                        <i className="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col sm:flex-row gap-4 items-end">
-                      <div className="flex-1 w-full">
-                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
-                          Sotuvchi turi / Do'kon sohasi
-                        </label>
-                        <select
-                          value={sellerType}
-                          onChange={(e) => setSellerType(e.target.value)}
-                          className="w-full p-3 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold appearance-none cursor-pointer"
-                        >
-                          {sellerTypes.map((type) => (
-                            <option key={type} value={type}>
-                              {type}
-                            </option>
-                          ))}
-                          {sellerTypes.length === 0 && (
-                            <option value="">Turlar mavjud emas</option>
-                          )}
-                        </select>
-                      </div>
-                      <button
-                        type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-blue-500/10 h-[48px] sm:w-auto w-full"
-                      >
-                        Sotuvchini qo'shish
-                      </button>
-                    </div>
-                  </form>
-                </div>
+            {/* Search and filter row styled like Image 1 */}
+            <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center gap-4">
+              <div className="relative flex-1 w-full">
+                <input
+                  type="text"
+                  placeholder="Qidirish..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                />
+                <i className="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
               </div>
 
-              {/* Manage Types / Categories Section */}
-              <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md flex flex-col justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i className="fas fa-tags text-blue-600"></i>
-                    Sotuvchi Turlari
-                  </h2>
-                  
-                  {/* Category badges list */}
-                  <div className="flex flex-wrap gap-2 mb-4 max-h-[120px] overflow-y-auto p-1 bg-white/40 rounded-xl border border-slate-100">
-                    {sellerTypes.length === 0 ? (
-                      <p className="text-slate-400 text-xs p-2">Turlar yaratilmagan</p>
-                    ) : (
-                      sellerTypes.map((type) => (
-                        <span
-                          key={type}
-                          className="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm"
-                        >
-                          {type}
-                          <button
-                            onClick={() => handleDeleteType(type)}
-                            className="text-blue-500 hover:text-red-600 font-bold ml-0.5 cursor-pointer text-[10px]"
-                            title="O'chirish"
-                          >
-                            <i className="fas fa-times"></i>
-                          </button>
-                        </span>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                <form onSubmit={handleAddType} className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Yangi tur nomi..."
-                    value={newTypeName}
-                    onChange={(e) => setNewTypeName(e.target.value)}
-                    className="flex-1 p-2.5 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-xs"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-md text-xs flex items-center justify-center min-w-[40px]"
-                    title="Qo'shish"
-                  >
-                    <i className="fas fa-plus"></i>
-                  </button>
-                </form>
+              <div className="relative w-full md:w-56">
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="w-full p-3 pr-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm appearance-none cursor-pointer"
+                >
+                  <option value="Barchasi">Barchasi (Sohalar)</option>
+                  {sellerTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+                <i className="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
               </div>
 
+              <button
+                onClick={() => {
+                  setModalTab("add_seller");
+                  setShowAddModal(true);
+                }}
+                className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 shadow-md shadow-blue-500/10"
+              >
+                <i className="fas fa-user-plus"></i> Qo'shish
+              </button>
             </div>
 
             {/* Editing seller modal overlay */}
@@ -559,55 +486,265 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* Sellers List section */}
-            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md">
-              <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i className="fas fa-list text-blue-600"></i>
-                Sotuvchilar va Daromadlar Ro'yxati
-              </h2>
-              <div className="space-y-4">
-                {users.filter(u => u.role === "seller").length === 0 ? (
-                  <p className="text-slate-500 text-center py-6">Hozircha sotuvchilar mavjud emas.</p>
-                ) : (
-                  users.filter(u => u.role === "seller").map((u) => {
-                    const stats = getSellerStats(u.username);
-                    return (
-                      <div key={u.username} className="bg-white/80 border border-blue-100/40 p-5 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Add Seller / Categories tabbed Modal */}
+            {showAddModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+                <div className="bg-white border border-blue-100 w-full max-w-lg rounded-2xl p-6 shadow-2xl animate-scale-up relative">
+                  
+                  {/* Close button */}
+                  <button
+                    onClick={() => setShowAddModal(false)}
+                    className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg cursor-pointer"
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+
+                  {/* Tabs */}
+                  <div className="flex border-b border-slate-100 mb-6">
+                    <button
+                      onClick={() => setModalTab("add_seller")}
+                      className={`pb-3 px-4 font-bold text-sm transition border-b-2 ${
+                        modalTab === "add_seller"
+                          ? "border-blue-600 text-blue-600"
+                          : "border-transparent text-slate-500 hover:text-slate-700"
+                      }`}
+                    >
+                      <i className="fas fa-user-plus mr-2"></i> Yangi Sotuvchi
+                    </button>
+                    <button
+                      onClick={() => setModalTab("manage_types")}
+                      className={`pb-3 px-4 font-bold text-sm transition border-b-2 ${
+                        modalTab === "manage_types"
+                          ? "border-blue-600 text-blue-600"
+                          : "border-transparent text-slate-500 hover:text-slate-700"
+                      }`}
+                    >
+                      <i className="fas fa-tags mr-2"></i> Do'kon Sohalari
+                    </button>
+                  </div>
+
+                  {/* Tab 1: Add Seller */}
+                  {modalTab === "add_seller" && (
+                    <form onSubmit={(e) => {
+                      handleAddSeller(e);
+                      setShowAddModal(false);
+                    }} className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                          Sotuvchi logini (ism)
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="Sotuvchi logini (ism)..."
+                            value={sellerUsername}
+                            onChange={(e) => setSellerUsername(e.target.value)}
+                            className="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                            required
+                          />
+                          <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                          Sotuvchi paroli
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="Sotuvchi paroli..."
+                            value={sellerPassword}
+                            onChange={(e) => setSellerPassword(e.target.value)}
+                            className="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                            required
+                          />
+                          <i className="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                          Sotuvchi turi / Do'kon sohasi
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={sellerType}
+                            onChange={(e) => setSellerType(e.target.value)}
+                            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm cursor-pointer appearance-none"
+                          >
+                            {sellerTypes.map((type) => (
+                              <option key={type} value={type}>
+                                {type}
+                              </option>
+                            ))}
+                            {sellerTypes.length === 0 && (
+                              <option value="">Turlar mavjud emas</option>
+                            )}
+                          </select>
+                          <i className="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                        </div>
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition shadow-md shadow-blue-500/10 cursor-pointer mt-4"
+                      >
+                        Sotuvchini qo'shish
+                      </button>
+                    </form>
+                  )}
+
+                  {/* Tab 2: Manage Types */}
+                  {modalTab === "manage_types" && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                          Mavjud do'kon sohalari
+                        </label>
+                        <div className="flex flex-wrap gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl min-h-[100px] max-h-[180px] overflow-y-auto">
+                          {sellerTypes.length === 0 ? (
+                            <p className="text-slate-400 text-xs p-2">Turlar yaratilmagan</p>
+                          ) : (
+                            sellerTypes.map((type) => (
+                              <span
+                                key={type}
+                                className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm"
+                              >
+                                {type}
+                                <button
+                                  onClick={() => handleDeleteType(type)}
+                                  className="text-blue-500 hover:text-red-600 font-bold ml-0.5 cursor-pointer text-[10px]"
+                                  title="O'chirish"
+                                >
+                                  <i className="fas fa-times"></i>
+                                </button>
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                      <form onSubmit={handleAddType} className="space-y-2 pt-2">
+                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                          Yangi soha qo'shish
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Yangi tur nomi..."
+                            value={newTypeName}
+                            onChange={(e) => setNewTypeName(e.target.value)}
+                            className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                          />
+                          <button
+                            type="submit"
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-xl font-bold transition shadow-md cursor-pointer flex items-center justify-center"
+                          >
+                            <i className="fas fa-plus mr-1"></i> Qo'shish
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+            )}
+
+            {/* Sellers List section (Styled as Image 1) */}
+            <div className="space-y-4">
+              {(() => {
+                const filtered = users
+                  .filter(u => u.role === "seller")
+                  .filter(u => {
+                    const matchesSearch = u.username.toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchesType = selectedType === "Barchasi" || u.type === selectedType;
+                    return matchesSearch && matchesType;
+                  });
+                
+                if (filtered.length === 0) {
+                  return (
+                    <div className="bg-white border border-slate-100 p-8 rounded-2xl text-center shadow-sm">
+                      <p className="text-slate-400 font-medium">Mos keladigan sotuvchilar topilmadi.</p>
+                    </div>
+                  );
+                }
+
+                return filtered.map((u) => {
+                  const stats = getSellerStats(u.username);
+                  return (
+                    <div 
+                      key={u.username} 
+                      className="bg-white border border-slate-100 border-l-4 border-l-blue-600 p-5 rounded-2xl shadow-sm hover:shadow-md transition flex flex-col gap-4"
+                    >
+                      {/* Avatar & Details Row */}
+                      <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg shadow-sm capitalize">
+                          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg border border-blue-100 uppercase">
                             {u.username[0]}
                           </div>
                           <div>
-                            <div className="flex items-center gap-2">
-                              <p className="font-bold text-slate-800 text-base">{u.username}</p>
-                              {u.type && (
-                                <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border border-blue-100">
-                                  {u.type}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-slate-400 text-xs font-semibold">Parol: {u.password}</p>
+                            <h3 className="font-bold text-slate-800 text-base">{u.username}</h3>
+                            <p className="text-slate-400 text-xs font-semibold mt-0.5">
+                              A'zo bo'ldi: {u.createdAt ? new Date(u.createdAt).toLocaleDateString("uz-UZ") : new Date().toLocaleDateString("uz-UZ")}
+                            </p>
                           </div>
                         </div>
+                        
+                        <span className="bg-emerald-50 text-emerald-600 border border-emerald-100 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          Faol
+                        </span>
+                      </div>
 
-                        {/* Revenue details */}
-                        <div className="grid grid-cols-3 gap-3 md:gap-6 text-center border-t border-slate-100 pt-3 md:pt-0 md:border-0">
-                          <div>
-                            <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider">Jami qarzlar</p>
-                            <p className="font-bold text-slate-800 text-sm mt-0.5">{stats.count} ta ({stats.totalAmount.toLocaleString()} so'm)</p>
-                          </div>
-                          <div>
-                            <p className="text-green-600 text-[10px] font-semibold uppercase tracking-wider">Daromad (Paid)</p>
-                            <p className="font-bold text-green-600 text-sm mt-0.5">{stats.paidAmount.toLocaleString()} so'm</p>
-                          </div>
-                          <div>
-                            <p className="text-yellow-600 text-[10px] font-semibold uppercase tracking-wider">Faol qarzlar</p>
-                            <p className="font-bold text-yellow-600 text-sm mt-0.5">{stats.activeAmount.toLocaleString()} so'm</p>
-                          </div>
+                      {/* Stats grid */}
+                      <div className="grid grid-cols-3 gap-2 py-3 px-4 bg-slate-50/70 border border-slate-100 rounded-xl text-center">
+                        <div>
+                          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Jami qarzlar</p>
+                          <p className="font-bold text-slate-800 text-xs sm:text-sm mt-0.5">
+                            {stats.count} ta ({stats.totalAmount.toLocaleString()} so'm)
+                          </p>
+                        </div>
+                        <div className="border-x border-slate-200/60">
+                          <p className="text-emerald-600 text-[10px] font-bold uppercase tracking-wider">Daromad (Paid)</p>
+                          <p className="font-bold text-emerald-600 text-xs sm:text-sm mt-0.5">
+                            {stats.paidAmount.toLocaleString()} so'm
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-amber-600 text-[10px] font-bold uppercase tracking-wider">Faol qarzlar</p>
+                          <p className="font-bold text-amber-600 text-xs sm:text-sm mt-0.5">
+                            {stats.activeAmount.toLocaleString()} so'm
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Quick Actions & Modify Panel */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-50">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <a
+                            href={`https://t.me/${u.username}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 px-4 py-2 rounded-xl text-xs font-bold transition active:scale-95"
+                          >
+                            <i className="fab fa-telegram-plane"></i> Telegram
+                          </a>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(u.password);
+                              toast.success("Sotuvchi paroli nusxalandi!");
+                            }}
+                            className="inline-flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer"
+                            title="Parolni nusxalash"
+                          >
+                            <i className="fas fa-key"></i> Parol: {u.password}
+                          </button>
+                          {u.type && (
+                            <span className="inline-flex items-center gap-1.5 bg-blue-50/50 text-blue-700 px-3.5 py-2 rounded-xl text-xs font-bold border border-blue-100/40">
+                              <i className="fas fa-store"></i> {u.type}
+                            </span>
+                          )}
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex gap-2 justify-end">
+                        <div className="flex items-center gap-2 ml-auto">
                           <button
                             onClick={() => {
                               setEditingUserId(u.username);
@@ -615,24 +752,24 @@ export default function AdminDashboard() {
                               setEditPassword(u.password);
                               setEditType(u.type || (sellerTypes[0] || "Kiyim-kechak"));
                             }}
-                            className="bg-blue-50 hover:bg-blue-100 text-blue-600 p-2.5 rounded-xl border border-blue-100/60 transition active:scale-95 cursor-pointer text-xs font-bold"
+                            className="w-9 h-9 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center transition border border-blue-100/40 cursor-pointer"
                             title="Tahrirlash"
                           >
-                            <i className="fas fa-edit mr-1"></i> Tahrirlash
+                            <i className="fas fa-pen text-sm"></i>
                           </button>
                           <button
                             onClick={() => handleDeleteSeller(u.username)}
-                            className="bg-red-50 hover:bg-red-100 text-red-600 p-2.5 rounded-xl border border-red-200/40 transition active:scale-95 cursor-pointer text-xs font-bold"
+                            className="w-9 h-9 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl flex items-center justify-center transition border border-red-200/40 cursor-pointer"
                             title="O'chirish"
                           >
-                            <i className="fas fa-trash-alt mr-1"></i> O'chirish
+                            <i className="fas fa-trash text-sm"></i>
                           </button>
                         </div>
                       </div>
-                    );
-                  })
-                )}
-              </div>
+                    </div>
+                  );
+                });
+              })()}
             </div>
 
           </div>
