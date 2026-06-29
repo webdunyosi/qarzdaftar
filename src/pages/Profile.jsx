@@ -1,13 +1,48 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import logo from "../assets/web-daftar.png";
 import api from "../utils/api";
 
 export default function Profile() {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const openEditModal = () => {
+    setNewUsername(currentUser?.username || "");
+    setNewPassword("");
+    setConfirmPassword("");
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    if (newPassword && newPassword !== confirmPassword) {
+      toast.error("Parollar bir-biriga mos kelmadi!");
+      return;
+    }
+
+    const res = await api.put("/users/profile", {
+      username: newUsername.trim(),
+      password: newPassword ? newPassword.trim() : undefined,
+    });
+
+    if (!res.error) {
+      toast.success("Profil ma'lumotlari muvaffaqiyatli yangilandi!");
+      
+      const updatedUser = { ...currentUser, username: res.username };
+      sessionStorage.setItem("currentUser", JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+      
+      setIsEditModalOpen(false);
+    } else {
+      toast.error(res.error);
+    }
+  };
   useEffect(() => {
     const userStr = sessionStorage.getItem("currentUser");
     if (!userStr) {
@@ -78,7 +113,13 @@ export default function Profile() {
                 </span>
               </div>
             </div>
-            <img src={logo} alt="Logo" className="w-12 h-12 rounded-xl flex-shrink-0 shadow border border-slate-100 bg-white" />
+            <button
+              onClick={openEditModal}
+              className="w-12 h-12 rounded-2xl bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-blue-100/60 cursor-pointer transition duration-200"
+              title="Profilni tahrirlash"
+            >
+              <i className="fas fa-user-edit text-lg"></i>
+            </button>
           </div>
 
 
@@ -113,6 +154,94 @@ export default function Profile() {
             <i className="fas fa-sign-out-alt text-lg"></i>
             Tizimdan chiqish
           </button>
+
+          {/* Edit Profile Modal */}
+          {isEditModalOpen && (
+            <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+              <div className="glass-card-premium max-w-md w-full p-6 rounded-3xl space-y-4 shadow-xl border border-white/60 bg-white/95 relative animate-slide-up">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i className="fas fa-user-cog text-blue-500"></i>
+                    Profilni tahrirlash
+                  </h3>
+                  <button
+                    onClick={() => setIsEditModalOpen(false)}
+                    className="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg bg-slate-50 cursor-pointer"
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+
+                <form onSubmit={handleUpdateProfile} className="space-y-4">
+                  {/* Username */}
+                  <div className="form-group relative">
+                    <label className="text-gray-700 font-semibold mb-1 text-sm block">Login (Foydalanuvchi nomi)</label>
+                    <div className="relative">
+                      <input
+                        className="w-full glass-input"
+                        type="text"
+                        value={newUsername}
+                        onChange={(e) => setNewUsername(e.target.value)}
+                        placeholder="Yangi login kiriting"
+                        required
+                      />
+                      <i className="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                  </div>
+
+                  {/* Password */}
+                  <div className="form-group relative">
+                    <label className="text-gray-700 font-semibold mb-1 text-sm block">Yangi parol (ixtiyoriy)</label>
+                    <div className="relative">
+                      <input
+                        className="w-full glass-input"
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="O'zgartirish uchun yangi parol yozing"
+                      />
+                      <i className="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                  </div>
+
+                  {/* Confirm Password */}
+                  {newPassword && (
+                    <div className="form-group relative animate-slide-up">
+                      <label className="text-gray-700 font-semibold mb-1 text-sm block">Yangi parolni tasdiqlash</label>
+                      <div className="relative">
+                        <input
+                          className="w-full glass-input"
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Yangi parolni qayta yozing"
+                          required
+                        />
+                        <i className="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition cursor-pointer shadow-md flex items-center justify-center gap-2"
+                    >
+                      <i className="fas fa-check-circle"></i>
+                      Saqlash
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditModalOpen(false)}
+                      className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-5 py-3 rounded-xl transition cursor-pointer"
+                    >
+                      Bekor qilish
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
         </div>
       </div>
