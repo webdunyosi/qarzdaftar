@@ -17,9 +17,11 @@ export default function AdminDashboard() {
   // New/Edit Seller Form state
   const [sellerUsername, setSellerUsername] = useState("");
   const [sellerPassword, setSellerPassword] = useState("");
+  const [sellerPhone, setSellerPhone] = useState("");
   const [editingUserId, setEditingUserId] = useState(null);
   const [editUsername, setEditUsername] = useState("");
   const [editPassword, setEditPassword] = useState("");
+  const [editPhone, setEditPhone] = useState("");
   
   // Category management and seller type state
   const [sellerTypes, setSellerTypes] = useState([]);
@@ -134,6 +136,7 @@ export default function AdminDashboard() {
       username: sellerUsername.trim(),
       password: sellerPassword.trim(),
       type: targetType,
+      phone: sellerPhone.trim(),
     });
 
     if (res.error) {
@@ -143,6 +146,7 @@ export default function AdminDashboard() {
     
     setSellerUsername("");
     setSellerPassword("");
+    setSellerPhone("");
     toast.success("Yangi sotuvchi muvaffaqiyatli qo'shildi!");
     loadAllData();
   };
@@ -159,6 +163,7 @@ export default function AdminDashboard() {
       username: editUsername.trim(),
       password: editPassword.trim(),
       type: editType,
+      phone: editPhone.trim(),
     });
 
     if (res.error) {
@@ -434,7 +439,7 @@ export default function AdminDashboard() {
                         type="text"
                         value={editUsername}
                         onChange={(e) => setEditUsername(e.target.value)}
-                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold !pl-4"
                       />
                     </div>
                     <div>
@@ -443,7 +448,17 @@ export default function AdminDashboard() {
                         type="text"
                         value={editPassword}
                         onChange={(e) => setEditPassword(e.target.value)}
-                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold !pl-4"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Telefon raqami</label>
+                      <input
+                        type="tel"
+                        value={editPhone}
+                        onChange={(e) => setEditPhone(e.target.value)}
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold !pl-4"
+                        placeholder="Telefon raqami..."
                       />
                     </div>
                     <div>
@@ -538,6 +553,21 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                            Telefon raqami
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="tel"
+                              placeholder="Telefon raqami (masalan: +998901234567)..."
+                              value={sellerPhone}
+                              onChange={(e) => setSellerPhone(e.target.value)}
+                              className="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                            />
+                            <i className="fas fa-phone absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
                             Sotuvchi turi / Do'kon sohasi
                           </label>
                           <div className="relative">
@@ -620,7 +650,7 @@ export default function AdminDashboard() {
                             placeholder="Yangi tur nomi..."
                             value={newTypeName}
                             onChange={(e) => setNewTypeName(e.target.value)}
-                            className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                            className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
                           />
                           <button
                             type="submit"
@@ -704,6 +734,7 @@ export default function AdminDashboard() {
                               setEditUsername(u.username);
                               setEditPassword(u.password);
                               setEditType(u.type || (sellerTypes[0] || "Kiyim-kechak"));
+                              setEditPhone(u.phone || "");
                             }}
                             className="w-8 h-8 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-slate-500 rounded-lg flex items-center justify-center transition border border-slate-100 cursor-pointer"
                             title="Tahrirlash"
@@ -752,16 +783,19 @@ export default function AdminDashboard() {
                         >
                           <i className="fab fa-telegram-plane"></i> Telegram
                         </a>
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(u.password);
-                            toast.success("Sotuvchi paroli nusxalandi!");
-                          }}
-                          className="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-xl text-[11px] font-bold transition active:scale-95 cursor-pointer"
-                          title="Parolni nusxalash"
-                        >
-                          <i className="fas fa-key"></i> Parol: <span className="font-mono text-slate-700">{u.password}</span>
-                        </button>
+                        {u.phone ? (
+                          <a
+                            href={`tel:${u.phone}`}
+                            className="inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 px-3 py-1.5 rounded-xl text-[11px] font-bold transition active:scale-95"
+                            title="Telefon qilish"
+                          >
+                            <i className="fas fa-phone-alt"></i> Tel: <span className="font-mono text-emerald-700">{u.phone}</span>
+                          </a>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 bg-slate-50 text-slate-400 border border-slate-200 px-3 py-1.5 rounded-xl text-[11px] font-bold">
+                            <i className="fas fa-phone-slash"></i> Tel: yo'q
+                          </span>
+                        )}
                       </div>
                     </div>
                   );
@@ -962,7 +996,7 @@ export default function AdminDashboard() {
                         type="text"
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
-                        className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                        className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
                       />
                     </div>
                     <div>
@@ -972,7 +1006,7 @@ export default function AdminDashboard() {
                         placeholder="Yangi admin parolini kiriting"
                         value={adminPassword}
                         onChange={(e) => setAdminPassword(e.target.value)}
-                        className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm"
+                        className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
                       />
                     </div>
                     <button
