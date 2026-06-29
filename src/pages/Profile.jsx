@@ -185,16 +185,37 @@ export default function Profile() {
               </div>
             ) : (
               <div className="divide-y divide-slate-100 mt-2">
-                {[...logs].reverse().slice(0, 6).map((log) => {
+                 {[...logs].reverse().slice(0, 6).map((log) => {
                   const ic = getLogIcon(log.type);
                   return (
-                    <div key={log.id} className="flex items-center gap-3 py-3 border-b last:border-b-0 border-slate-100/60 hover:bg-slate-50/40 px-2 rounded-xl transition duration-150">
-                      <div className={`w-8 h-8 ${ic.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <div key={log._id || log.id} className="flex items-start gap-3 py-3 border-b last:border-b-0 border-slate-100/60 hover:bg-slate-50/40 px-2 rounded-xl transition duration-150">
+                      <div className={`w-8 h-8 ${ic.bg} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                         <i className={`fas ${ic.icon} text-xs`}></i>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-slate-700 text-sm truncate font-medium">{log.text}</p>
-                        <p className="text-slate-400 text-xs mt-0.5">{log.time}</p>
+                        <p className="text-slate-700 text-sm font-medium break-words whitespace-pre-wrap">{log.text}</p>
+                        {log.imageUrl && (
+                          <div className="mt-2 rounded-xl overflow-hidden border border-slate-100/80 shadow-sm max-w-full">
+                            <img
+                              src={log.imageUrl}
+                              alt="Notification attachment"
+                              className="w-full h-auto object-cover max-h-48 cursor-zoom-in"
+                              onClick={() => window.open(log.imageUrl, "_blank")}
+                              onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/600x400?text=Rasm+yuklanmadi"; }}
+                            />
+                          </div>
+                        )}
+                        {log.videoUrl && (
+                          <div className="mt-2 rounded-xl overflow-hidden border border-slate-100/80 shadow-sm max-w-full">
+                            <video
+                              src={log.videoUrl}
+                              controls
+                              className="w-full h-auto max-h-48 bg-black"
+                              onError={(e) => { console.log("Video load error:", e); }}
+                            />
+                          </div>
+                        )}
+                        <p className="text-slate-400 text-xs mt-1">{log.time}</p>
                       </div>
                     </div>
                   );

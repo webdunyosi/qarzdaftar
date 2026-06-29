@@ -38,6 +38,8 @@ export default function AdminDashboard() {
   // Notification form state
   const [notificationText, setNotificationText] = useState("");
   const [notificationType, setNotificationType] = useState("info");
+  const [notificationImageUrl, setNotificationImageUrl] = useState("");
+  const [notificationVideoUrl, setNotificationVideoUrl] = useState("");
   
   // Admin own profile change state
   const [adminUsername, setAdminUsername] = useState("Admin");
@@ -206,7 +208,9 @@ export default function AdminDashboard() {
     const res = await api.post("/logs", {
       text: `📢 ${notificationText.trim()}`,
       type: notificationType,
-      seller: null // global/broadcasted to all
+      seller: null, // global/broadcasted to all
+      imageUrl: notificationImageUrl.trim() || null,
+      videoUrl: notificationVideoUrl.trim() || null
     });
 
     if (res.error) {
@@ -215,6 +219,8 @@ export default function AdminDashboard() {
     }
     
     setNotificationText("");
+    setNotificationImageUrl("");
+    setNotificationVideoUrl("");
     toast.success("Bildirishnoma barcha sotuvchilarga yuborildi!");
     loadAllData();
   };
@@ -365,14 +371,37 @@ export default function AdminDashboard() {
                   <p className="text-slate-400 text-xs p-4 text-center">Yuborilgan bildirishnomalar mavjud emas</p>
                 ) : (
                   [...broadcasts].reverse().slice(0, 5).map((b) => (
-                    <div key={b.id} className="py-3 flex items-start justify-between gap-3 group">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
-                          <i className="fas fa-bullhorn"></i>
+                    <div key={b._id || b.id} className="py-3 flex flex-col border-b last:border-b-0 border-slate-50 gap-2 group">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs flex-shrink-0">
+                            <i className="fas fa-bullhorn"></i>
+                          </div>
+                          <p className="font-semibold text-slate-700 text-sm break-words">{b.text}</p>
                         </div>
-                        <p className="font-semibold text-slate-700 text-sm">{b.text}</p>
+                        <span className="text-slate-400 text-[10px] whitespace-nowrap mt-1 font-semibold flex-shrink-0">{b.time}</span>
                       </div>
-                      <span className="text-slate-400 text-[10px] whitespace-nowrap mt-1 font-semibold">{b.time}</span>
+                      {b.imageUrl && (
+                        <div className="ml-11 rounded-lg overflow-hidden border border-slate-100 shadow-sm max-w-xs">
+                          <img
+                            src={b.imageUrl}
+                            alt="Preview"
+                            className="w-full h-auto object-cover max-h-24 cursor-zoom-in"
+                            onClick={() => window.open(b.imageUrl, "_blank")}
+                            onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/600x400?text=Rasm+yuklanmadi"; }}
+                          />
+                        </div>
+                      )}
+                      {b.videoUrl && (
+                        <div className="ml-11 rounded-lg overflow-hidden border border-slate-100 shadow-sm max-w-xs">
+                          <video
+                            src={b.videoUrl}
+                            controls
+                            className="w-full h-auto max-h-24 bg-black"
+                            onError={(e) => { console.log("Video preview load error:", e); }}
+                          />
+                        </div>
+                      )}
                     </div>
                   ))
                 )}
@@ -706,8 +735,8 @@ export default function AdminDashboard() {
                       {/* Top Row: Avatar, Username, Type & Edit/Delete Buttons */}
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-base border border-blue-100 uppercase flex-shrink-0">
-                            {u.username[0]}
+                          <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center border border-blue-100 flex-shrink-0">
+                            <i className="fas fa-user text-sm"></i>
                           </div>
                           <div>
                             <div className="flex items-center gap-1.5 flex-wrap">
@@ -986,6 +1015,28 @@ export default function AdminDashboard() {
                     className="w-full p-3 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold resize-none"
                   ></textarea>
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Rasm URL manzili</label>
+                    <input
+                      type="url"
+                      placeholder="https://images.unsplash.com/... (ixtiyoriy)"
+                      value={notificationImageUrl}
+                      onChange={(e) => setNotificationImageUrl(e.target.value)}
+                      className="w-full p-3 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Video URL manzili</label>
+                    <input
+                      type="url"
+                      placeholder="https://example.com/video.mp4 (ixtiyoriy)"
+                      value={notificationVideoUrl}
+                      onChange={(e) => setNotificationVideoUrl(e.target.value)}
+                      className="w-full p-3 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+                    />
+                  </div>
+                </div>
                 <button
                   type="submit"
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-blue-500/10 flex items-center justify-center gap-2"
@@ -1002,14 +1053,35 @@ export default function AdminDashboard() {
                 <i className="fas fa-history text-blue-600"></i>
                 Oxirgi yuborilganlar
               </h2>
-              <div className="space-y-3 max-h-[300px] overflow-y-auto">
+              <div className="space-y-3 max-h-[450px] overflow-y-auto pr-1">
                 {broadcasts.length === 0 ? (
                   <p className="text-slate-400 text-center py-6 text-sm">Xabarlar yuborilmagan.</p>
                 ) : (
                   [...broadcasts].reverse().slice(0, 10).map((b) => (
-                    <div key={b.id} className="bg-white/80 border border-blue-100/40 p-3 rounded-xl text-xs shadow-sm">
-                      <p className="font-semibold text-slate-700">{b.text}</p>
-                      <p className="text-slate-400 text-[10px] text-right mt-1.5">{b.time}</p>
+                    <div key={b._id || b.id} className="bg-white/80 border border-blue-100/40 p-3 rounded-xl text-xs shadow-sm flex flex-col gap-2">
+                      <p className="font-semibold text-slate-700 break-words whitespace-pre-wrap">{b.text}</p>
+                      {b.imageUrl && (
+                        <div className="rounded-lg overflow-hidden border border-slate-100 shadow-sm max-w-full">
+                          <img
+                            src={b.imageUrl}
+                            alt="Preview"
+                            className="w-full h-auto object-cover max-h-32 cursor-zoom-in"
+                            onClick={() => window.open(b.imageUrl, "_blank")}
+                            onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/600x400?text=Rasm+yuklanmadi"; }}
+                          />
+                        </div>
+                      )}
+                      {b.videoUrl && (
+                        <div className="rounded-lg overflow-hidden border border-slate-100 shadow-sm max-w-full">
+                          <video
+                            src={b.videoUrl}
+                            controls
+                            className="w-full h-auto max-h-32 bg-black"
+                            onError={(e) => { console.log("Video preview load error:", e); }}
+                          />
+                        </div>
+                      )}
+                      <p className="text-slate-400 text-[10px] text-right mt-0.5">{b.time}</p>
                     </div>
                   ))
                 )}
