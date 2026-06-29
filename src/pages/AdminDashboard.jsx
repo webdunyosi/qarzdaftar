@@ -670,79 +670,34 @@ export default function AdminDashboard() {
                   return (
                     <div 
                       key={u.username} 
-                      className="bg-white border border-slate-100 border-l-4 border-l-blue-600 p-5 rounded-2xl shadow-sm hover:shadow-md transition flex flex-col gap-4"
+                      className="bg-white border border-slate-100 border-l-4 border-l-blue-600 p-4 rounded-2xl shadow-sm hover:shadow-md transition flex flex-col gap-3"
                     >
-                      {/* Avatar & Details Row */}
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg border border-blue-100 uppercase">
+                      {/* Top Row: Avatar, Username, Type & Edit/Delete Buttons */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-base border border-blue-100 uppercase flex-shrink-0">
                             {u.username[0]}
                           </div>
                           <div>
-                            <h3 className="font-bold text-slate-800 text-base">{u.username}</h3>
-                            <p className="text-slate-400 text-xs font-semibold mt-0.5">
-                              A'zo bo'ldi: {u.createdAt ? new Date(u.createdAt).toLocaleDateString("uz-UZ") : new Date().toLocaleDateString("uz-UZ")}
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <h3 className="font-bold text-slate-800 text-sm sm:text-base leading-none">{u.username}</h3>
+                              {u.type && (
+                                <span className="bg-blue-50/70 text-blue-600 px-2 py-0.5 rounded text-[10px] font-bold border border-blue-100/50">
+                                  {u.type}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-slate-400 text-[10px] font-semibold mt-1">
+                              A'zo: {u.createdAt ? new Date(u.createdAt).toLocaleDateString("uz-UZ") : new Date().toLocaleDateString("uz-UZ")}
                             </p>
                           </div>
                         </div>
                         
-                        <span className="bg-emerald-50 text-emerald-600 border border-emerald-100 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                          Faol
-                        </span>
-                      </div>
-
-                      {/* Stats grid */}
-                      <div className="grid grid-cols-3 gap-2 py-3 px-4 bg-slate-50/70 border border-slate-100 rounded-xl text-center">
-                        <div>
-                          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Jami qarzlar</p>
-                          <p className="font-bold text-slate-800 text-xs sm:text-sm mt-0.5">
-                            {stats.count} ta ({stats.totalAmount.toLocaleString()} so'm)
-                          </p>
-                        </div>
-                        <div className="border-x border-slate-200/60">
-                          <p className="text-emerald-600 text-[10px] font-bold uppercase tracking-wider">Daromad (Paid)</p>
-                          <p className="font-bold text-emerald-600 text-xs sm:text-sm mt-0.5">
-                            {stats.paidAmount.toLocaleString()} so'm
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-amber-600 text-[10px] font-bold uppercase tracking-wider">Faol qarzlar</p>
-                          <p className="font-bold text-amber-600 text-xs sm:text-sm mt-0.5">
-                            {stats.activeAmount.toLocaleString()} so'm
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Quick Actions & Modify Panel */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-50">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <a
-                            href={`https://t.me/${u.username}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 px-4 py-2 rounded-xl text-xs font-bold transition active:scale-95"
-                          >
-                            <i className="fab fa-telegram-plane"></i> Telegram
-                          </a>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(u.password);
-                              toast.success("Sotuvchi paroli nusxalandi!");
-                            }}
-                            className="inline-flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer"
-                            title="Parolni nusxalash"
-                          >
-                            <i className="fas fa-key"></i> Parol: {u.password}
-                          </button>
-                          {u.type && (
-                            <span className="inline-flex items-center gap-1.5 bg-blue-50/50 text-blue-700 px-3.5 py-2 rounded-xl text-xs font-bold border border-blue-100/40">
-                              <i className="fas fa-store"></i> {u.type}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2 ml-auto">
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <span className="bg-emerald-50 text-emerald-600 border border-emerald-100/60 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Faol
+                          </span>
                           <button
                             onClick={() => {
                               setEditingUserId(u.username);
@@ -750,19 +705,63 @@ export default function AdminDashboard() {
                               setEditPassword(u.password);
                               setEditType(u.type || (sellerTypes[0] || "Kiyim-kechak"));
                             }}
-                            className="w-9 h-9 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center transition border border-blue-100/40 cursor-pointer"
+                            className="w-8 h-8 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-slate-500 rounded-lg flex items-center justify-center transition border border-slate-100 cursor-pointer"
                             title="Tahrirlash"
                           >
-                            <i className="fas fa-pen text-sm"></i>
+                            <i className="fas fa-pen text-xs"></i>
                           </button>
                           <button
                             onClick={() => handleDeleteSeller(u.username)}
-                            className="w-9 h-9 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl flex items-center justify-center transition border border-red-200/40 cursor-pointer"
+                            className="w-8 h-8 bg-slate-50 hover:bg-red-50 hover:text-red-600 text-slate-500 rounded-lg flex items-center justify-center transition border border-slate-100 cursor-pointer"
                             title="O'chirish"
                           >
-                            <i className="fas fa-trash text-sm"></i>
+                            <i className="fas fa-trash-alt text-xs"></i>
                           </button>
                         </div>
+                      </div>
+
+                      {/* Stats grid */}
+                      <div className="flex items-stretch justify-between gap-1 py-2.5 px-3 bg-slate-50/50 border border-slate-100 rounded-xl text-center">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-slate-400 text-[9px] font-bold uppercase tracking-wider">Jami qarzlar</p>
+                          <p className="font-extrabold text-slate-700 text-[11px] sm:text-xs mt-0.5 truncate">
+                            {stats.count} ta ({stats.totalAmount.toLocaleString()} so'm)
+                          </p>
+                        </div>
+                        <div className="flex-1 min-w-0 border-x border-slate-200/50">
+                          <p className="text-emerald-600 text-[9px] font-bold uppercase tracking-wider">Daromad (Paid)</p>
+                          <p className="font-extrabold text-emerald-600 text-[11px] sm:text-xs mt-0.5 truncate">
+                            {stats.paidAmount.toLocaleString()} so'm
+                          </p>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-amber-600 text-[9px] font-bold uppercase tracking-wider">Faol qarzlar</p>
+                          <p className="font-extrabold text-amber-600 text-[11px] sm:text-xs mt-0.5 truncate">
+                            {stats.activeAmount.toLocaleString()} so'm
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Quick Actions */}
+                      <div className="flex items-center gap-2 pt-0.5">
+                        <a
+                          href={`https://t.me/${u.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100/60 px-3 py-1.5 rounded-xl text-[11px] font-bold transition active:scale-95"
+                        >
+                          <i className="fab fa-telegram-plane"></i> Telegram
+                        </a>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(u.password);
+                            toast.success("Sotuvchi paroli nusxalandi!");
+                          }}
+                          className="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-xl text-[11px] font-bold transition active:scale-95 cursor-pointer"
+                          title="Parolni nusxalash"
+                        >
+                          <i className="fas fa-key"></i> Parol: <span className="font-mono text-slate-700">{u.password}</span>
+                        </button>
                       </div>
                     </div>
                   );
