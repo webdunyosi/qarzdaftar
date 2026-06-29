@@ -560,24 +560,20 @@ export default function DebtsList() {
                                 </button>
                               )}
                               
-                              {currentUser?.role === "admin" && (
-                                <>
-                                  <button
-                                    onClick={() => qarzniTahrirlash(q)}
-                                    className="text-white bg-yellow-500 hover:bg-yellow-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
-                                  >
-                                    <i className="fas fa-edit mr-1"></i>
-                                    Tahrirlash
-                                  </button>
-                                  <button
-                                    onClick={() => qarzniOchirish(q.id)}
-                                    className="text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
-                                  >
-                                    <i className="fas fa-trash mr-1"></i>
-                                    O'chirish
-                                  </button>
-                                </>
-                              )}
+                              <button
+                                onClick={() => qarzniTahrirlash(q)}
+                                className="text-white bg-yellow-500 hover:bg-yellow-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
+                              >
+                                <i className="fas fa-edit mr-1"></i>
+                                Tahrirlash
+                              </button>
+                              <button
+                                onClick={() => qarzniOchirish(q.id)}
+                                className="text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
+                              >
+                                <i className="fas fa-trash mr-1"></i>
+                                O'chirish
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -645,10 +641,6 @@ export default function DebtsList() {
                         className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition active:bg-gray-100"
                       >
                         <div className="flex items-center gap-3">
-                          {/* Avatar */}
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white bg-gradient-to-tr ${getAvatarGradient(group.mijozIsmi)} shadow-sm`}>
-                            {group.mijozIsmi.trim().charAt(0).toUpperCase()}
-                          </div>
                           <div>
                             <div className="flex items-center gap-1.5">
                               <span className="text-sm font-bold text-gray-800 capitalize">
@@ -761,25 +753,21 @@ export default function DebtsList() {
                                       To'landi
                                     </button>
                                   )}
-                                  {currentUser?.role === "admin" && (
-                                    <>
-                                      <button
-                                        onClick={() => qarzniTahrirlash(item)}
-                                        className="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
-                                      >
-                                        <i className="fas fa-edit mr-1"></i>
-                                        Tahrirlash
-                                      </button>
-                                      <button
-                                        onClick={() => qarzniOchirish(item.id)}
-                                        className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
-                                      >
-                                        <i className="fas fa-trash mr-1"></i>
-                                        O'chirish
-                                      </button>
-                                    </>
-                                  )}
-                                </div>
+                                   <button
+                                     onClick={() => qarzniTahrirlash(item)}
+                                     className="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                   >
+                                     <i className="fas fa-edit mr-1"></i>
+                                     Tahrirlash
+                                   </button>
+                                   <button
+                                     onClick={() => qarzniOchirish(item.id)}
+                                     className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                   >
+                                     <i className="fas fa-trash mr-1"></i>
+                                     O'chirish
+                                   </button>
+                                 </div>
                               </div>
                             );
                           })}

@@ -890,25 +890,21 @@ export default function Dashboard() {
                               </button>
                             )}
                             
-                            {currentUser?.role === "admin" && (
-                              <>
-                                <button
-                                  onClick={() => qarzniTahrirlash(q)}
-                                  className="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-md transition text-xs font-semibold"
-                                >
-                                  <i className="fas fa-edit mr-1"></i>
-                                  Tahrirlash
-                                </button>
-                                <button
-                                  onClick={() => qarzniOchirish(q.id)}
-                                  className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md transition text-xs font-semibold"
-                                >
-                                  <i className="fas fa-trash mr-1"></i>
-                                  O'chirish
-                                </button>
-                              </>
-                            )}
-                          </div>
+                              <button
+                                onClick={() => qarzniTahrirlash(q)}
+                                className="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-md transition text-xs font-semibold"
+                              >
+                                <i className="fas fa-edit mr-1"></i>
+                                Tahrirlash
+                              </button>
+                              <button
+                                onClick={() => qarzniOchirish(q.id)}
+                                className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md transition text-xs font-semibold"
+                              >
+                                <i className="fas fa-trash mr-1"></i>
+                                O'chirish
+                              </button>
+                            </div>
                         </td>
                       </tr>
                     );
