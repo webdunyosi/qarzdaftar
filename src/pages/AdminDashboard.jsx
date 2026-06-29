@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   const [modalTab, setModalTab] = useState("add_seller");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("Barchasi");
+  const [collapsedSellers, setCollapsedSellers] = useState({});
   
   // Notification form state
   const [notificationText, setNotificationText] = useState("");
@@ -808,63 +809,146 @@ export default function AdminDashboard() {
 
         {/* Tab Content 2: All Debts View */}
         {activeTab === "all_debts" && (
-          <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md">
-            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <i className="fas fa-database text-blue-600"></i>
-              Barcha Sotuvchilarning Qarzlar Ro'yxati ({qarzlar.length})
-            </h2>
+          <div className="space-y-4 animate-slide-up">
+            <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex items-center justify-between w-full">
+              <h2 className="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+                <i className="fas fa-database text-blue-600"></i>
+                Barcha Sotuvchilarning Qarzlar Ro'yxati ({qarzlar.length})
+              </h2>
+            </div>
 
-            {qarzlar.length === 0 ? (
-              <p className="text-slate-500 text-center py-6">Qarzlar kiritilmagan.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-blue-100/60">
-                  <thead className="bg-white/70">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Mijoz</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Sotuvchi</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Mahsulot</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Miqdor</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Sana</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Muddati</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white/40 divide-y divide-blue-50/40 font-medium text-slate-700 text-sm">
-                    {qarzlar.map((q) => (
-                      <tr key={q.id} className="hover:bg-blue-50/30 transition-colors">
-                        <td className="px-4 py-3">
-                          <p className="font-bold text-slate-800">{q.mijozIsmi}</p>
-                          <p className="text-slate-400 text-xs">{q.telefon || "—"}</p>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className="bg-blue-100/70 text-blue-700 px-2 py-0.5 rounded-full text-xs font-bold capitalize">
-                            {q.seller || "Marjona"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">{q.mahsulot}</td>
-                        <td className="px-4 py-3 text-slate-800 font-bold">
-                          {Number(q.qarzMiqdori || q.miqdor || 0).toLocaleString()} so'm
-                        </td>
-                        <td className="px-4 py-3 text-slate-500 text-xs">
-                          {new Date(q.sana).toLocaleDateString("uz-UZ")}
-                        </td>
-                        <td className="px-4 py-3 text-slate-500 text-xs">
-                          {new Date(q.tolashMuddati).toLocaleDateString("uz-UZ")}
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                            q.status === "To'langan" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-800"
-                          }`}>
-                            {q.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            {(() => {
+              if (qarzlar.length === 0) {
+                return (
+                  <div className="bg-white border border-slate-100 p-8 rounded-2xl text-center shadow-sm">
+                    <p className="text-slate-500 font-medium">Qarzlar kiritilmagan.</p>
+                  </div>
+                );
+              }
+
+              // Group debts by seller name
+              const groupedDebts = qarzlar.reduce((acc, q) => {
+                const sellerName = q.seller || "Marjona";
+                if (!acc[sellerName]) acc[sellerName] = [];
+                acc[sellerName].push(q);
+                return acc;
+              }, {});
+
+              const toggleSellerCollapse = (sellerName) => {
+                setCollapsedSellers(prev => ({
+                  ...prev,
+                  [sellerName]: !prev[sellerName]
+                }));
+              };
+
+              return (
+                <div className="space-y-4">
+                  {Object.entries(groupedDebts).map(([sellerName, sellerDebts]) => {
+                    const totalSum = sellerDebts.reduce((sum, q) => sum + Number(q.qarzMiqdori || q.miqdor || 0), 0);
+                    const isCollapsed = collapsedSellers[sellerName] ?? false;
+
+                    return (
+                      <div key={sellerName} className="bg-white border border-slate-100/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition">
+                        {/* Seller Header Row */}
+                        <div 
+                          onClick={() => toggleSellerCollapse(sellerName)}
+                          className="flex items-center justify-between cursor-pointer select-none"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold text-base border border-blue-100/50 uppercase flex-shrink-0">
+                              {sellerName[0]}
+                            </div>
+                            <div>
+                              <h3 className="font-extrabold text-slate-800 text-sm sm:text-base capitalize leading-tight">{sellerName}</h3>
+                              <p className="text-slate-400 text-[10px] sm:text-[11px] font-semibold mt-0.5">
+                                {sellerDebts.length} ta qarz &bull; Jami: {totalSum.toLocaleString()} so'm
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-[9px] font-bold border border-blue-100/40">
+                              Sotuvchi
+                            </span>
+                            <button className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+                              <i className={`fas fa-chevron-${isCollapsed ? 'down' : 'up'} text-xs transition-transform`}></i>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Seller's Debts List (Collapsible) */}
+                        {!isCollapsed && (
+                          <div className="mt-4 pt-4 border-t border-slate-100/70 space-y-3 animate-slide-up">
+                            {sellerDebts.map((q) => (
+                              <div key={q.id || q._id} className="bg-slate-50/50 border border-slate-100/80 rounded-xl p-3.5 space-y-2.5">
+                                {/* Customer info row */}
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="w-8 h-8 bg-blue-100/50 text-blue-600 rounded-full flex items-center justify-center font-bold text-xs uppercase flex-shrink-0">
+                                      {q.mijozIsmi[0]}
+                                    </div>
+                                    <div>
+                                      <h4 className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{q.mijozIsmi}</h4>
+                                      <p className="text-slate-400 text-[10px] font-semibold mt-0.5">
+                                        {q.telefon || "Telefon kiritilmagan"}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    {q.telefon && (
+                                      <a
+                                        href={`tel:${q.telefon}`}
+                                        className="w-7 h-7 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center transition border border-emerald-100/50"
+                                        title="Qo'ng'iroq qilish"
+                                      >
+                                        <i className="fas fa-phone-alt text-[10px]"></i>
+                                      </a>
+                                    )}
+                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${
+                                      q.status === "To'langan" 
+                                        ? "bg-green-50 text-green-600 border-green-100" 
+                                        : "bg-amber-50 text-amber-600 border-amber-100"
+                                    }`}>
+                                      {q.status}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Debt Details Sub-card */}
+                                <div className="bg-white border border-slate-100 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+                                  <div>
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Mahsulot</p>
+                                    <p className="font-extrabold text-slate-700 text-xs sm:text-sm mt-0.5">{q.mahsulot}</p>
+                                  </div>
+                                  
+                                  <div className="text-center sm:text-left">
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Muddatlar</p>
+                                    <p className="text-slate-500 text-[9px] font-semibold mt-0.5">
+                                      Sana: <span className="text-slate-700">{new Date(q.sana).toLocaleDateString("uz-UZ")}</span>
+                                    </p>
+                                    <p className="text-slate-500 text-[9px] font-semibold">
+                                      Muddati: <span className="text-slate-700">{new Date(q.tolashMuddati).toLocaleDateString("uz-UZ")}</span>
+                                    </p>
+                                  </div>
+
+                                  <div className="text-right">
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Qarz Miqdori</p>
+                                    <p className="font-black text-blue-600 text-xs sm:text-sm mt-0.5">
+                                      {Number(q.qarzMiqdori || q.miqdor || 0).toLocaleString()} so'm
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         )}
 
