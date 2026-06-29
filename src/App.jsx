@@ -9,6 +9,7 @@ import DebtsList from "./pages/DebtsList";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import Notifications from "./pages/Notifications";
+import ManageProducts from "./pages/ManageProducts";
 import AdminDashboard from "./pages/AdminDashboard";
 import BottomBar from "./components/BottomBar";
 import UserLayout from "./components/UserLayout";
@@ -55,6 +56,7 @@ export default function App() {
             <Route path="/debts" element={<DebtsList />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/notifications" element={<Notifications />} />
+            <Route path="/manage-products" element={<ManageProducts />} />
           </Route>
 
           {/* Admin Routes Wrapped in AdminLayout */}

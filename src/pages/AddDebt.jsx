@@ -31,19 +31,69 @@ async function sendTelegramMessage(message) {
   }
 }
 
+// Product suggestions helper based on seller business type
+const getProductSuggestions = (type) => {
+  switch (type) {
+    case "Kiyim-kechak":
+      return {
+        products: ["Shim", "Ko'ylak", "Kurtka", "Kostyum-shim", "T-shirt"],
+        icon: "fa-tshirt"
+      };
+    case "Oziq-ovqat":
+      return {
+        products: ["Guruch", "Yog'", "Shakar", "Un", "Choy", "Makaron"],
+        icon: "fa-apple-alt"
+      };
+    case "Go'sht mahsulotlari (Tovuq)":
+      return {
+        products: ["Tovuq go'shti (Butun)", "Tovuq soni", "Tovuq filesi", "Tovuq qanoti", "Tovuq qiymasi"],
+        icon: "fa-drumstick-bite"
+      };
+    case "Maishiy texnika":
+      return {
+        products: ["Muzlatgich", "Televizor", "Konditsioner", "Kir yuvish mashinasi", "Dazmol", "Changyutgich"],
+        icon: "fa-tv"
+      };
+    default:
+      return {
+        products: ["Shim", "Ko'ylak", "Kurtka", "Kostyum-shim", "T-shirt"],
+        icon: "fa-box"
+      };
+  }
+};
+
+const loadProductSuggestions = (type) => {
+  const saved = localStorage.getItem(`product_suggestions_${type}`);
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  return getProductSuggestions(type);
+};
+
 export default function AddDebt() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentUser, setCurrentUser] = useState(null);
+
+  // Get logged-in user synchronously to initialize states
+  const loggedUser = (() => {
+    try {
+      const userStr = sessionStorage.getItem("currentUser");
+      return userStr ? JSON.parse(userStr) : null;
+    } catch {
+      return null;
+    }
+  })();
+
 
   useEffect(() => {
-    const userStr = sessionStorage.getItem("currentUser");
-    if (!userStr) {
+    if (!loggedUser) {
       navigate("/login");
-      return;
     }
-    setCurrentUser(JSON.parse(userStr));
-  }, [navigate]);
+  }, [loggedUser, navigate]);
 
   // Activity logger helper
   const addActivityLog = async (text, type) => {
@@ -57,7 +107,9 @@ export default function AddDebt() {
   // Form states
   const [mijozIsmi, setMijozIsmi] = useState("");
   const [telefon, setTelefon] = useState("");
-  const [mahsulot, setMahsulot] = useState("Shim");
+
+  const suggestions = loadProductSuggestions(loggedUser?.type);
+  const [mahsulot, setMahsulot] = useState(suggestions.products[0] || "Boshqa");
   const [customProduct, setCustomProduct] = useState("");
   const [qarzMiqdori, setQarzMiqdori] = useState("");
   const [sana, setSana] = useState("");
@@ -73,7 +125,8 @@ export default function AddDebt() {
       setMijozIsmi(qarz.mijozIsmi);
       setTelefon(qarz.telefon);
 
-      const presetProducts = ["Shim", "Ko'ylak", "Kurtka", "Kostyum-shim", "T-shirt"];
+      const userSuggestions = loadProductSuggestions(loggedUser?.type);
+      const presetProducts = userSuggestions.products;
       if (presetProducts.includes(qarz.mahsulot)) {
         setMahsulot(qarz.mahsulot);
         setCustomProduct("");
@@ -90,7 +143,7 @@ export default function AddDebt() {
       setMijozIsmi(mijozIsmi);
       setTelefon(telefon);
     }
-  }, [location]);
+  }, [location, loggedUser]);
 
   // Format amount input as user types
   const handleAmountChange = (e) => {
@@ -230,7 +283,7 @@ export default function AddDebt() {
               </div>
             </div>
 
-            {/* Mahsulot nomi (select with default clothing values) */}
+            {/* Mahsulot nomi (select with default dynamic values based on seller type) */}
             <div className="form-group relative flex flex-col gap-2">
               <label className="text-gray-700 font-semibold mb-1 text-sm block">Mahsulot Nomi</label>
               <div className="relative">
@@ -240,14 +293,12 @@ export default function AddDebt() {
                   onChange={(e) => setMahsulot(e.target.value)}
                   required
                 >
-                  <option value="Shim">Shim</option>
-                  <option value="Ko'ylak">Ko'ylak</option>
-                  <option value="Kurtka">Kurtka</option>
-                  <option value="Kostyum-shim">Kostyum-shim</option>
-                  <option value="T-shirt">T-shirt</option>
+                  {suggestions.products.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
                   <option value="Boshqa">Boshqa...</option>
                 </select>
-                <i className="fas fa-tshirt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                <i className={`fas ${suggestions.icon} absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none`}></i>
                 <i className="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
               </div>
               

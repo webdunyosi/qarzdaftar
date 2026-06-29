@@ -73,6 +73,13 @@ export default function Profile() {
 
   const menuItems = [
     {
+      icon: "fa-boxes",
+      label: "Mahsulotlar va turlar",
+      sublabel: "Mahsulot nomlarini tahrirlash va yangi turlar qo'shish",
+      iconBg: "bg-indigo-100 text-indigo-600",
+      action: () => navigate("/manage-products"),
+    },
+    {
       icon: "fa-bell",
       label: "Bildirishnomalar",
       sublabel: `${logs.length} ta faoliyat logi`,
