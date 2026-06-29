@@ -318,8 +318,8 @@ export default function DebtsList() {
   return (
     <div>
       <div className="main-background"></div>
-      {/* Fixed wrapper from top to just above bottom nav */}
-      <div style={{position: 'fixed', inset: 0, bottom: '4rem', overflowY: 'auto', padding: '0.75rem', display: 'flex', flexDirection: 'column', zIndex: 10, background: 'transparent'}}>
+      {/* Fixed wrapper from top to just above bottom nav, cleared sidebar on desktop */}
+      <div className="fixed inset-0 bottom-16 md:bottom-0 left-0 md:left-64 overflow-y-auto p-3 flex flex-col z-10 bg-transparent">
         <div className="w-full glass-card-premium p-4 sm:p-6 rounded-3xl animate-slide-up" style={{flex: 1, display: 'flex', flexDirection: 'column', background: 'white', transform: 'none'}}>
           
           {/* Header & Back Button */}
