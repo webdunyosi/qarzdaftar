@@ -58,6 +58,7 @@ export default function DebtsList() {
   const [currentUser, setCurrentUser] = useState(null);
   const [qarzlar, setQarzlar] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState(null);
 
   // Search & Filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,13 +83,13 @@ export default function DebtsList() {
   };
 
   // Load Initial Data
-  const loadFilteredDebts = async () => {
-    setLoading(true);
+  const loadFilteredDebts = async (showGlobalLoading = true) => {
+    if (showGlobalLoading) setLoading(true);
     const res = await api.get("/debts");
     if (!res.error) {
       setQarzlar(res);
     }
-    setLoading(false);
+    if (showGlobalLoading) setLoading(false);
   };
 
   useEffect(() => {
@@ -103,32 +104,51 @@ export default function DebtsList() {
     loadFilteredDebts();
   }, [navigate]);
 
-  // Mark as paid
-  const qarzniTolash = async (id) => {
+  // Toggle status (paid / unpaid)
+  const toggleQarzStatus = async (id, currentStatus) => {
     const target = qarzlar.find((q) => (q.id || q._id) === id);
     if (!target) return;
 
-    const res = await api.put(`/debts/${id}`, { status: "To'langan" });
+    setUpdatingId(id);
+
+    const newStatus = currentStatus === "To'langan" ? "To'lanmagan" : "To'langan";
+    const res = await api.put(`/debts/${id}`, { status: newStatus });
     if (res.error) {
       toast.error(res.error);
+      setUpdatingId(null);
       return;
     }
 
-    const message = `✅ <b>Qarz to'landi (Mobil)</b>\n\n👤 Mijoz: ${
-      res.mijozIsmi
-    }\n📱 Telefon: ${res.telefon}\n👕 Mahsulot: ${
-      res.mahsulot
-    }\n💰 Qarz miqdori: ${res.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
-      res.sana
-    ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
-      res.tolashMuddati
-    ).toLocaleDateString()}`;
+    let message = "";
+    if (newStatus === "To'langan") {
+      message = `✅ <b>Qarz to'landi (Mobil)</b>\n\n👤 Mijoz: ${
+        res.mijozIsmi
+      }\n📱 Telefon: ${res.telefon}\n👕 Mahsulot: ${
+        res.mahsulot
+      }\n💰 Qarz miqdori: ${res.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
+        res.sana
+      ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
+        res.tolashMuddati
+      ).toLocaleDateString()}`;
+      await addActivityLog(`Qarz to'landi: ${res.mijozIsmi} (${res.qarzMiqdori.toLocaleString()} so'm)`, "pay");
+      toast.success("Qarz to'langan deb belgilandi!");
+    } else {
+      message = `⚠️ <b>Qarz to'lanmadi deb qayta belgilandi (Mobil)</b>\n\n👤 Mijoz: ${
+        res.mijozIsmi
+      }\n📱 Telefon: ${res.telefon}\n👕 Mahsulot: ${
+        res.mahsulot
+      }\n💰 Qarz miqdori: ${res.qarzMiqdori.toLocaleString()} so'm\n📅 Sana: ${new Date(
+        res.sana
+      ).toLocaleDateString()}\n⏰ To'lash muddati: ${new Date(
+        res.tolashMuddati
+      ).toLocaleDateString()}`;
+      await addActivityLog(`Qarz to'lanmagan deb belgilandi: ${res.mijozIsmi} (${res.qarzMiqdori.toLocaleString()} so'm)`, "unpay");
+      toast.success("Qarz to'lanmagan deb belgilandi!");
+    }
     
     sendTelegramMessage(message);
-    await addActivityLog(`Qarz to'landi: ${res.mijozIsmi} (${res.qarzMiqdori.toLocaleString()} so'm)`, "pay");
-
-    toast.success("Qarz to'langan deb belgilandi!");
-    loadFilteredDebts();
+    await loadFilteredDebts(false);
+    setUpdatingId(null);
   };
 
   // Delete debt
@@ -471,6 +491,43 @@ export default function DebtsList() {
                 ) : (
                   <>
                     {filteredQarzlar.map((q) => {
+                      if (updatingId === q.id || updatingId === q._id) {
+                        return (
+                          <tr key={q.id || q._id} className="animate-pulse">
+                            <td className="px-4 py-3">
+                              <div className="flex items-center">
+                                <div className="w-8 h-8 bg-slate-200/50 rounded-full skeleton-dark-premium flex-shrink-0" />
+                                <div className="ml-2.5 space-y-1">
+                                  <div className="h-3.5 w-24 bg-slate-200/70 rounded skeleton-dark-premium" />
+                                  <div className="h-3 w-16 bg-slate-200/50 rounded skeleton-dark-premium" />
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="h-3.5 w-20 bg-slate-200/50 rounded skeleton-dark-premium" />
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="h-3.5 w-16 bg-slate-200/50 rounded skeleton-dark-premium" />
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="h-3.5 w-24 bg-slate-200/70 rounded skeleton-dark-premium" />
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="h-3.5 w-20 bg-slate-200/50 rounded skeleton-dark-premium" />
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="h-3.5 w-20 bg-slate-200/50 rounded skeleton-dark-premium mb-1" />
+                              <div className="h-3 w-16 bg-slate-200/50 rounded skeleton-dark-premium" />
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex gap-2">
+                                <div className="h-6 w-16 bg-slate-200/50 rounded" />
+                                <div className="h-6 w-16 bg-slate-200/50 rounded" />
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      }
                       const tolashDate = new Date(q.tolashMuddati);
                       const overdue = today > tolashDate && q.status === "To'lanmagan";
                       const remainingDays = Math.ceil((tolashDate - today) / (1000 * 60 * 60 * 24));
@@ -550,15 +607,26 @@ export default function DebtsList() {
                                 Qarz+
                               </button>
 
-                              {q.status !== "To'langan" && (
-                                <button
-                                  onClick={() => qarzniTolash(q.id)}
-                                  className="text-white bg-green-500 hover:bg-green-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
-                                >
-                                  <i className="fas fa-check mr-1"></i>
-                                  To'landi
-                                </button>
-                              )}
+                              <button
+                                onClick={() => toggleQarzStatus(q.id || q._id, q.status)}
+                                className={`text-white px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer ${
+                                  q.status === "To'langan"
+                                    ? "bg-emerald-600 hover:bg-emerald-700"
+                                    : "bg-green-500 hover:bg-green-600"
+                                }`}
+                              >
+                                {q.status === "To'langan" ? (
+                                  <>
+                                    <i className="fas fa-undo mr-1"></i>
+                                    To'lanmadi
+                                  </>
+                                ) : (
+                                  <>
+                                    <i className="fas fa-check mr-1"></i>
+                                    To'landi
+                                  </>
+                                )}
+                              </button>
                               
                               <button
                                 onClick={() => qarzniTahrirlash(q)}
@@ -691,6 +759,51 @@ export default function DebtsList() {
                       {isExpanded && (
                         <div className="px-4 pb-4 pt-1 border-t border-gray-50 bg-gray-50/30 space-y-3">
                           {group.items.map((item) => {
+                             if (updatingId === item.id || updatingId === item._id) {
+                               const tolashDateTmp = new Date(item.tolashMuddati);
+                               const overdueTmp = today > tolashDateTmp && item.status === "To'lanmagan";
+                               const borderClassTmp = item.status === "To'langan"
+                                 ? "border-l-green-500 bg-green-50/15"
+                                 : overdueTmp
+                                   ? "border-l-red-500 bg-red-50/15"
+                                   : "border-l-yellow-500 bg-yellow-50/15";
+                               return (
+                                 <div key={item.id || item._id} className={`p-3 rounded-xl border-l-4 ${borderClassTmp} border border-gray-100 bg-white/95 shadow-sm space-y-3 animate-pulse`}>
+                                   {/* Sub-card header */}
+                                   <div className="flex justify-between items-center">
+                                     <div className="h-3 w-16 bg-slate-200/60 rounded" />
+                                     <div className="h-3 w-16 bg-slate-200/60 rounded" />
+                                   </div>
+
+                                   {/* Sub-card info */}
+                                   <div className="flex justify-between items-start">
+                                     <div className="space-y-2 flex-1">
+                                       {/* Product title placeholder */}
+                                       <div className="flex items-center gap-1.5">
+                                         <div className="w-3.5 h-3.5 bg-slate-200/60 rounded" />
+                                         <div className="h-4 w-28 bg-slate-200/60 rounded" />
+                                       </div>
+                                       {/* Muddat placeholder */}
+                                       <div className="h-3 w-24 bg-slate-200/60 rounded" />
+                                     </div>
+                                     <div className="flex flex-col items-end space-y-2">
+                                       {/* Price placeholder */}
+                                       <div className="h-4 w-20 bg-slate-200/60 rounded" />
+                                       {/* Status badge placeholder */}
+                                       <div className="h-4.5 w-14 bg-slate-200/60 rounded-full" />
+                                     </div>
+                                   </div>
+
+                                   {/* Divider */}
+                                   <div className="border-t border-gray-100 pt-2 flex justify-end gap-1.5">
+                                     {/* Buttons placeholders */}
+                                     <div className="h-7 w-20 bg-slate-200/60 rounded-full" />
+                                     <div className="h-7 w-16 bg-slate-200/60 rounded-full" />
+                                     <div className="h-7 w-16 bg-slate-200/60 rounded-full" />
+                                   </div>
+                                 </div>
+                               );
+                             }
                             const tolashDate = new Date(item.tolashMuddati);
                             const overdue = today > tolashDate && item.status === "To'lanmagan";
                             const remainingDays = Math.ceil((tolashDate - today) / (1000 * 60 * 60 * 24));
@@ -744,15 +857,26 @@ export default function DebtsList() {
 
                                 {/* Sub-card actions */}
                                 <div className="flex justify-end gap-1.5 pt-2 border-t border-gray-100">
-                                  {item.status !== "To'langan" && (
                                     <button
-                                      onClick={() => qarzniTolash(item.id)}
-                                      className="text-white bg-green-500 hover:bg-green-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
+                                      onClick={() => toggleQarzStatus(item.id || item._id, item.status)}
+                                      className={`text-white px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer ${
+                                        item.status === "To'langan"
+                                          ? "bg-emerald-600 hover:bg-emerald-700"
+                                          : "bg-green-500 hover:bg-green-600"
+                                      }`}
                                     >
-                                      <i className="fas fa-check mr-1"></i>
-                                      To'landi
+                                      {item.status === "To'langan" ? (
+                                        <>
+                                          <i className="fas fa-undo mr-1"></i>
+                                          To'lanmadi
+                                        </>
+                                      ) : (
+                                        <>
+                                          <i className="fas fa-check mr-1"></i>
+                                          To'landi
+                                        </>
+                                      )}
                                     </button>
-                                  )}
                                    <button
                                      onClick={() => qarzniTahrirlash(item)}
                                      className="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
