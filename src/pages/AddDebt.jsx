@@ -203,7 +203,7 @@ export default function AddDebt() {
               <label className="text-gray-700 font-semibold mb-1 text-sm block">Mijoz Ismi</label>
               <div className="relative">
                 <input
-                  className="w-full p-3 rounded-xl px-4 pl-10 bg-white/95 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full glass-input"
                   type="text"
                   value={mijozIsmi}
                   onChange={(e) => setMijozIsmi(e.target.value)}
@@ -219,7 +219,7 @@ export default function AddDebt() {
               <label className="text-gray-700 font-semibold mb-1 text-sm block">Telefon Raqami</label>
               <div className="relative">
                 <input
-                  className="w-full p-3 rounded-xl px-4 pl-10 bg-white/95 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full glass-input"
                   type="tel"
                   value={telefon}
                   onChange={(e) => setTelefon(e.target.value)}
@@ -235,7 +235,7 @@ export default function AddDebt() {
               <label className="text-gray-700 font-semibold mb-1 text-sm block">Mahsulot Nomi</label>
               <div className="relative">
                 <select
-                  className="w-full p-3 rounded-xl px-4 pl-10 bg-white/95 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none"
+                  className="w-full glass-input appearance-none"
                   value={mahsulot}
                   onChange={(e) => setMahsulot(e.target.value)}
                   required
@@ -247,21 +247,21 @@ export default function AddDebt() {
                   <option value="T-shirt">T-shirt</option>
                   <option value="Boshqa">Boshqa...</option>
                 </select>
-                <i className="fas fa-tshirt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                <i className="fas fa-tshirt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                 <i className="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
               </div>
               
               {mahsulot === "Boshqa" && (
                 <div className="relative mt-1 animate-slide-up">
                   <input
-                    className="w-full p-3 rounded-xl px-4 pl-10 bg-white/95 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none border-blue-200 border"
+                    className="w-full glass-input"
                     type="text"
                     value={customProduct}
                     onChange={(e) => setCustomProduct(e.target.value)}
                     placeholder="Mahsulot nomini kiriting"
                     required
                   />
-                  <i className="fas fa-edit absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                  <i className="fas fa-edit absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                 </div>
               )}
             </div>
@@ -271,7 +271,7 @@ export default function AddDebt() {
               <label className="text-gray-700 font-semibold mb-1 text-sm block">Qarz Miqdori (so'm)</label>
               <div className="relative">
                 <input
-                  className="w-full p-3 rounded-xl px-4 pl-10 bg-white/95 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full glass-input"
                   type="text"
                   value={qarzMiqdori}
                   onChange={handleAmountChange}
@@ -287,7 +287,7 @@ export default function AddDebt() {
               <label className="text-gray-700 font-semibold mb-1 text-sm block">Sana</label>
               <div className="relative">
                 <input
-                  className="w-full p-3 rounded-xl px-4 pl-10 bg-white/95 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full glass-input"
                   type="date"
                   value={sana}
                   onChange={(e) => setSana(e.target.value)}
@@ -302,7 +302,7 @@ export default function AddDebt() {
               <label className="text-gray-700 font-semibold mb-1 text-sm block">To'lash Muddati</label>
               <div className="relative">
                 <input
-                  className="w-full p-3 rounded-xl px-4 pl-10 bg-white/95 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full glass-input"
                   type="date"
                   value={tolashMuddati}
                   onChange={(e) => setTolashMuddati(e.target.value)}

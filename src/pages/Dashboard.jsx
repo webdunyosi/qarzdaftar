@@ -572,7 +572,7 @@ export default function Dashboard() {
                 {/* Mijoz ismi */}
                 <div className="form-group relative">
                   <input
-                    className="w-full p-2.5 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full glass-input-round"
                     type="text"
                     value={mijozIsmi}
                     onChange={(e) => setMijozIsmi(e.target.value)}
@@ -585,7 +585,7 @@ export default function Dashboard() {
                 {/* Telefon raqami */}
                 <div className="form-group relative">
                   <input
-                    className="w-full p-2.5 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full glass-input-round"
                     type="tel"
                     value={telefon}
                     onChange={(e) => setTelefon(e.target.value)}
@@ -599,7 +599,7 @@ export default function Dashboard() {
                 <div className="form-group relative flex flex-col gap-2">
                   <div className="relative">
                     <select
-                      className="w-full p-2.5 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none"
+                      className="w-full glass-input-round appearance-none"
                       value={mahsulot}
                       onChange={(e) => setMahsulot(e.target.value)}
                       required
@@ -611,21 +611,21 @@ export default function Dashboard() {
                       <option value="T-shirt">T-shirt</option>
                       <option value="Boshqa">Boshqa...</option>
                     </select>
-                    <i className="fas fa-tshirt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <i className="fas fa-tshirt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                     <i className="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                   </div>
                   
                   {mahsulot === "Boshqa" && (
                     <div className="relative mt-1 animate-slide-up">
                       <input
-                        className="w-full p-2.5 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none border-blue-200 border"
+                        className="w-full glass-input-round"
                         type="text"
                         value={customProduct}
                         onChange={(e) => setCustomProduct(e.target.value)}
                         placeholder="Mahsulot nomini kiriting"
                         required
                       />
-                      <i className="fas fa-edit absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                      <i className="fas fa-edit absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                     </div>
                   )}
                 </div>
@@ -633,7 +633,7 @@ export default function Dashboard() {
                 {/* Qarz miqdori */}
                 <div className="form-group relative">
                   <input
-                    className="w-full p-2.5 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full glass-input-round"
                     type="text"
                     value={qarzMiqdori}
                     onChange={handleAmountChange}
@@ -646,7 +646,7 @@ export default function Dashboard() {
                 {/* Sana */}
                 <div className="form-group relative">
                   <input
-                    className="w-full p-2.5 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full glass-input-round"
                     type="date"
                     value={sana}
                     onChange={(e) => setSana(e.target.value)}
@@ -658,7 +658,7 @@ export default function Dashboard() {
                 {/* To'lash muddati */}
                 <div className="form-group relative">
                   <input
-                    className="w-full p-2.5 rounded-full px-4 pl-10 bg-white/90 focus:bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full glass-input-round"
                     type="date"
                     value={tolashMuddati}
                     onChange={(e) => setTolashMuddati(e.target.value)}

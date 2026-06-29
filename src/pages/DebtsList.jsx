@@ -361,7 +361,24 @@ export default function DebtsList() {
 
           {/* Search box & Date filter */}
           <div className="flex items-center gap-2 mb-2 w-full">
-            <div className="search-box flex items-center bg-white border border-gray-300 rounded-full px-3 py-1.5 w-1/2">
+            {/* Date filter */}
+            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-full px-3 py-1.5 w-1/2 relative">
+              <i className="fas fa-calendar text-gray-400"></i>
+              <input
+                type="date"
+                value={sanaFilter}
+                onChange={(e) => setSanaFilter(e.target.value)}
+                className="outline-none text-xs w-full bg-transparent border-none !p-0 !pl-1 focus:ring-0 cursor-pointer"
+              />
+              {sanaFilter && (
+                <button onClick={() => setSanaFilter("")} className="text-red-500 hover:text-red-700 relative z-20">
+                  <i className="fas fa-times-circle text-xs"></i>
+                </button>
+              )}
+            </div>
+
+            {/* Search box */}
+            <div className="search-box flex items-center bg-white border border-gray-300 rounded-full px-3 py-1.5 w-1/2 relative">
               <i className="fas fa-search text-gray-400 mr-1.5 text-xs"></i>
               <input
                 type="text"
@@ -371,22 +388,7 @@ export default function DebtsList() {
                 className="outline-none text-xs w-full bg-transparent border-none !p-0 !pl-1 focus:ring-0 focus:outline-none"
               />
               {searchTerm && (
-                <button onClick={() => setSearchTerm("")} className="text-gray-400 hover:text-gray-600">
-                  <i className="fas fa-times-circle text-xs"></i>
-                </button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-full px-3 py-1.5 w-1/2">
-              <i className="fas fa-calendar text-gray-400"></i>
-              <input
-                type="date"
-                value={sanaFilter}
-                onChange={(e) => setSanaFilter(e.target.value)}
-                className="outline-none text-xs w-full bg-transparent border-none !p-0 !pl-1 focus:ring-0 cursor-pointer"
-              />
-              {sanaFilter && (
-                <button onClick={() => setSanaFilter("")} className="text-red-500 hover:text-red-700">
+                <button onClick={() => setSearchTerm("")} className="text-gray-400 hover:text-gray-600 relative z-20">
                   <i className="fas fa-times-circle text-xs"></i>
                 </button>
               )}
