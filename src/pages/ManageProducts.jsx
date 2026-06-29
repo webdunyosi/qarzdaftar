@@ -55,23 +55,25 @@ export default function ManageProducts() {
   const [newTypeName, setNewTypeName] = useState("");
 
   useEffect(() => {
-    if (!loggedUser) {
+    const userStr = sessionStorage.getItem("currentUser");
+    if (!userStr) {
       navigate("/login");
       return;
     }
+    const user = JSON.parse(userStr);
 
     // Load products list for user's type
-    const savedProducts = localStorage.getItem(`product_suggestions_${loggedUser.type}`);
+    const savedProducts = localStorage.getItem(`product_suggestions_${user.type}`);
     if (savedProducts) {
       try {
         setProducts(JSON.parse(savedProducts).products);
       } catch (e) {
         console.error(e);
-        const defaults = getProductSuggestionsDefault(loggedUser.type);
+        const defaults = getProductSuggestionsDefault(user.type);
         setProducts(defaults.products);
       }
     } else {
-      const defaults = getProductSuggestionsDefault(loggedUser.type);
+      const defaults = getProductSuggestionsDefault(user.type);
       setProducts(defaults.products);
     }
 
@@ -83,7 +85,7 @@ export default function ManageProducts() {
       }
     };
     loadTypes();
-  }, [navigate, loggedUser]);
+  }, [navigate]);
 
   // Save current products list to localStorage
   const saveProductsList = (updatedList) => {
@@ -186,10 +188,11 @@ export default function ManageProducts() {
         {/* Header */}
         <div className="flex items-center gap-4">
           <button
+            type="button"
             onClick={() => navigate("/profile")}
-            className="w-10 h-10 rounded-xl bg-white border border-slate-200/80 shadow-sm flex items-center justify-center text-slate-600 hover:text-slate-800 transition cursor-pointer"
+            className="w-10 h-10 rounded-xl bg-white border border-slate-200/80 shadow-sm flex items-center justify-center text-slate-600 hover:text-slate-800 transition cursor-pointer relative z-10"
           >
-            <i className="fas fa-arrow-left"></i>
+            <i className="fas fa-arrow-left pointer-events-none"></i>
           </button>
           <div>
             <h1 className="text-xl font-black text-slate-800 tracking-tight">
