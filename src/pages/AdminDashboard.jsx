@@ -1022,10 +1022,7 @@ export default function AdminDashboard() {
         {/* Tab Content 4: Admin own profile change */}
         {activeTab === "settings" && (
           <div className="max-w-md mx-auto space-y-5 animate-slide-up pb-10">
-            {/* Header: Shaxsiy Kabinet */}
-            <h1 className="text-2xl font-black text-center text-slate-800 tracking-tight py-2">
-              Shaxsiy Kabinet
-            </h1>
+
 
             {/* Profile Card */}
             <div className="bg-white border border-slate-100/80 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] transition-all duration-200">
