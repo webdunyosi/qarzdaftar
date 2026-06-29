@@ -517,38 +517,7 @@ tbody tr:hover {
   background-color: rgba(239, 68, 68, 0.2);
 }
 
-/* Hover va Active holatlari (gradient fon, oq matn, chegara yo'q) */
-.filter-btn:hover:not(.active),
-.filter-btn.active {
-  color: white;
-  border-color: transparent;
-  background: linear-gradient(to right, var(--start-color), var(--end-color));
-}
-
-/* Gradient fon ranglari (CSS variables yordamida) */
-.filter-btn[data-filter="all"]:hover:not(.active),
-.filter-btn[data-filter="all"].active {
-  --start-color: #3b82f6;
-  --end-color: #60a5fa;
-}
-
-.filter-btn[data-filter="tolangan"]:hover:not(.active),
-.filter-btn[data-filter="tolangan"].active {
-  --start-color: #10b981;
-  --end-color: #34d399;
-}
-
-.filter-btn[data-filter="tolanmagan"]:hover:not(.active),
-.filter-btn[data-filter="tolanmagan"].active {
-  --start-color: #f59e0b;
-  --end-color: #fbbf24;
-}
-
-.filter-btn[data-filter="muddatiOtgan"]:hover:not(.active),
-.filter-btn[data-filter="muddatiOtgan"].active {
-  --start-color: #ef4444;
-  --end-color: #f87171;
-}
+/* Hover va Active holatlari Tailwind CSS orqali boshqariladi */
 
 .filter-btn::after {
   content: "";
@@ -711,7 +680,6 @@ tbody tr:hover {
 }
 
 .glass-card-premium:hover {
-  transform: translateY(-5px);
   border-color: rgba(99, 102, 241, 0.18);
   box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.12), 
               0 1px 5px rgba(0, 0, 0, 0.01), 
