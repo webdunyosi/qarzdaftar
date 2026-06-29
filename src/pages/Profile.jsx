@@ -104,10 +104,7 @@ export default function Profile() {
 
       <div className="min-h-screen pb-24">
 
-        {/* Header */}
-        <div className="px-4 pt-6 pb-2">
-          <h1 className="text-slate-800 font-bold text-xl">Shaxsiy Kabinet</h1>
-        </div>
+
 
         <div className="px-4 pt-2 space-y-4">
 

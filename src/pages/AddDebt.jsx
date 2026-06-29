@@ -190,15 +190,8 @@ export default function AddDebt() {
       <div className="backdrop-blur flex items-center justify-center p-4 min-h-screen pb-20">
         <div className="w-full max-w-lg glass-card-premium hover-shadow-blue p-6 sm:p-8 rounded-3xl animate-slide-up">
           
-          {/* Header & Back Button */}
+          {/* Header */}
           <div className="flex items-center gap-3 mb-6">
-            <button
-              onClick={() => navigate("/")}
-              className="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full md:hidden flex items-center justify-center transition active:scale-95 cursor-pointer"
-              title="Orqaga"
-            >
-              <i className="fas fa-arrow-left"></i>
-            </button>
             <h2 className="text-xl font-bold text-gray-800">
               {tahrirlanayotganId ? "Qarzni Tahrirlash" : "Yangi Qarz Qo'shish"}
             </h2>
