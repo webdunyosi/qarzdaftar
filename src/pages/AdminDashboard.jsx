@@ -60,6 +60,11 @@ export default function AdminDashboard() {
     onConfirm: null
   });
   const [activeSubPage, setActiveSubPage] = useState("settings"); // "settings" or "payments"
+  const [datePickerModal, setDatePickerModal] = useState({
+    isOpen: false,
+    username: "",
+    date: ""
+  });
 
   useEffect(() => {
     setActiveSubPage("settings");
@@ -354,6 +359,7 @@ export default function AdminDashboard() {
       return;
     }
     toast.success("To'lov muddati muvaffaqiyatli o'zgartirildi!");
+    setDatePickerModal({ isOpen: false, username: "", date: "" });
     loadAllData();
   };
 
@@ -1405,17 +1411,27 @@ export default function AdminDashboard() {
                           </div>
 
                           {/* Subscription Control Actions */}
-                          <div className="flex flex-wrap items-center gap-4 pt-3 md:pt-0 border-t border-slate-100 md:border-t-0 justify-between">
+                          <div className="flex flex-wrap items-end gap-4 pt-3 md:pt-0 border-t border-slate-100 md:border-t-0 justify-between">
                             
                             {/* Expiry Date picker */}
                             <div className="flex flex-col gap-1">
                               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">To'lov muddati</label>
-                              <input
-                                type="date"
-                                value={u.subscriptionUntil ? new Date(u.subscriptionUntil).toISOString().split("T")[0] : ""}
-                                onChange={(e) => handleUpdateSubscriptionDate(u.username, e.target.value)}
-                                className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-slate-700 shadow-sm"
-                              />
+                              <button
+                                onClick={() => setDatePickerModal({
+                                  isOpen: true,
+                                  username: u.username,
+                                  date: u.subscriptionUntil ? new Date(u.subscriptionUntil).toISOString().split("T")[0] : ""
+                                })}
+                                className="p-2.5 bg-slate-50 hover:bg-slate-100/50 border border-slate-200 rounded-xl text-xs font-bold outline-none cursor-pointer text-slate-700 shadow-sm flex items-center gap-2 transition"
+                              >
+                                <i className="far fa-calendar-alt text-blue-600 text-sm"></i>
+                                <span>
+                                  {u.subscriptionUntil 
+                                    ? new Date(u.subscriptionUntil).toLocaleDateString("uz-UZ", { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+                                    : "Belgilanmagan"
+                                  }
+                                </span>
+                              </button>
                             </div>
 
                             {/* Toggles */}
@@ -1724,6 +1740,57 @@ export default function AdminDashboard() {
                   className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition active:scale-95 text-xs cursor-pointer shadow-md shadow-red-500/10"
                 >
                   O'chirish
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* Date Picker Modal */}
+        {datePickerModal.isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white border border-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-scale-up relative">
+              
+              {/* Close Button */}
+              <button
+                onClick={() => setDatePickerModal({ isOpen: false, username: "", date: "" })}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg cursor-pointer"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 mb-4">
+                <i className="far fa-calendar-alt text-blue-600"></i>
+                To'lov muddatini tanlash
+              </h3>
+
+              <p className="text-xs text-slate-500 mb-3.5 font-semibold">
+                Sotuvchi: <span className="capitalize text-slate-700 font-extrabold">{datePickerModal.username}</span>
+              </p>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Muddati (Sana)</label>
+                <input
+                  type="date"
+                  value={datePickerModal.date}
+                  onChange={(e) => setDatePickerModal(prev => ({ ...prev, date: e.target.value }))}
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm text-slate-700 cursor-pointer"
+                />
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setDatePickerModal({ isOpen: false, username: "", date: "" })}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition active:scale-95 text-xs cursor-pointer"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  onClick={() => handleUpdateSubscriptionDate(datePickerModal.username, datePickerModal.date)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition active:scale-95 text-xs cursor-pointer shadow-md shadow-blue-500/10"
+                >
+                  Saqlash
                 </button>
               </div>
 
