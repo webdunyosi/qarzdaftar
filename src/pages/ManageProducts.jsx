@@ -51,9 +51,6 @@ export default function ManageProducts() {
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingValue, setEditingValue] = useState("");
 
-  const [sellerTypes, setSellerTypes] = useState([]);
-  const [newTypeName, setNewTypeName] = useState("");
-
   useEffect(() => {
     const userStr = sessionStorage.getItem("currentUser");
     if (!userStr) {
@@ -76,15 +73,6 @@ export default function ManageProducts() {
       const defaults = getProductSuggestionsDefault(user.type);
       setProducts(defaults.products);
     }
-
-    // Load all seller types from API
-    const loadTypes = async () => {
-      const res = await api.get("/seller-types");
-      if (!res.error) {
-        setSellerTypes(res);
-      }
-    };
-    loadTypes();
   }, [navigate]);
 
   // Save current products list to localStorage
@@ -138,55 +126,15 @@ export default function ManageProducts() {
     toast.success("Mahsulot nomi yangilandi!");
   };
 
-  // Add new seller type
-  const handleAddType = async (e) => {
-    e.preventDefault();
-    if (!newTypeName.trim()) return;
-    if (sellerTypes.includes(newTypeName.trim())) {
-      toast.error("Bunday sotuvchi turi allaqachon mavjud!");
-      return;
-    }
-
-    const res = await api.post("/seller-types", { name: newTypeName.trim() });
-    if (res.error) {
-      toast.error(res.error);
-      return;
-    }
-
-    toast.success("Yangi tur muvaffaqiyatli qo'shildi!");
-    setNewTypeName("");
-    // Reload types
-    const updatedTypes = await api.get("/seller-types");
-    if (!updatedTypes.error) {
-      setSellerTypes(updatedTypes);
-    }
-  };
-
-  // Delete a seller type
-  const handleDeleteType = async (typeName) => {
-    if (window.confirm(`"${typeName}" sotuvchi turini o'chirib tashlamoqchimisiz?`)) {
-      const res = await api.delete(`/seller-types/${typeName}`);
-      if (res.error) {
-        toast.error(res.error);
-        return;
-      }
-      toast.success("Sotuvchi turi o'chirildi!");
-      // Reload types
-      const updatedTypes = await api.get("/seller-types");
-      if (!updatedTypes.error) {
-        setSellerTypes(updatedTypes);
-      }
-    }
-  };
 
   const currentIcon = getProductSuggestionsDefault(loggedUser?.type).icon;
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-24 pt-4 px-4 md:px-8 animate-fade-in">
-      <div className="max-w-xl mx-auto space-y-6">
+    <div className="min-h-screen bg-transparent pb-24 pt-4 px-0 sm:px-4 animate-fade-in">
+      <div className="max-w-xl mx-auto space-y-5">
         
         {/* Header */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 px-4 sm:px-0">
           <button
             type="button"
             onClick={() => navigate("/profile")}
@@ -195,24 +143,15 @@ export default function ManageProducts() {
             <i className="fas fa-arrow-left pointer-events-none"></i>
           </button>
           <div>
-            <h1 className="text-xl font-black text-slate-800 tracking-tight">
-              Mahsulotlar va turlar
+            <h1 className="text-xl font-black text-slate-800 tracking-tight capitalize">
+              {loggedUser?.type || "Mahsulotlar"}
             </h1>
-            <p className="text-xs text-slate-400">Mahsulot ro'yxatlari va do'kon sohalarini boshqarish</p>
+            <p className="text-xs text-slate-400">Mahsulot ro'yxatlarini boshqarish</p>
           </div>
         </div>
 
         {/* Section 1: Product names management */}
-        <div className="glass-card-premium rounded-3xl p-6 shadow-sm border border-white bg-white/80 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h2 className="text-base font-extrabold text-slate-800 flex items-center gap-2">
-              <i className={`fas ${currentIcon} text-blue-500`}></i>
-              Mahsulot nomlarini boshqarish
-            </h2>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-600 border border-blue-100 rounded-full px-2.5 py-1">
-              {loggedUser?.type || "Kiyim-kechak"}
-            </span>
-          </div>
+        <div className="card-mobile-fullscreen rounded-none sm:rounded-3xl px-4 py-3 sm:p-6 space-y-4 animate-slide-up">
 
           {/* Add product form */}
           <form onSubmit={handleAddProduct} className="flex gap-2">
@@ -234,7 +173,7 @@ export default function ManageProducts() {
           </form>
 
           {/* Products list */}
-          <div className="space-y-2 mt-2 max-h-[300px] overflow-y-auto pr-1">
+          <div className="space-y-2 mt-2 max-h-[calc(100vh-270px)] overflow-y-auto pr-1">
             {products.length === 0 ? (
               <p className="text-center text-slate-400 py-6 text-sm">Hali mahsulotlar qo'shilmagan</p>
             ) : (
@@ -286,52 +225,6 @@ export default function ManageProducts() {
             )}
           </div>
         </div>
-
-        {/* Section 2: Manage Seller Types */}
-        <div className="glass-card-premium rounded-3xl p-6 shadow-sm border border-white bg-white/80 space-y-4">
-          <div className="pb-3 border-b border-slate-100">
-            <h2 className="text-base font-extrabold text-slate-800 flex items-center gap-2">
-              <i className="fas fa-store text-blue-500"></i>
-              Sotuvchi sohalari (Turlari)
-            </h2>
-            <p className="text-[10px] text-slate-400 mt-0.5">Sotuvchilar ro'yxatdan o'tishi uchun do'kon turlari</p>
-          </div>
-
-          {/* Add seller type form */}
-          <form onSubmit={handleAddType} className="flex gap-2">
-            <input
-              type="text"
-              className="flex-1 glass-input py-2 text-sm"
-              value={newTypeName}
-              onChange={(e) => setNewTypeName(e.target.value)}
-              placeholder="Yangi do'kon turi nomi"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 rounded-xl text-sm transition cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <i className="fas fa-plus"></i>
-              Qo'shish
-            </button>
-          </form>
-
-          {/* Seller types list */}
-          <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-1">
-            {sellerTypes.map((type, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-2xl bg-white border border-slate-100/80 shadow-sm animate-slide-up">
-                <span className="text-slate-700 font-semibold text-sm">{type}</span>
-                <button
-                  onClick={() => handleDeleteType(type)}
-                  className="w-8 h-8 text-red-500 hover:bg-red-50 rounded-lg flex items-center justify-center cursor-pointer transition"
-                >
-                  <i className="fas fa-trash-alt text-xs"></i>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
       </div>
     </div>
   );

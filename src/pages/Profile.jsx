@@ -110,13 +110,10 @@ export default function Profile() {
               <h2 className="text-slate-800 font-extrabold text-xl capitalize truncate">
                 {currentUser?.username || "Mehmon"}
               </h2>
-              <p className="text-blue-600 text-xs font-bold uppercase tracking-wider mt-0.5">
-                {currentUser?.role === "admin" ? "Tizim Administratori" : "Operator / Foydalanuvchi"}
-              </p>
               <div className="mt-2 inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded-full px-3 py-1 text-blue-600">
-                <i className="fas fa-shield-alt text-[9px]"></i>
+                <i className={`fas ${currentUser?.role === "admin" ? "fa-user-shield" : "fa-store"} text-[10px]`}></i>
                 <span className="text-[10px] font-bold uppercase tracking-wider">
-                  {currentUser?.role || "user"}
+                  {currentUser?.role === "admin" ? "Admin" : currentUser?.role === "seller" ? "Sotuvchi" : currentUser?.role || "user"}
                 </span>
               </div>
             </div>
