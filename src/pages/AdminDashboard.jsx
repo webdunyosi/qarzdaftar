@@ -350,6 +350,16 @@ export default function AdminDashboard() {
     setConfirmModal(prev => ({ ...prev, isOpen: false }));
   };
 
+  const getRemainingDays = (dateStr) => {
+    if (!dateStr) return null;
+    const expiryDate = new Date(dateStr);
+    const today = new Date();
+    expiryDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    const diffTime = expiryDate.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
   const handleUpdateSubscriptionDate = async (username, dateStr) => {
     const res = await api.put(`/users/${username}`, {
       subscriptionUntil: dateStr ? new Date(dateStr) : null
@@ -1400,6 +1410,31 @@ export default function AdminDashboard() {
                                     Faol (Paid)
                                   </span>
                                 )}
+
+                                {/* Remaining days badge */}
+                                {!u.isBlocked && u.subscriptionUntil && (() => {
+                                  const rem = getRemainingDays(u.subscriptionUntil);
+                                  if (rem === null) return null;
+                                  if (rem > 0) {
+                                    return (
+                                      <span className="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full text-[9px] font-bold">
+                                        {rem} kun qoldi
+                                      </span>
+                                    );
+                                  } else if (rem === 0) {
+                                    return (
+                                      <span className="bg-amber-50 text-amber-600 border border-amber-100 px-2 py-0.5 rounded-full text-[9px] font-bold animate-pulse">
+                                        Bugun oxirgi kun!
+                                      </span>
+                                    );
+                                  } else {
+                                    return (
+                                      <span className="bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full text-[9px] font-bold">
+                                        {Math.abs(rem)} kun o'tdi
+                                      </span>
+                                    );
+                                  }
+                                })()}
                               </div>
                               
                               <p className="text-slate-400 text-xs font-semibold mt-1 flex items-center gap-1.5">
