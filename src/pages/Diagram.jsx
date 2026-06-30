@@ -37,9 +37,13 @@ const LABELS = [
   "Yakshanba",
 ];
 
+const LABELS_SHORT = ["Du", "Se", "Chor", "Pay", "Jum", "Sha", "Yak"];
+
 export default function Diagram() {
   const navigate = useNavigate();
-  const [chartData, setChartData] = useState({ labels: LABELS, datasets: [] });
+  const isMobile = window.innerWidth < 640;
+  const currentLabels = isMobile ? LABELS_SHORT : LABELS;
+  const [chartData, setChartData] = useState({ labels: currentLabels, datasets: [] });
 
   useEffect(() => {
     // Authenticate
@@ -130,7 +134,7 @@ export default function Diagram() {
       }
 
       setChartData({
-        labels: LABELS,
+        labels: currentLabels,
         datasets,
       });
     };
@@ -181,8 +185,10 @@ export default function Diagram() {
         ticks: {
           color: "#64748b",
           font: {
-            size: window.innerWidth < 640 ? 10 : 13,
+            size: window.innerWidth < 640 ? 11 : 13,
           },
+          maxRotation: 0,
+          minRotation: 0,
         },
         grid: { color: "rgba(0, 0, 0, 0.05)" },
       },
@@ -209,7 +215,7 @@ export default function Diagram() {
             <span className="chart-title">Qarzlar Statistikasi</span>
           </div>
           <div className="chart-desc">
-            Tovarlar bo'yicha kunlik qo'shilgan qarzlar statistikasi (real-time).
+            Tovarlar bo'yicha kunlik qo'shilgan qarzlar statistikasi.
           </div>
           <div style={{ height: "350px", position: "relative" }}>
             <Line data={chartData} options={options} />
