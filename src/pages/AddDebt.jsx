@@ -283,6 +283,41 @@ export default function AddDebt() {
               </div>
             </div>
 
+            {/* Sana & To'lash muddati side-by-side */}
+            <div className="flex gap-3">
+              {/* Sana */}
+              <div className="form-group relative flex-1">
+                <label className="text-gray-700 font-semibold mb-1 text-sm block">Sana</label>
+                <div className="relative">
+                  <input
+                    className="w-full glass-input"
+                    type="date"
+                    value={sana}
+                    onChange={(e) => setSana(e.target.value)}
+                    onFocus={(e) => e.target.scrollIntoView({ behavior: "smooth", block: "center" })}
+                    required
+                  />
+                  <i className="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                </div>
+              </div>
+
+              {/* To'lash muddati */}
+              <div className="form-group relative flex-1">
+                <label className="text-gray-700 font-semibold mb-1 text-sm block">To'lash Muddati</label>
+                <div className="relative">
+                  <input
+                    className="w-full glass-input"
+                    type="date"
+                    value={tolashMuddati}
+                    onChange={(e) => setTolashMuddati(e.target.value)}
+                    onFocus={(e) => e.target.scrollIntoView({ behavior: "smooth", block: "center" })}
+                    required
+                  />
+                  <i className="fas fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                </div>
+              </div>
+            </div>
+
             {/* Mahsulot nomi (select with default dynamic values based on seller type) */}
             <div className="form-group relative flex flex-col gap-2">
               <label className="text-gray-700 font-semibold mb-1 text-sm block">Mahsulot Nomi</label>
@@ -330,39 +365,6 @@ export default function AddDebt() {
                   required
                 />
                 <i className="fas fa-money-bill-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-              </div>
-            </div>
-
-            {/* Sana & To'lash muddati side-by-side */}
-            <div className="flex gap-3">
-              {/* Sana */}
-              <div className="form-group relative flex-1">
-                <label className="text-gray-700 font-semibold mb-1 text-sm block">Sana</label>
-                <div className="relative">
-                  <input
-                    className="w-full glass-input"
-                    type="date"
-                    value={sana}
-                    onChange={(e) => setSana(e.target.value)}
-                    required
-                  />
-                  <i className="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                </div>
-              </div>
-
-              {/* To'lash muddati */}
-              <div className="form-group relative flex-1">
-                <label className="text-gray-700 font-semibold mb-1 text-sm block">To'lash Muddati</label>
-                <div className="relative">
-                  <input
-                    className="w-full glass-input"
-                    type="date"
-                    value={tolashMuddati}
-                    onChange={(e) => setTolashMuddati(e.target.value)}
-                    required
-                  />
-                  <i className="fas fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                </div>
               </div>
             </div>
 
