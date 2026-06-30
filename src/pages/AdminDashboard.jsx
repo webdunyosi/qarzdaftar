@@ -1633,7 +1633,7 @@ export default function AdminDashboard() {
                             <i className="fab fa-telegram-plane text-sm"></i>
                           </div>
                           <div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telegram</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telegrami</p>
                             <p className="font-bold text-slate-700 text-sm mt-0.5">@AlimardonToshpulatov</p>
                           </div>
                         </div>
@@ -1649,7 +1649,7 @@ export default function AdminDashboard() {
                             <i className="fas fa-phone text-sm"></i>
                           </div>
                           <div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telefon</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telefoni</p>
                             <p className="font-bold text-slate-700 text-sm mt-0.5">+998 (50) 950-95-45</p>
                           </div>
                         </div>

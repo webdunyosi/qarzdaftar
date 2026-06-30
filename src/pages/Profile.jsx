@@ -287,6 +287,45 @@ export default function Profile() {
                 ))}
               </div>
 
+              {/* Developer Contact Card */}
+              <div className="glass-card-premium hover-shadow-blue rounded-3xl p-2 animate-slide-up">
+                <div className="divide-y divide-slate-50">
+                  <a
+                    href="https://t.me/AlimardonToshpulatov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-slate-50/80 transition group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i className="fab fa-telegram-plane text-base"></i>
+                      </div>
+                      <div>
+                        <p className="text-slate-700 font-semibold text-sm transition-colors duration-200 group-hover:text-blue-600">Dasturchi Telegrami</p>
+                        <p className="text-slate-400 text-xs mt-0.5 font-medium">@AlimardonToshpulatov</p>
+                      </div>
+                    </div>
+                    <i className="fas fa-chevron-right text-slate-300 text-xs flex-shrink-0 transition-transform duration-200 group-hover:text-blue-500"></i>
+                  </a>
+
+                  <a
+                    href="tel:+998509509545"
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-slate-50/80 transition group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i className="fas fa-phone text-base"></i>
+                      </div>
+                      <div>
+                        <p className="text-slate-700 font-semibold text-sm transition-colors duration-200 group-hover:text-blue-600">Dasturchi Telefoni</p>
+                        <p className="text-slate-400 text-xs mt-0.5 font-medium">+998 (50) 950-95-45</p>
+                      </div>
+                    </div>
+                    <i className="fas fa-chevron-right text-slate-300 text-xs flex-shrink-0 transition-transform duration-200 group-hover:text-blue-500"></i>
+                  </a>
+                </div>
+              </div>
+
               {/* Logout Button */}
               <button
                 onClick={handleLogout}
