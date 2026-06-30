@@ -833,7 +833,7 @@ export default function Dashboard() {
                       );
 
                     return (
-                      <tr key={q.id} className="hover:bg-gray-50/50 transition">
+                      <tr key={q._id || q.id} className="hover:bg-gray-50/50 transition">
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-9 w-9 bg-gray-100 rounded-full flex items-center justify-center">

@@ -270,7 +270,7 @@ export default function Home() {
               <div className="space-y-3">
                 {todayDue.map((q) => (
                   <div
-                    key={q.id}
+                    key={q._id || q.id}
                     className="glass-card-premium hover-shadow-blue rounded-2xl p-4 flex items-center gap-3 border-l-4 border-l-amber-500"
                   >
                     <div className="w-10 h-10 bg-amber-50 border border-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -332,7 +332,7 @@ export default function Home() {
                     );
                     return (
                       <div
-                        key={q.id}
+                        key={q._id || q.id}
                         className="glass-card-premium hover-shadow-red rounded-2xl p-4 flex items-center gap-3 border-l-4 border-l-rose-500"
                       >
                         <div className="w-10 h-10 bg-rose-50 border border-rose-100 rounded-xl flex items-center justify-center flex-shrink-0">
