@@ -216,14 +216,6 @@ export default function Diagram() {
           </div>
         </div>
       </div>
-      <div className="flex justify-center mt-6 md:hidden">
-        <Link
-          to="/"
-          className="text-indigo-600 hover:text-indigo-700 hover:underline text-lg font-semibold flex items-center gap-2"
-        >
-          <i className="fas fa-arrow-left"></i> Asosiy sahifaga qaytish
-        </Link>
-      </div>
     </div>
   );
 }
