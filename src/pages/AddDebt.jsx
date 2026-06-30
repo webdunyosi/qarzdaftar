@@ -240,17 +240,17 @@ export default function AddDebt() {
   return (
     <div>
       <div className="main-background"></div>
-      <div className="backdrop-blur flex items-center justify-center p-4 min-h-screen pb-20">
-        <div className="w-full max-w-lg glass-card-premium hover-shadow-blue p-6 sm:p-8 rounded-3xl animate-slide-up">
+      <div className="backdrop-blur flex items-start sm:items-center justify-center p-0 sm:p-4 min-h-screen pb-16 sm:pb-20 pt-2 sm:pt-0">
+        <div className="w-full max-w-lg card-mobile-fullscreen px-5 py-4 sm:p-8 rounded-none sm:rounded-3xl animate-slide-up">
           
           {/* Header */}
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-4">
             <h2 className="text-xl font-bold text-gray-800">
               {tahrirlanayotganId ? "Qarzni Tahrirlash" : "Yangi Qarz Qo'shish"}
             </h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Mijoz ismi */}
             <div className="form-group relative">
               <label className="text-gray-700 font-semibold mb-1 text-sm block">Mijoz Ismi</label>
@@ -333,33 +333,36 @@ export default function AddDebt() {
               </div>
             </div>
 
-            {/* Sana */}
-            <div className="form-group relative">
-              <label className="text-gray-700 font-semibold mb-1 text-sm block">Sana</label>
-              <div className="relative">
-                <input
-                  className="w-full glass-input"
-                  type="date"
-                  value={sana}
-                  onChange={(e) => setSana(e.target.value)}
-                  required
-                />
-                <i className="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            {/* Sana & To'lash muddati side-by-side */}
+            <div className="flex gap-3">
+              {/* Sana */}
+              <div className="form-group relative flex-1">
+                <label className="text-gray-700 font-semibold mb-1 text-sm block">Sana</label>
+                <div className="relative">
+                  <input
+                    className="w-full glass-input"
+                    type="date"
+                    value={sana}
+                    onChange={(e) => setSana(e.target.value)}
+                    required
+                  />
+                  <i className="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                </div>
               </div>
-            </div>
 
-            {/* To'lash muddati */}
-            <div className="form-group relative">
-              <label className="text-gray-700 font-semibold mb-1 text-sm block">To'lash Muddati</label>
-              <div className="relative">
-                <input
-                  className="w-full glass-input"
-                  type="date"
-                  value={tolashMuddati}
-                  onChange={(e) => setTolashMuddati(e.target.value)}
-                  required
-                />
-                <i className="fas fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+              {/* To'lash muddati */}
+              <div className="form-group relative flex-1">
+                <label className="text-gray-700 font-semibold mb-1 text-sm block">To'lash Muddati</label>
+                <div className="relative">
+                  <input
+                    className="w-full glass-input"
+                    type="date"
+                    value={tolashMuddati}
+                    onChange={(e) => setTolashMuddati(e.target.value)}
+                    required
+                  />
+                  <i className="fas fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                </div>
               </div>
             </div>
 
