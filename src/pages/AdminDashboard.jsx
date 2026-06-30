@@ -1002,10 +1002,10 @@ export default function AdminDashboard() {
                     onChange={(e) => setNotificationType(e.target.value)}
                     className="w-full p-3 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold appearance-none cursor-pointer"
                   >
-                    <option value="info">Info (Ko'k)</option>
-                    <option value="pay">Muvaffaqiyatli (Yashil)</option>
-                    <option value="edit">Ogohlantirish (Sariq)</option>
-                    <option value="delete">Muhim / Xavf (Qizil)</option>
+                    <option value="info">Info</option>
+                    <option value="pay">Muvaffaqiyatli</option>
+                    <option value="edit">Ogohlantirish</option>
+                    <option value="delete">Muhim / Xavf</option>
                   </select>
                 </div>
                 <div>
