@@ -1590,7 +1590,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Logout Button */}
-                  <div className="pt-2">
+                  <div className="pt-2 hidden md:block">
                     <button
                       onClick={handleLogout}
                       className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-3.5 rounded-2xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-sm border border-red-100 shadow-sm"
@@ -1656,6 +1656,17 @@ export default function AdminDashboard() {
                         <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
                       </a>
                     </div>
+                  </div>
+
+                  {/* Logout Button (Mobile Only) */}
+                  <div className="pt-2 block md:hidden">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-3.5 rounded-2xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-sm border border-red-100 shadow-sm"
+                    >
+                      <i className="fas fa-sign-out-alt"></i>
+                      Tizimdan chiqish
+                    </button>
                   </div>
                 </div>
 
