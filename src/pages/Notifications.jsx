@@ -3,6 +3,15 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../utils/api";
 
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) 
+    ? `https://www.youtube.com/embed/${match[2]}`
+    : null;
+};
+
 export default function Notifications() {
   const navigate = useNavigate();
   const [logs, setLogs] = useState([]);
@@ -128,12 +137,23 @@ export default function Notifications() {
                         )}
                         {log.videoUrl && (
                           <div className="mt-2.5 rounded-2xl overflow-hidden border border-slate-100/80 shadow-sm max-w-full">
-                            <video
-                              src={log.videoUrl}
-                              controls
-                              className="w-full h-auto max-h-48 bg-black"
-                              onError={(e) => { console.log("Video load error:", e); }}
-                            />
+                            {getYouTubeEmbedUrl(log.videoUrl) ? (
+                              <iframe
+                                src={getYouTubeEmbedUrl(log.videoUrl)}
+                                title="YouTube video player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                className="w-full h-auto aspect-video rounded-2xl bg-black"
+                              ></iframe>
+                            ) : (
+                              <video
+                                src={log.videoUrl}
+                                controls
+                                className="w-full h-auto max-h-48 bg-black"
+                                onError={(e) => { console.log("Video load error:", e); }}
+                              />
+                            )}
                           </div>
                         )}
                         <p className="text-slate-400 text-[11px] font-medium mt-1.5 flex items-center gap-1">

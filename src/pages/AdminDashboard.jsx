@@ -1,9 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../utils/api";
+
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) 
+    ? `https://www.youtube.com/embed/${match[2]}`
+    : null;
+};
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const formRef = useRef(null);
   
   // Lists loaded from localStorage
   const [users, setUsers] = useState([]);
@@ -40,6 +51,14 @@ export default function AdminDashboard() {
   const [notificationType, setNotificationType] = useState("info");
   const [notificationImageUrl, setNotificationImageUrl] = useState("");
   const [notificationVideoUrl, setNotificationVideoUrl] = useState("");
+  const [editingLogId, setEditingLogId] = useState(null);
+  const [previewLog, setPreviewLog] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null
+  });
   
   // Admin own profile change state
   const [adminUsername, setAdminUsername] = useState("Admin");
@@ -114,16 +133,20 @@ export default function AdminDashboard() {
     loadAllData();
   };
 
-  const handleDeleteType = async (typeToDelete) => {
-    if (window.confirm(`"${typeToDelete}" turini o'chirib tashlamoqchimisiz?`)) {
-      const res = await api.delete(`/seller-types/${typeToDelete}`);
-      if (res.error) {
-        toast.error(res.error);
-        return;
+  const handleDeleteType = (typeToDelete) => {
+    showConfirm(
+      `"${typeToDelete}" turini o'chirib tashlamoqchimisiz?`,
+      "Sohani o'chirish",
+      async () => {
+        const res = await api.delete(`/seller-types/${typeToDelete}`);
+        if (res.error) {
+          toast.error(res.error);
+          return;
+        }
+        toast.success("Sotuvchi turi o'chirildi!");
+        loadAllData();
       }
-      toast.success("Sotuvchi turi o'chirildi!");
-      loadAllData();
-    }
+    );
   };
   
   // Add new seller
@@ -180,49 +203,141 @@ export default function AdminDashboard() {
   };
   
   // Delete seller
-  const handleDeleteSeller = async (username) => {
+  const handleDeleteSeller = (username) => {
     if (username.toLowerCase() === "admin") {
       toast.error("Admin hisobini o'chirib bo'lmaydi!");
       return;
     }
     
-    if (window.confirm(`${username} sotuvchini tizimdan butunlay o'chirib tashlamoqchimisiz?`)) {
-      const res = await api.delete(`/users/${username}`);
-      if (res.error) {
-        toast.error(res.error);
-        return;
+    showConfirm(
+      `${username} sotuvchini tizimdan butunlay o'chirib tashlamoqchimisiz?`,
+      "Sotuvchini o'chirish",
+      async () => {
+        const res = await api.delete(`/users/${username}`);
+        if (res.error) {
+          toast.error(res.error);
+          return;
+        }
+        toast.success("Sotuvchi muvaffaqiyatli o'chirildi!");
+        loadAllData();
       }
-      toast.success("Sotuvchi muvaffaqiyatli o'chirildi!");
-      loadAllData();
-    }
+    );
   };
   
-  // Send Broadcast notification
+  // Send/Update Broadcast notification
   const handleSendNotification = async (e) => {
     e.preventDefault();
     if (!notificationText.trim()) {
       toast.error("Iltimos, bildirishnoma matnini kiriting!");
       return;
     }
-    
-    const res = await api.post("/logs", {
-      text: `📢 ${notificationText.trim()}`,
-      type: notificationType,
-      seller: null, // global/broadcasted to all
-      imageUrl: notificationImageUrl.trim() || null,
-      videoUrl: notificationVideoUrl.trim() || null
-    });
 
-    if (res.error) {
-      toast.error(res.error);
-      return;
+    const textToSend = notificationText.trim().startsWith("📢 ") 
+      ? notificationText.trim() 
+      : `📢 ${notificationText.trim()}`;
+
+    if (editingLogId) {
+      const res = await api.put(`/logs/${editingLogId}`, {
+        text: textToSend,
+        type: notificationType,
+        imageUrl: notificationImageUrl.trim() || null,
+        videoUrl: notificationVideoUrl.trim() || null
+      });
+
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
+      
+      setEditingLogId(null);
+      setNotificationText("");
+      setNotificationImageUrl("");
+      setNotificationVideoUrl("");
+      toast.success("Bildirishnoma muvaffaqiyatli tahrirlandi!");
+      loadAllData();
+    } else {
+      const res = await api.post("/logs", {
+        text: textToSend,
+        type: notificationType,
+        seller: null, // global/broadcasted to all
+        imageUrl: notificationImageUrl.trim() || null,
+        videoUrl: notificationVideoUrl.trim() || null
+      });
+
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
+      
+      setNotificationText("");
+      setNotificationImageUrl("");
+      setNotificationVideoUrl("");
+      toast.success("Bildirishnoma barcha sotuvchilarga yuborildi!");
+      loadAllData();
     }
-    
+  };
+
+  const handleDeleteLog = (logId) => {
+    showConfirm(
+      "Ushbu bildirishnomani tizimdan o'chirib tashlamoqchimisiz?",
+      "Bildirishnomani o'chirish",
+      async () => {
+        const res = await api.delete(`/logs/${logId}`);
+        if (res.error) {
+          toast.error(res.error);
+          return;
+        }
+        toast.success("Bildirishnoma muvaffaqiyatli o'chirildi!");
+        loadAllData();
+      }
+    );
+  };
+
+  const startEditLog = (log) => {
+    setEditingLogId(log._id || log.id);
+    const cleanText = log.text.startsWith("📢 ") ? log.text.substring(2) : log.text;
+    setNotificationText(cleanText);
+    setNotificationType(log.type || "info");
+    setNotificationImageUrl(log.imageUrl || "");
+    setNotificationVideoUrl(log.videoUrl || "");
+    setTimeout(() => {
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
+  const cancelEditLog = () => {
+    setEditingLogId(null);
     setNotificationText("");
     setNotificationImageUrl("");
     setNotificationVideoUrl("");
-    toast.success("Bildirishnoma barcha sotuvchilarga yuborildi!");
-    loadAllData();
+  };
+
+  const getLogIcon = (type) => {
+    switch (type) {
+      case "add": return { icon: "fa-plus-circle", bg: "bg-green-100 text-green-600" };
+      case "edit": return { icon: "fa-edit", bg: "bg-yellow-100 text-yellow-600" };
+      case "delete": return { icon: "fa-trash-alt", bg: "bg-red-100 text-red-600" };
+      case "pay": return { icon: "fa-check-circle", bg: "bg-blue-100 text-blue-600" };
+      default: return { icon: "fa-info-circle", bg: "bg-gray-100 text-gray-600" };
+    }
+  };
+
+  const showConfirm = (message, title, onConfirm) => {
+    setConfirmModal({
+      isOpen: true,
+      title: title || "Tasdiqlash",
+      message,
+      onConfirm: () => {
+        onConfirm();
+        closeConfirm();
+      }
+    });
+  };
+
+  const closeConfirm = () => {
+    setConfirmModal(prev => ({ ...prev, isOpen: false }));
   };
   
   // Change Admin Profile
@@ -286,7 +401,7 @@ export default function AdminDashboard() {
   const totalSellersCount = users.filter(u => u.role === "seller").length;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="max-w-6xl mx-auto px-4 pt-6 pb-24 md:pb-6">
         
         {/* Tab Content 0: Bosh sahifa (Dashboard overview) */}
         {activeTab === "dashboard" && (
@@ -379,7 +494,16 @@ export default function AdminDashboard() {
                           </div>
                           <p className="font-semibold text-slate-700 text-sm break-words">{b.text}</p>
                         </div>
-                        <span className="text-slate-400 text-[10px] whitespace-nowrap mt-1 font-semibold flex-shrink-0">{b.time}</span>
+                        <div className="flex items-center gap-2 flex-shrink-0 mt-1">
+                          <button
+                            onClick={() => setPreviewLog(b)}
+                            className="w-6 h-6 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md flex items-center justify-center transition cursor-pointer border border-blue-100/40"
+                            title="Sotuvchi ko'rinishida ko'rish"
+                          >
+                            <i className="fas fa-eye text-[9px]"></i>
+                          </button>
+                          <span className="text-slate-400 text-[10px] whitespace-nowrap font-semibold">{b.time}</span>
+                        </div>
                       </div>
                       {b.imageUrl && (
                         <div className="ml-11 rounded-lg overflow-hidden border border-slate-100 shadow-sm max-w-xs">
@@ -394,12 +518,23 @@ export default function AdminDashboard() {
                       )}
                       {b.videoUrl && (
                         <div className="ml-11 rounded-lg overflow-hidden border border-slate-100 shadow-sm max-w-xs">
-                          <video
-                            src={b.videoUrl}
-                            controls
-                            className="w-full h-auto max-h-24 bg-black"
-                            onError={(e) => { console.log("Video preview load error:", e); }}
-                          />
+                          {getYouTubeEmbedUrl(b.videoUrl) ? (
+                            <iframe
+                              src={getYouTubeEmbedUrl(b.videoUrl)}
+                              title="YouTube video player"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                              className="w-full h-auto aspect-video rounded-lg bg-black"
+                            ></iframe>
+                          ) : (
+                            <video
+                              src={b.videoUrl}
+                              controls
+                              className="w-full h-auto max-h-24 bg-black"
+                              onError={(e) => { console.log("Video preview load error:", e); }}
+                            />
+                          )}
                         </div>
                       )}
                     </div>
@@ -989,10 +1124,10 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Form */}
-            <div className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md md:col-span-2">
+            <div ref={formRef} className="bg-blue-50/85 border border-blue-100/70 backdrop-blur-md rounded-2xl p-5 shadow-md md:col-span-2">
               <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <i className="fas fa-bullhorn text-blue-600"></i>
-                Sotuvchilarga Bildirishnoma Yuborish
+                {editingLogId ? "Bildirishnomani Tahrirlash" : "Sotuvchilarga Bildirishnoma Yuborish"}
               </h2>
               <form onSubmit={handleSendNotification} className="space-y-4">
                 <div>
@@ -1040,13 +1175,24 @@ export default function AdminDashboard() {
                     />
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-blue-500/10 flex items-center justify-center gap-2"
-                >
-                  <i className="fas fa-paper-plane"></i>
-                  Bildirishnomani tarqatish (Send)
-                </button>
+                <div className="flex gap-3 pt-2">
+                  {editingLogId && (
+                    <button
+                      type="button"
+                      onClick={cancelEditLog}
+                      className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-sm"
+                    >
+                      Bekor qilish
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-blue-500/10 flex items-center justify-center gap-2 text-sm"
+                  >
+                    <i className={editingLogId ? "fas fa-save" : "fas fa-paper-plane"}></i>
+                    {editingLogId ? "O'zgarishlarni Saqlash" : "Bildirishnomani tarqatish (Send)"}
+                  </button>
+                </div>
               </form>
             </div>
 
@@ -1076,15 +1222,51 @@ export default function AdminDashboard() {
                       )}
                       {b.videoUrl && (
                         <div className="rounded-lg overflow-hidden border border-slate-100 shadow-sm max-w-full">
-                          <video
-                            src={b.videoUrl}
-                            controls
-                            className="w-full h-auto max-h-32 bg-black"
-                            onError={(e) => { console.log("Video preview load error:", e); }}
-                          />
+                          {getYouTubeEmbedUrl(b.videoUrl) ? (
+                            <iframe
+                              src={getYouTubeEmbedUrl(b.videoUrl)}
+                              title="YouTube video player"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                              className="w-full h-auto aspect-video rounded-lg bg-black"
+                            ></iframe>
+                          ) : (
+                            <video
+                              src={b.videoUrl}
+                              controls
+                              className="w-full h-auto max-h-32 bg-black"
+                              onError={(e) => { console.log("Video preview load error:", e); }}
+                            />
+                          )}
                         </div>
                       )}
-                      <p className="text-slate-400 text-[10px] text-right mt-0.5">{b.time}</p>
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100/50">
+                        <span className="text-slate-400 text-[9px] font-semibold">{b.time}</span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => setPreviewLog(b)}
+                            className="w-7 h-7 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center transition border border-blue-100/40 cursor-pointer"
+                            title="Sotuvchi ko'rinishida ko'rish"
+                          >
+                            <i className="fas fa-eye text-[10px]"></i>
+                          </button>
+                          <button
+                            onClick={() => startEditLog(b)}
+                            className="w-7 h-7 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center transition border border-amber-100/40 cursor-pointer"
+                            title="Tahrirlash"
+                          >
+                            <i className="fas fa-pen text-[10px]"></i>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteLog(b._id || b.id)}
+                            className="w-7 h-7 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center transition border border-rose-100/40 cursor-pointer"
+                            title="O'chirish"
+                          >
+                            <i className="fas fa-trash-alt text-[10px]"></i>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   ))
                 )}
@@ -1284,6 +1466,124 @@ export default function AdminDashboard() {
                     </a>
                   </div>
                 </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* Preview Modal */}
+        {previewLog && (() => {
+          const ic = getLogIcon(previewLog.type);
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+              <div className="bg-white border border-blue-100 w-full max-w-md rounded-3xl p-6 shadow-2xl animate-scale-up relative">
+                
+                {/* Close Button */}
+                <button
+                  onClick={() => setPreviewLog(null)}
+                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg cursor-pointer"
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+
+                <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 mb-4">
+                  <i className="fas fa-eye text-blue-600"></i>
+                  Sotuvchilar uchun ko'rinishi
+                </h3>
+
+                {/* Mock Notification bubble */}
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 shadow-sm flex items-start gap-4">
+                  <div className={`w-9 h-9 ${ic.bg} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                    <i className={`fas ${ic.icon} text-sm`}></i>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-slate-700 text-sm font-semibold break-words whitespace-pre-wrap">{previewLog.text}</p>
+                    {previewLog.imageUrl && (
+                      <div className="mt-2.5 rounded-2xl overflow-hidden border border-slate-100 shadow-sm max-w-full">
+                        <img
+                          src={previewLog.imageUrl}
+                          alt="Notification attachment"
+                          className="w-full h-auto object-cover max-h-48"
+                          onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/600x400?text=Rasm+yuklanmadi"; }}
+                        />
+                      </div>
+                    )}
+                    {previewLog.videoUrl && (
+                      <div className="mt-2.5 rounded-2xl overflow-hidden border border-slate-100 shadow-sm max-w-full">
+                        {getYouTubeEmbedUrl(previewLog.videoUrl) ? (
+                          <iframe
+                            src={getYouTubeEmbedUrl(previewLog.videoUrl)}
+                            title="YouTube video player"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                            className="w-full h-auto aspect-video rounded-2xl bg-black"
+                          ></iframe>
+                        ) : (
+                          <video
+                            src={previewLog.videoUrl}
+                            controls
+                            className="w-full h-auto max-h-48 bg-black"
+                          />
+                        )}
+                      </div>
+                    )}
+                    <p className="text-slate-400 text-[11px] font-medium mt-1.5 flex items-center gap-1">
+                      <i className="far fa-clock"></i>
+                      <span>{previewLog.time || "Bugun"}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <button
+                    onClick={() => setPreviewLog(null)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition shadow-md shadow-blue-500/10 cursor-pointer text-sm"
+                  >
+                    Yopish
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Custom Confirmation Modal */}
+        {confirmModal.isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white border border-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-scale-up text-center relative">
+              
+              {/* Alert Warning Trash Icon */}
+              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-red-100/60 shadow-sm text-2xl">
+                <i className="fas fa-trash-alt animate-pulse"></i>
+              </div>
+
+              {/* Title */}
+              <h3 className="text-lg font-bold text-slate-800 leading-tight">
+                {confirmModal.title}
+              </h3>
+
+              {/* Message Description */}
+              <p className="text-slate-500 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed">
+                {confirmModal.message}
+              </p>
+
+              {/* Buttons */}
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={closeConfirm}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition active:scale-95 text-xs cursor-pointer"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  onClick={confirmModal.onConfirm}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition active:scale-95 text-xs cursor-pointer shadow-md shadow-red-500/10"
+                >
+                  O'chirish
+                </button>
               </div>
 
             </div>
