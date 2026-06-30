@@ -59,6 +59,11 @@ export default function AdminDashboard() {
     message: "",
     onConfirm: null
   });
+  const [activeSubPage, setActiveSubPage] = useState("settings"); // "settings" or "payments"
+
+  useEffect(() => {
+    setActiveSubPage("settings");
+  }, [activeTab]);
   
   // Admin own profile change state
   const [adminUsername, setAdminUsername] = useState("Admin");
@@ -338,6 +343,50 @@ export default function AdminDashboard() {
 
   const closeConfirm = () => {
     setConfirmModal(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const handleUpdateSubscriptionDate = async (username, dateStr) => {
+    const res = await api.put(`/users/${username}`, {
+      subscriptionUntil: dateStr ? new Date(dateStr) : null
+    });
+    if (res.error) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success("To'lov muddati muvaffaqiyatli o'zgartirildi!");
+    loadAllData();
+  };
+
+  const handleToggleBlock = (user) => {
+    const actionText = user.isBlocked ? "blokdan chiqarmoqchimisiz" : "bloklamoqchimisiz";
+    showConfirm(
+      `Sotuvchi "${user.username}" ni rostdan ham ${actionText}?`,
+      user.isBlocked ? "Blokdan chiqarish" : "Sotuvchini bloklash",
+      async () => {
+        const res = await api.put(`/users/${user.username}`, {
+          isBlocked: !user.isBlocked
+        });
+        if (res.error) {
+          toast.error(res.error);
+          return;
+        }
+        toast.success(user.isBlocked ? "Sotuvchi blokdan chiqarildi!" : "Sotuvchi bloklandi!");
+        loadAllData();
+      }
+    );
+  };
+
+  const handleTogglePaymentStatus = async (user) => {
+    const newStatus = user.paymentStatus === "paid" ? "unpaid" : "paid";
+    const res = await api.put(`/users/${user.username}`, {
+      paymentStatus: newStatus
+    });
+    if (res.error) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success("To'lov holati o'zgartirildi!");
+    loadAllData();
   };
   
   // Change Admin Profile
@@ -1279,196 +1328,288 @@ export default function AdminDashboard() {
         {/* Tab Content 4: Admin own profile change */}
         {activeTab === "settings" && (
           <div className="w-full mx-auto space-y-5 animate-slide-up pb-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              {/* Left Column: Profile Card & Logout */}
-              <div className="space-y-5">
-                {/* Profile Card */}
-                <div className="bg-white border border-slate-100/80 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] transition-all duration-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      {/* Rounded avatar with blue/indigo gradient */}
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 relative">
-                        <i className="fas fa-user-shield text-2xl"></i>
-                        {/* Active green tick indicator */}
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full flex items-center justify-center text-[10px] text-white">
-                          <i className="fas fa-check"></i>
-                        </div>
-                      </div>
+            {activeSubPage === "payments" ? (
+              /* Payments Control View */
+              <div className="space-y-6">
+                
+                {/* Header Row */}
+                <div className="bg-white border border-slate-100/80 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setActiveSubPage("settings")}
+                      className="w-10 h-10 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-600 rounded-xl flex items-center justify-center transition active:scale-95 cursor-pointer"
+                      title="Orqaga"
+                    >
+                      <i className="fas fa-arrow-left text-sm"></i>
+                    </button>
+                    <div>
+                      <h2 className="text-lg font-bold text-slate-800">Sotuvchilar oylik to'lovi va faolligi</h2>
+                      <p className="text-slate-400 text-xs font-semibold mt-0.5">Oylik to'lov muddati va bloklarni boshqarish</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sellers subscription list */}
+                <div className="space-y-4">
+                  {users
+                    .filter(u => u.role === "seller")
+                    .map(u => {
+                      const isExpired = u.subscriptionUntil && new Date(u.subscriptionUntil) < new Date();
+                      const isUnpaid = u.paymentStatus === "unpaid" || isExpired;
                       
-                      <div>
-                        <h3 className="font-bold text-slate-800 text-lg capitalize leading-tight">
-                          {adminUsername || "Admin"}
-                        </h3>
-                        <p className="text-slate-400 text-xs font-semibold mt-0.5">
-                          +998 (90) 123-45-67
-                        </p>
-                        <div className="mt-1.5">
-                          <span className="bg-blue-50 text-blue-600 border border-blue-100/50 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase tracking-wider">
-                            Super Admin
-                          </span>
+                      return (
+                        <div key={u._id || u.id} className={`bg-white border p-5 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:shadow-md transition duration-200 flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                          u.isBlocked 
+                            ? "border-red-100 bg-red-50/20" 
+                            : isUnpaid 
+                            ? "border-amber-100 bg-amber-50/20"
+                            : "border-slate-100"
+                        }`}>
+                          
+                          {/* Seller Details */}
+                          <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold flex-shrink-0 shadow-sm ${
+                              u.isBlocked 
+                                ? "bg-red-100 text-red-600 border border-red-200" 
+                                : isUnpaid 
+                                ? "bg-amber-100 text-amber-600 border border-amber-200"
+                                : "bg-blue-100 text-blue-600 border border-blue-200"
+                            }`}>
+                              {u.username[0].toUpperCase()}
+                            </div>
+                            
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-extrabold text-slate-800 text-sm sm:text-base capitalize">{u.username}</h4>
+                                {u.isBlocked ? (
+                                  <span className="bg-red-100 text-red-600 border border-red-200 px-2 py-0.5 rounded-full text-[9px] font-bold">
+                                    Bloklangan
+                                  </span>
+                                ) : isUnpaid ? (
+                                  <span className="bg-amber-100 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full text-[9px] font-bold animate-pulse">
+                                    To'lov muddati o'tgan
+                                  </span>
+                                ) : (
+                                  <span className="bg-emerald-100 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded-full text-[9px] font-bold">
+                                    Faol (Paid)
+                                  </span>
+                                )}
+                              </div>
+                              
+                              <p className="text-slate-400 text-xs font-semibold mt-1 flex items-center gap-1.5">
+                                <i className="fas fa-phone-alt"></i> {u.phone || "Telefon kiritilmagan"}
+                                <span className="text-slate-200">|</span>
+                                <i className="fas fa-store"></i> {u.type || "Do'kon turi yo'q"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Subscription Control Actions */}
+                          <div className="flex flex-wrap items-center gap-4 pt-3 md:pt-0 border-t border-slate-100 md:border-t-0 justify-between">
+                            
+                            {/* Expiry Date picker */}
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">To'lov muddati</label>
+                              <input
+                                type="date"
+                                value={u.subscriptionUntil ? new Date(u.subscriptionUntil).toISOString().split("T")[0] : ""}
+                                onChange={(e) => handleUpdateSubscriptionDate(u.username, e.target.value)}
+                                className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-slate-700 shadow-sm"
+                              />
+                            </div>
+
+                            {/* Toggles */}
+                            <div className="flex items-center gap-2.5">
+                              {/* Payment status toggle */}
+                              <button
+                                onClick={() => handleTogglePaymentStatus(u)}
+                                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-sm border ${
+                                  u.paymentStatus === "paid"
+                                    ? "bg-green-50 hover:bg-green-100 text-green-600 border-green-200"
+                                    : "bg-amber-50 hover:bg-amber-100 text-amber-600 border-amber-200"
+                                }`}
+                                title="To'lov holatini o'zgartirish"
+                              >
+                                <i className={`fas ${u.paymentStatus === "paid" ? "fa-check-circle" : "fa-exclamation-circle"}`}></i>
+                                <span>{u.paymentStatus === "paid" ? "To'langan" : "To'lanmagan"}</span>
+                              </button>
+
+                              {/* Block toggle button */}
+                              <button
+                                onClick={() => handleToggleBlock(u)}
+                                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-sm border ${
+                                  u.isBlocked
+                                    ? "bg-red-600 hover:bg-red-700 text-white border-red-600 shadow-red-500/10"
+                                    : "bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200"
+                                }`}
+                                title={u.isBlocked ? "Blokdan chiqarish" : "Bloklash"}
+                              >
+                                <i className={`fas ${u.isBlocked ? "fa-user-check" : "fa-user-alt-slash"}`}></i>
+                                <span>{u.isBlocked ? "Ochish" : "Bloklash"}</span>
+                              </button>
+                            </div>
+
+                          </div>
+
+                        </div>
+                      );
+                    })}
+                </div>
+
+              </div>
+            ) : (
+              /* Main Settings Layout */
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* Left Column: Profile Card & Logout */}
+                <div className="space-y-5">
+                  {/* Profile Card */}
+                  <div className="bg-white border border-slate-100/80 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] transition-all duration-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        {/* Rounded avatar with blue/indigo gradient */}
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 relative">
+                          <i className="fas fa-user-shield text-2xl"></i>
+                          {/* Active green tick indicator */}
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full flex items-center justify-center text-[10px] text-white">
+                            <i className="fas fa-check"></i>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-bold text-slate-800 text-lg capitalize leading-tight">
+                            {adminUsername || "Admin"}
+                          </h3>
+                          <div className="mt-1.5">
+                            <span className="bg-blue-50 text-blue-600 border border-blue-100/50 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 w-fit">
+                              <i className="fas fa-crown text-[8px]"></i>
+                              Admin
+                            </span>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Edit Toggle Icon Button */}
+                      <button
+                        onClick={() => setShowEditForm(!showEditForm)}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center border transition cursor-pointer ${
+                          showEditForm 
+                            ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10" 
+                            : "bg-slate-50 border-slate-200/60 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                        }`}
+                        title="Tahrirlash"
+                      >
+                        <i className="fas fa-edit text-sm"></i>
+                      </button>
                     </div>
 
-                    {/* Edit Toggle Icon Button */}
+                    {/* Collapsible Edit form */}
+                    {showEditForm && (
+                      <div className="mt-5 pt-5 border-t border-slate-100 animate-slide-down">
+                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Profilni Tahrirlash</h4>
+                        <form onSubmit={handleUpdateAdminProfile} className="space-y-4">
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Admin Logini</label>
+                            <input
+                              type="text"
+                              value={adminUsername}
+                              onChange={(e) => setAdminUsername(e.target.value)}
+                              className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Yangi Parol</label>
+                            <input
+                              type="password"
+                              placeholder="Yangi admin parolini kiriting"
+                              value={adminPassword}
+                              onChange={(e) => setAdminPassword(e.target.value)}
+                              className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
+                            />
+                          </div>
+                          <button
+                            type="submit"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-md shadow-blue-500/10 text-sm"
+                          >
+                            O'zgarishlarni saqlash
+                          </button>
+                        </form>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Logout Button */}
+                  <div className="pt-2">
                     <button
-                      onClick={() => setShowEditForm(!showEditForm)}
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center border transition cursor-pointer ${
-                        showEditForm 
-                          ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10" 
-                          : "bg-slate-50 border-slate-200/60 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                      }`}
-                      title="Tahrirlash"
+                      onClick={handleLogout}
+                      className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-3.5 rounded-2xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-sm border border-red-100 shadow-sm"
                     >
-                      <i className="fas fa-edit text-sm"></i>
+                      <i className="fas fa-sign-out-alt"></i>
+                      Tizimdan chiqish
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right Column: Navigation & Developer Contacts */}
+                <div className="space-y-5">
+                  {/* Navigation / Control Card */}
+                  <div className="bg-white border border-slate-100/80 rounded-3xl p-2 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
+                    <button
+                      onClick={() => setActiveSubPage("payments")}
+                      className="w-full flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition cursor-pointer text-left group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center transition-colors group-hover:bg-amber-100">
+                          <i className="fas fa-credit-card text-sm"></i>
+                        </div>
+                        <span className="font-bold text-slate-700 text-sm">Oylik to'lovlar boshqaruvi</span>
+                      </div>
+                      <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
                     </button>
                   </div>
 
-                  {/* Collapsible Edit form */}
-                  {showEditForm && (
-                    <div className="mt-5 pt-5 border-t border-slate-100 animate-slide-down">
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Profilni Tahrirlash</h4>
-                      <form onSubmit={handleUpdateAdminProfile} className="space-y-4">
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Admin Logini</label>
-                          <input
-                            type="text"
-                            value={adminUsername}
-                            onChange={(e) => setAdminUsername(e.target.value)}
-                            className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
-                          />
+                  {/* Developer Contact Card */}
+                  <div className="bg-white border border-slate-100/80 rounded-3xl p-2 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
+                    <div className="divide-y divide-slate-50">
+                      <a
+                        href="https://t.me/AlimardonToshpulatov"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center transition-colors group-hover:bg-sky-100">
+                            <i className="fab fa-telegram-plane text-sm"></i>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telegram</p>
+                            <p className="font-bold text-slate-700 text-sm mt-0.5">@AlimardonToshpulatov</p>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Yangi Parol</label>
-                          <input
-                            type="password"
-                            placeholder="Yangi admin parolini kiriting"
-                            value={adminPassword}
-                            onChange={(e) => setAdminPassword(e.target.value)}
-                            className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
-                          />
+                        <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
+                      </a>
+                      
+                      <a
+                        href="tel:+998509509545"
+                        className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center transition-colors group-hover:bg-teal-100">
+                            <i className="fas fa-phone text-sm"></i>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telefon</p>
+                            <p className="font-bold text-slate-700 text-sm mt-0.5">+998 (50) 950-95-45</p>
+                          </div>
                         </div>
-                        <button
-                          type="submit"
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-md shadow-blue-500/10 text-sm"
-                        >
-                          O'zgarishlarni saqlash
-                        </button>
-                      </form>
+                        <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
+                      </a>
                     </div>
-                  )}
-                </div>
-
-                {/* Logout Button */}
-                <div className="pt-2">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-3.5 rounded-2xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-sm border border-red-100 shadow-sm"
-                  >
-                    <i className="fas fa-sign-out-alt"></i>
-                    Tizimdan chiqish
-                  </button>
-                </div>
-              </div>
-
-              {/* Right Column: Navigation & Developer Contacts */}
-              <div className="space-y-5">
-                {/* Navigation / Control Card */}
-                <div className="bg-white border border-slate-100/80 rounded-3xl p-2 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
-                  <div className="divide-y divide-slate-50">
-                    <button
-                      onClick={() => setSearchParams({ tab: "dashboard" })}
-                      className="w-full flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition cursor-pointer text-left group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center transition-colors group-hover:bg-indigo-100">
-                          <i className="fas fa-chart-pie text-sm"></i>
-                        </div>
-                        <span className="font-bold text-slate-700 text-sm">Bosh sahifa (Statistika)</span>
-                      </div>
-                      <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
-                    </button>
-                    <button
-                      onClick={() => setSearchParams({ tab: "sellers" })}
-                      className="w-full flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition cursor-pointer text-left group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center transition-colors group-hover:bg-blue-100">
-                          <i className="fas fa-users text-sm"></i>
-                        </div>
-                        <span className="font-bold text-slate-700 text-sm">Sotuvchilar boshqaruvi</span>
-                      </div>
-                      <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
-                    </button>
-                    <button
-                      onClick={() => setSearchParams({ tab: "all_debts" })}
-                      className="w-full flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition cursor-pointer text-left group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center transition-colors group-hover:bg-green-100">
-                          <i className="fas fa-list-alt text-sm"></i>
-                        </div>
-                        <span className="font-bold text-slate-700 text-sm">Barcha qarzlar boshqaruvi</span>
-                      </div>
-                      <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
-                    </button>
-                    <button
-                      onClick={() => setSearchParams({ tab: "notifications" })}
-                      className="w-full flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition cursor-pointer text-left group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center transition-colors group-hover:bg-purple-100">
-                          <i className="fas fa-bullhorn text-sm"></i>
-                        </div>
-                        <span className="font-bold text-slate-700 text-sm">Bildirishnomalar boshqaruvi</span>
-                      </div>
-                      <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
-                    </button>
                   </div>
                 </div>
 
-                {/* Developer Contact Card */}
-                <div className="bg-white border border-slate-100/80 rounded-3xl p-2 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
-                  <div className="divide-y divide-slate-50">
-                    <a
-                      href="https://t.me/AlimardonToshpulatov"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center transition-colors group-hover:bg-sky-100">
-                          <i className="fab fa-telegram-plane text-sm"></i>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telegram</p>
-                          <p className="font-bold text-slate-700 text-sm mt-0.5">@AlimardonToshpulatov</p>
-                        </div>
-                      </div>
-                      <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
-                    </a>
-                    
-                    <a
-                      href="tel:+998509509545"
-                      className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center transition-colors group-hover:bg-teal-100">
-                          <i className="fas fa-phone text-sm"></i>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telefon</p>
-                          <p className="font-bold text-slate-700 text-sm mt-0.5">+998 (50) 950-95-45</p>
-                        </div>
-                      </div>
-                      <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
-                    </a>
-                  </div>
-                </div>
               </div>
-
-            </div>
+            )}
           </div>
         )}
 
