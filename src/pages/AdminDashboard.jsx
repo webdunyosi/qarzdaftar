@@ -864,17 +864,20 @@ export default function AdminDashboard() {
               }, {});
 
               const toggleSellerCollapse = (sellerName) => {
-                setCollapsedSellers(prev => ({
-                  ...prev,
-                  [sellerName]: !prev[sellerName]
-                }));
+                setCollapsedSellers(prev => {
+                  const current = prev[sellerName] ?? true;
+                  return {
+                    ...prev,
+                    [sellerName]: !current
+                  };
+                });
               };
 
               return (
                 <div className="space-y-4">
                   {Object.entries(groupedDebts).map(([sellerName, sellerDebts]) => {
                     const totalSum = sellerDebts.reduce((sum, q) => sum + Number(q.qarzMiqdori || q.miqdor || 0), 0);
-                    const isCollapsed = collapsedSellers[sellerName] ?? false;
+                    const isCollapsed = collapsedSellers[sellerName] ?? true;
 
                     return (
                       <div key={sellerName} className="bg-white border border-slate-100/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition">
