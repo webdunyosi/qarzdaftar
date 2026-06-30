@@ -843,4 +843,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 inset 0 1px 0 rgba(255, 255, 255, 0.8),
                 0 20px 40px -15px rgba(59, 130, 246, 0.15);
   }
+}
+
+/* Custom class to slide text input to the right for the fixed +998 code prefix */
+.phone-input-prefix {
+  padding-left: 5rem !important; /* 80px */
 }

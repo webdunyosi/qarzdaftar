@@ -111,19 +111,40 @@ export default function AddDebt() {
   const suggestions = loadProductSuggestions(loggedUser?.type);
   const [mahsulot, setMahsulot] = useState(suggestions.products[0] || "Boshqa");
   const [customProduct, setCustomProduct] = useState("");
+  const getTodayDateString = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const [qarzMiqdori, setQarzMiqdori] = useState("");
-  const [sana, setSana] = useState("");
+  const [sana, setSana] = useState(getTodayDateString());
   const [tolashMuddati, setTolashMuddati] = useState("");
 
   const [tahrirlanayotganId, setTahrirlanayotganId] = useState(null);
 
   // Load editing debt data if passed via location state
   useEffect(() => {
+    const formatPhoneNumber = (phone) => {
+      let cleanPhone = (phone || "").replace(/\D/g, "");
+      if (cleanPhone.startsWith("998")) {
+        cleanPhone = cleanPhone.slice(3);
+      }
+      let formatted = "";
+      if (cleanPhone.length > 0) formatted += cleanPhone.substring(0, 2);
+      if (cleanPhone.length > 2) formatted += " " + cleanPhone.substring(2, 5);
+      if (cleanPhone.length > 5) formatted += " " + cleanPhone.substring(5, 7);
+      if (cleanPhone.length > 7) formatted += " " + cleanPhone.substring(7, 9);
+      return formatted || cleanPhone;
+    };
+
     if (location.state?.editDebt) {
       const qarz = location.state.editDebt;
       setTahrirlanayotganId(qarz.id);
       setMijozIsmi(qarz.mijozIsmi);
-      setTelefon(qarz.telefon);
+      setTelefon(formatPhoneNumber(qarz.telefon));
 
       const userSuggestions = loadProductSuggestions(loggedUser?.type);
       const presetProducts = userSuggestions.products;
@@ -136,14 +157,40 @@ export default function AddDebt() {
       }
 
       setQarzMiqdori(qarz.qarzMiqdori.toLocaleString());
-      setSana(qarz.sana);
-      setTolashMuddati(qarz.tolashMuddati);
+      setSana(qarz.sana ? qarz.sana.substring(0, 10) : getTodayDateString());
+      setTolashMuddati(qarz.tolashMuddati ? qarz.tolashMuddati.substring(0, 10) : "");
     } else if (location.state?.prefill) {
       const { mijozIsmi, telefon } = location.state.prefill;
       setMijozIsmi(mijozIsmi);
-      setTelefon(telefon);
+      setTelefon(formatPhoneNumber(telefon));
     }
   }, [location, loggedUser]);
+
+  // Format phone input on change
+  const handlePhoneChange = (e) => {
+    let val = e.target.value;
+    let digits = val.replace(/\D/g, "");
+    if (digits.startsWith("998")) {
+      digits = digits.slice(3);
+    }
+    if (digits.length > 9) {
+      digits = digits.slice(0, 9);
+    }
+    let formatted = "";
+    if (digits.length > 0) {
+      formatted += digits.substring(0, 2);
+    }
+    if (digits.length > 2) {
+      formatted += " " + digits.substring(2, 5);
+    }
+    if (digits.length > 5) {
+      formatted += " " + digits.substring(5, 7);
+    }
+    if (digits.length > 7) {
+      formatted += " " + digits.substring(7, 9);
+    }
+    setTelefon(formatted || digits);
+  };
 
   // Format amount input as user types
   const handleAmountChange = (e) => {
@@ -176,10 +223,12 @@ export default function AddDebt() {
     try {
       const finalProduct = mahsulot === "Boshqa" ? customProduct || "Boshqa" : mahsulot;
       const parsedAmount = parseFloat(qarzMiqdori.replace(/,/g, ""));
+      const rawPhone = telefon.replace(/\D/g, "");
+      const finalPhone = `+998${rawPhone}`;
 
       const yangiMalumot = {
         mijozIsmi,
-        telefon,
+        telefon: finalPhone,
         mahsulot: finalProduct,
         qarzMiqdori: parsedAmount,
         sana,
@@ -272,14 +321,17 @@ export default function AddDebt() {
               <label className="text-gray-700 font-semibold mb-1 text-sm block">Telefon Raqami</label>
               <div className="relative">
                 <input
-                  className="w-full glass-input"
+                  className="w-full glass-input phone-input-prefix"
                   type="tel"
                   value={telefon}
-                  onChange={(e) => setTelefon(e.target.value)}
-                  placeholder="Telefon raqamini kiriting"
+                  onChange={handlePhoneChange}
+                  placeholder="90 123 45 67"
                   required
                 />
                 <i className="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                <span className="absolute left-10 top-1/2 -translate-y-1/2 text-slate-700 font-semibold text-sm select-none pointer-events-none">
+                  +998
+                </span>
               </div>
             </div>
 
@@ -287,7 +339,7 @@ export default function AddDebt() {
             <div className="flex gap-3">
               {/* Sana */}
               <div className="form-group relative flex-1">
-                <label className="text-gray-700 font-semibold mb-1 text-sm block">Sana</label>
+                <label className="text-gray-700 font-semibold mb-1 text-sm block">Olingan Sana</label>
                 <div className="relative">
                   <input
                     className="w-full glass-input"
