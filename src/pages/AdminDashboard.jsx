@@ -466,7 +466,7 @@ export default function AdminDashboard() {
   const totalSellersCount = users.filter(u => u.role === "seller").length;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pt-6 pb-24 md:pb-6">
+    <div className="max-w-7xl mx-auto px-4 pt-6 pb-24 md:pb-6">
         
         {/* Tab Content 0: Bosh sahifa (Dashboard overview) */}
         {activeTab === "dashboard" && (
@@ -1510,166 +1510,146 @@ export default function AdminDashboard() {
               </div>
             ) : (
               /* Main Settings Layout */
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="w-full mx-auto max-w-7xl space-y-4">
                 
-                {/* Left Column: Profile Card & Logout */}
-                <div className="space-y-5">
-                  {/* Profile Card */}
-                  <div className="bg-white border border-slate-100/80 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] transition-all duration-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        {/* Rounded avatar with blue/indigo gradient */}
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 relative">
-                          <i className="fas fa-user-shield text-2xl"></i>
-                          {/* Active green tick indicator */}
-                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full flex items-center justify-center text-[10px] text-white">
-                            <i className="fas fa-check"></i>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <h3 className="font-bold text-slate-800 text-lg capitalize leading-tight">
-                            {adminUsername || "Admin"}
-                          </h3>
-                          <div className="mt-1.5">
-                            <span className="bg-blue-50 text-blue-600 border border-blue-100/50 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 w-fit">
-                              <i className="fas fa-crown text-[8px]"></i>
-                              Admin
-                            </span>
-                          </div>
+                {/* Profile Card */}
+                <div className="bg-white border border-slate-100/80 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] transition-all duration-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      {/* Rounded avatar with blue/indigo gradient */}
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 relative">
+                        <i className="fas fa-user-shield text-2xl"></i>
+                        {/* Active green tick indicator */}
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full flex items-center justify-center text-[10px] text-white">
+                          <i className="fas fa-check"></i>
                         </div>
                       </div>
-
-                      {/* Edit Toggle Icon Button */}
-                      <button
-                        onClick={() => setShowEditForm(!showEditForm)}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center border transition cursor-pointer ${
-                          showEditForm 
-                            ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10" 
-                            : "bg-slate-50 border-slate-200/60 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                        }`}
-                        title="Tahrirlash"
-                      >
-                        <i className="fas fa-edit text-sm"></i>
-                      </button>
+                      
+                      <div>
+                        <h3 className="font-bold text-slate-800 text-lg capitalize leading-tight">
+                          {adminUsername || "Admin"}
+                        </h3>
+                        <div className="mt-1.5">
+                          <span className="bg-blue-50 text-blue-600 border border-blue-100/50 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 w-fit">
+                            <i className="fas fa-crown text-[8px]"></i>
+                            Admin
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Collapsible Edit form */}
-                    {showEditForm && (
-                      <div className="mt-5 pt-5 border-t border-slate-100 animate-slide-down">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Profilni Tahrirlash</h4>
-                        <form onSubmit={handleUpdateAdminProfile} className="space-y-4">
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Admin Logini</label>
-                            <input
-                              type="text"
-                              value={adminUsername}
-                              onChange={(e) => setAdminUsername(e.target.value)}
-                              className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Yangi Parol</label>
-                            <input
-                              type="password"
-                              placeholder="Yangi admin parolini kiriting"
-                              value={adminPassword}
-                              onChange={(e) => setAdminPassword(e.target.value)}
-                              className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
-                            />
-                          </div>
-                          <button
-                            type="submit"
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-md shadow-blue-500/10 text-sm"
-                          >
-                            O'zgarishlarni saqlash
-                          </button>
-                        </form>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Logout Button */}
-                  <div className="pt-2 hidden md:block">
+                    {/* Edit Toggle Icon Button */}
                     <button
-                      onClick={handleLogout}
-                      className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-3.5 rounded-2xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-sm border border-red-100 shadow-sm"
+                      onClick={() => setShowEditForm(!showEditForm)}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center border transition cursor-pointer ${
+                        showEditForm 
+                          ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10" 
+                          : "bg-slate-50 border-slate-200/60 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                      }`}
+                      title="Tahrirlash"
                     >
-                      <i className="fas fa-sign-out-alt"></i>
-                      Tizimdan chiqish
+                      <i className="fas fa-edit text-sm"></i>
                     </button>
                   </div>
+
+                  {/* Collapsible Edit form */}
+                  {showEditForm && (
+                    <div className="mt-5 pt-5 border-t border-slate-100 animate-slide-down">
+                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Profilni Tahrirlash</h4>
+                      <form onSubmit={handleUpdateAdminProfile} className="space-y-4">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Admin Logini</label>
+                          <input
+                            type="text"
+                            value={adminUsername}
+                            onChange={(e) => setAdminUsername(e.target.value)}
+                            className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Yangi Parol</label>
+                          <input
+                            type="password"
+                            placeholder="Yangi admin parolini kiriting"
+                            value={adminPassword}
+                            onChange={(e) => setAdminPassword(e.target.value)}
+                            className="w-full p-3 bg-slate-50 border border-slate-200/60 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm !pl-4"
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-md shadow-blue-500/10 text-sm"
+                        >
+                          O'zgarishlarni saqlash
+                        </button>
+                      </form>
+                    </div>
+                  )}
                 </div>
 
-                {/* Right Column: Navigation & Developer Contacts */}
-                <div className="space-y-5">
-                  {/* Navigation / Control Card */}
-                  <div className="bg-white border border-slate-100/80 rounded-3xl p-2 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
-                    <button
-                      onClick={() => setActiveSubPage("payments")}
-                      className="w-full flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition cursor-pointer text-left group"
+                {/* Navigation / Control Card */}
+                <div className="bg-white border border-slate-100/80 rounded-3xl p-2 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
+                  <button
+                    onClick={() => setActiveSubPage("payments")}
+                    className="w-full flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition cursor-pointer text-left group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center transition-colors group-hover:bg-amber-100">
+                        <i className="fas fa-credit-card text-sm"></i>
+                      </div>
+                      <span className="font-bold text-slate-700 text-sm">Oylik to'lovlar boshqaruvi</span>
+                    </div>
+                    <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
+                  </button>
+                </div>
+
+                {/* Developer Contact Card */}
+                <div className="bg-white border border-slate-100/80 rounded-3xl p-2 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
+                  <div className="divide-y divide-slate-50">
+                    <a
+                      href="https://t.me/AlimardonToshpulatov"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition group"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center transition-colors group-hover:bg-amber-100">
-                          <i className="fas fa-credit-card text-sm"></i>
+                        <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center transition-colors group-hover:bg-sky-100">
+                          <i className="fab fa-telegram-plane text-sm"></i>
                         </div>
-                        <span className="font-bold text-slate-700 text-sm">Oylik to'lovlar boshqaruvi</span>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telegrami</p>
+                          <p className="font-bold text-slate-700 text-sm mt-0.5">@AlimardonToshpulatov</p>
+                        </div>
                       </div>
                       <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
-                    </button>
-                  </div>
-
-                  {/* Developer Contact Card */}
-                  <div className="bg-white border border-slate-100/80 rounded-3xl p-2 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
-                    <div className="divide-y divide-slate-50">
-                      <a
-                        href="https://t.me/AlimardonToshpulatov"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center transition-colors group-hover:bg-sky-100">
-                            <i className="fab fa-telegram-plane text-sm"></i>
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telegrami</p>
-                            <p className="font-bold text-slate-700 text-sm mt-0.5">@AlimardonToshpulatov</p>
-                          </div>
-                        </div>
-                        <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
-                      </a>
-                      
-                      <a
-                        href="tel:+998509509545"
-                        className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center transition-colors group-hover:bg-teal-100">
-                            <i className="fas fa-phone text-sm"></i>
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telefoni</p>
-                            <p className="font-bold text-slate-700 text-sm mt-0.5">+998 (50) 950-95-45</p>
-                          </div>
-                        </div>
-                        <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Logout Button (Mobile Only) */}
-                  <div className="pt-2 block md:hidden">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-3.5 rounded-2xl font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-sm border border-red-100 shadow-sm"
+                    </a>
+                    
+                    <a
+                      href="tel:+998509509545"
+                      className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-2xl transition group"
                     >
-                      <i className="fas fa-sign-out-alt"></i>
-                      Tizimdan chiqish
-                    </button>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center transition-colors group-hover:bg-teal-100">
+                          <i className="fas fa-phone text-sm"></i>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dasturchi Telefoni</p>
+                          <p className="font-bold text-slate-700 text-sm mt-0.5">+998 (50) 950-95-45</p>
+                        </div>
+                      </div>
+                      <i className="fas fa-chevron-right text-xs text-slate-300 transition-transform group-hover:translate-x-1"></i>
+                    </a>
                   </div>
                 </div>
 
+                {/* Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  className="w-full bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 hover:shadow-red-500/25 text-white font-extrabold py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(239,68,68,0.25)] hover:shadow-lg cursor-pointer"
+                >
+                  <i className="fas fa-sign-out-alt text-lg"></i>
+                  Tizimdan chiqish
+                </button>
               </div>
             )}
           </div>

@@ -490,7 +490,7 @@ export default function Dashboard() {
     <div>
       <div className="main-background"></div>
       <div className="backdrop-blur">
-        <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
+        <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
           
           {/* Header section */}
           <div className="hidden md:flex justify-between items-center mb-5 md:mb-8">

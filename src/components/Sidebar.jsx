@@ -103,31 +103,6 @@ export default function Sidebar() {
           );
         })}
       </nav>
-
-      {/* User Info & Logout */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-        <div className="flex items-center gap-3 p-2 bg-white rounded-2xl border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] mb-3">
-          <div className="w-10 h-10 bg-blue-600/90 rounded-xl flex items-center justify-center text-white shadow-md">
-            <i className="fas fa-user-tie text-lg"></i>
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-slate-800 font-bold text-sm truncate capitalize">
-              {currentUser.username}
-            </p>
-            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-              Operator
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-xl font-bold text-xs transition-all duration-200 border border-red-100 active:scale-95 cursor-pointer"
-        >
-          <i className="fas fa-sign-out-alt"></i>
-          Tizimdan chiqish
-        </button>
-      </div>
     </aside>
   );
 }
