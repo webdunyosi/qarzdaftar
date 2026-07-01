@@ -829,7 +829,7 @@ export default function DebtsList() {
                             }
 
                             return (
-                              <div key={item.id} className={`p-3 rounded-xl border-l-4 ${borderClass} shadow-sm space-y-2 animate-fade-in`}>
+                              <div key={item._id || item.id} className={`p-3 rounded-xl border-l-4 ${borderClass} shadow-sm space-y-2 animate-fade-in`}>
                                 {/* Sub-card header */}
                                 <div className="flex justify-between items-center text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
                                   <span>📅 {new Date(item.sana).toLocaleDateString("uz-UZ")}</span>
