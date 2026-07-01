@@ -261,8 +261,22 @@ export default function Diagram() {
           </div>
 
           {/* Daily & Monthly Receipts Cards */}
-          <div className="grid grid-cols-2 gap-4 mt-6">
-            <div className="bg-white border-t-[5px] border-t-emerald-500 rounded-2xl p-4 shadow-md flex flex-col justify-between min-h-[95px] border border-slate-100 hover:shadow-lg transition-shadow duration-200">
+          <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+            <div 
+              className="bg-white"
+              style={{
+                flex: 1,
+                border: "1px solid #f1f5f9",
+                borderLeft: "6px solid #10b981",
+                borderRadius: "1rem",
+                padding: "1rem",
+                boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                minHeight: "95px"
+              }}
+            >
               <span className="text-xl sm:text-2xl font-black text-emerald-600 block">
                 {formatMoney(bugungiTushumlar)}
               </span>
@@ -276,7 +290,21 @@ export default function Diagram() {
               </div>
             </div>
 
-            <div className="bg-white border-t-[5px] border-t-blue-600 rounded-2xl p-4 shadow-md flex flex-col justify-between min-h-[95px] border border-slate-100 hover:shadow-lg transition-shadow duration-200">
+            <div 
+              className="bg-white"
+              style={{
+                flex: 1,
+                border: "1px solid #f1f5f9",
+                borderLeft: "6px solid #2563eb",
+                borderRadius: "1rem",
+                padding: "1rem",
+                boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                minHeight: "95px"
+              }}
+            >
               <span className="text-xl sm:text-2xl font-black text-blue-700 block">
                 {formatMoney(oylikTushumlar)}
               </span>
