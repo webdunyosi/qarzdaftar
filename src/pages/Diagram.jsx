@@ -44,6 +44,16 @@ export default function Diagram() {
   const isMobile = window.innerWidth < 640;
   const currentLabels = isMobile ? LABELS_SHORT : LABELS;
   const [chartData, setChartData] = useState({ labels: currentLabels, datasets: [] });
+  const [bugungiTushumlar, setBugungiTushumlar] = useState(0);
+  const [oylikTushumlar, setOylikTushumlar] = useState(0);
+
+  const formatMoney = (n) => {
+    if (n >= 1000000) {
+      const val = n / 1000000;
+      return (val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)) + " MLN";
+    }
+    return n.toLocaleString("uz-UZ");
+  };
 
   useEffect(() => {
     // Authenticate
@@ -60,6 +70,35 @@ export default function Diagram() {
         console.error("Failed to fetch qarzlar:", qarzlar.error);
         return;
       }
+
+      // Calculate today's and monthly receipts (tushumlar)
+      const todayLocal = new Date();
+      const todayYear = todayLocal.getFullYear();
+      const todayMonth = todayLocal.getMonth();
+      const todayDate = todayLocal.getDate();
+
+      const isToday = (dateStr) => {
+        if (!dateStr) return false;
+        const d = new Date(dateStr);
+        return d.getFullYear() === todayYear && d.getMonth() === todayMonth && d.getDate() === todayDate;
+      };
+
+      const isThisMonth = (dateStr) => {
+        if (!dateStr) return false;
+        const d = new Date(dateStr);
+        return d.getFullYear() === todayYear && d.getMonth() === todayMonth;
+      };
+
+      const dailyPaid = qarzlar
+        .filter((q) => q.status === "To'langan" && isToday(q.updatedAt || q.sana))
+        .reduce((sum, q) => sum + Number(q.qarzMiqdori || 0), 0);
+
+      const monthlyPaid = qarzlar
+        .filter((q) => q.status === "To'langan" && isThisMonth(q.updatedAt || q.sana))
+        .reduce((sum, q) => sum + Number(q.qarzMiqdori || 0), 0);
+
+      setBugungiTushumlar(dailyPaid);
+      setOylikTushumlar(monthlyPaid);
 
       // Process stats
       const weekStats = {};
@@ -207,7 +246,7 @@ export default function Diagram() {
   };
 
   return (
-    <div className="diagram-page min-h-screen pb-10">
+    <div className="diagram-page min-h-screen pb-24">
       <div className="chart-container">
         <div className="chart-content">
           <div className="flex items-center mb-2">
@@ -219,6 +258,37 @@ export default function Diagram() {
           </div>
           <div style={{ height: "350px", position: "relative" }}>
             <Line data={chartData} options={options} />
+          </div>
+
+          {/* Daily & Monthly Receipts Cards */}
+          <div className="grid grid-cols-2 gap-4 mt-6">
+            <div className="bg-white border-t-[5px] border-t-emerald-500 rounded-2xl p-4 shadow-md flex flex-col justify-between min-h-[95px] border border-slate-100 hover:shadow-lg transition-shadow duration-200">
+              <span className="text-xl sm:text-2xl font-black text-emerald-600 block">
+                {formatMoney(bugungiTushumlar)}
+              </span>
+              <div>
+                <span className="text-slate-500 text-[10px] font-extrabold uppercase tracking-wider block leading-tight">
+                  Bugungi tushumlar
+                </span>
+                <span className="text-slate-400 text-[8px] font-bold uppercase tracking-wider block mt-0.5">
+                  (So'm)
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-white border-t-[5px] border-t-blue-600 rounded-2xl p-4 shadow-md flex flex-col justify-between min-h-[95px] border border-slate-100 hover:shadow-lg transition-shadow duration-200">
+              <span className="text-xl sm:text-2xl font-black text-blue-700 block">
+                {formatMoney(oylikTushumlar)}
+              </span>
+              <div>
+                <span className="text-slate-500 text-[10px] font-extrabold uppercase tracking-wider block leading-tight">
+                  Oylik ko'rsatkichlar
+                </span>
+                <span className="text-slate-400 text-[8px] font-bold uppercase tracking-wider block mt-0.5">
+                  (So'm)
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
