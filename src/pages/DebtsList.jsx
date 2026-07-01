@@ -638,7 +638,7 @@ export default function DebtsList() {
                                 Tahrirlash
                               </button>
                               <button
-                                onClick={() => qarzniOchirish(q.id)}
+                                onClick={() => qarzniOchirish(q._id || q.id)}
                                 className="text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition text-xs font-semibold cursor-pointer"
                               >
                                 <i className="fas fa-trash mr-1"></i>
@@ -887,7 +887,7 @@ export default function DebtsList() {
                                      Tahrirlash
                                    </button>
                                    <button
-                                     onClick={() => qarzniOchirish(item.id)}
+                                     onClick={() => qarzniOchirish(item._id || item.id)}
                                      className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full transition text-[11px] font-bold cursor-pointer"
                                    >
                                      <i className="fas fa-trash mr-1"></i>
